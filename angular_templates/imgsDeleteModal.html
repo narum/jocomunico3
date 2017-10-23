@@ -1,0 +1,112 @@
+<!--Delete Imgs Modal-->
+<div class="modal fade" id="imgsDeleteModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="row" id="boxUserConfig" style="background-image: url({{img.Patterns6}})">
+            <div id="header" class="row">
+                <div class="col-xs-10 headerTitle">{{searchArasaacImgsContent.deleteImgsTitle}}</div>
+            </div>
+            <div class="row backgroundUserConfigBox">
+                <div class="row fonsAlert">
+                    
+                    <div class="row">
+                        <div class="col-xs-8" ng-init="searchImgDelete('')">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <input type="text" class="historicInputText" ng-model="imgAACSearch" ng-keyup="searchImgDelete(imgAACSearch);" placeholder="{{searchArasaacImgsContent.placeholder}}"/><br>
+                                </div>
+                                <div class="col-xs-2">
+                                    <div class="buttonsSearchView" ng-click="searchImgDelete(imgAACSearch);">
+                                          <img class="buttonAddImg pull-right" ng-src="img/icons/lupa.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[0].imgPath; deletedImage.id=imgData[0].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[0].imgPath}}" ng-show="imgData[0].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[1].imgPath; deletedImage.id=imgData[1].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[1].imgPath}}" ng-show="imgData[1].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[2].imgPath; deletedImage.id=imgData[2].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[2].imgPath}}" ng-show="imgData[2].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[3].imgPath; deletedImage.id=imgData[3].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[3].imgPath}}" ng-show="imgData[3].imgPath"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[4].imgPath; deletedImage.id=imgData[4].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[4].imgPath}}" ng-show="imgData[4].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[5].imgPath; deletedImage.id=imgData[5].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[5].imgPath}}" ng-show="imgData[5].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[6].imgPath; deletedImage.id=imgData[6].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[6].imgPath}}" ng-show="imgData[6].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCellD" ng-click="deletedImage.path=imgData[7].imgPath; deletedImage.id=imgData[7].ID_Image;
+                                         deleteImage(deletedImage.id, deletedImage.path);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[7].imgPath}}" ng-show="imgData[7].imgPath"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-xs-offset-1">
+                            <div class=" row imgCellLg2">
+                                <img class="img-rounded imgAdapted" ng-src="{{deletedImage.path}}" ng-show="deletedImage.path"/>
+                            </div>
+                            <div class="row">
+                                <span style="display: block; font-size: 0.8em; font-weight: bold; margin-top: 15px;">
+                                    <div ng-if="deletedOK === 'waiting'"></div>
+                                    <div ng-if="deletedOK === 'ok'"><span style="color: green;">{{searchArasaacImgsContent.okdelete}}</span></div>
+                                    <div ng-if="deletedOK === 'error'"><span style="color: crimson;">{{searchArasaacImgsContent.error}}</span></div>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- INSTRUCCIONES -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span style="font-size: 0.9em; line-height: 1.3em; text-align: justify;
+                                      display: block; color: black; margin-top: 30px;">
+                                    <strong>{{searchArasaacImgsContent.important}}</strong><br />
+                                    {{searchArasaacImgsContent.guidedelete}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row dadesUsuariCentre" style="padding-left: 0; padding-right: 0; padding-top: 30px;">
+                        <div class="col-xs-6">
+                        </div>
+                        <div class="col-xs-6">
+                            <button type="reset" class="btn-gray pull-right" data-dismiss="modal">{{searchArasaacImgsContent.exit}}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row verticalMarginTop"></div>
+            </div>
+        </div>
+    </div>
+</div>

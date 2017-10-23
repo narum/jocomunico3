@@ -1,0 +1,82 @@
+<!--Delete Imgs Modal-->
+<div class="modal fade" id="imgsSearchModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="row" id="boxUserConfig" style="background-image: url(img/srcWeb/patterns/pattern4.png)">
+            <div id="header" class="row">
+                <div class="col-xs-10 headerTitle">{{searchArasaacImgsContent.searchImgsTitle}}</div>
+            </div>
+            <div class="row backgroundUserConfigBox">
+                <div class="row fonsAlert">
+                    
+                    <div class="row">
+                        <div class="col-xs-12" ng-init="searchImg('')">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <input type="text" class="historicInputText" ng-model="imgAACSearch" ng-keyup="searchImg(imgAACSearch);" placeholder="{{searchArasaacImgsContent.placeholder}}"/><br>
+                                </div>
+                                <div class="col-xs-2">
+                                    <div class="buttonsSearchView" ng-click="searchImg(imgAACSearch);">
+                                          <img class="buttonAddImg pull-right" ng-src="img/icons/lupa.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[0].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[0].imgPath}}" ng-show="imgData[0].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[1].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[1].imgPath}}" ng-show="imgData[1].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[2].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[2].imgPath}}" ng-show="imgData[2].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[3].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[3].imgPath}}" ng-show="imgData[3].imgPath"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[4].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[4].imgPath}}" ng-show="imgData[4].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[5].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[5].imgPath}}" ng-show="imgData[5].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[6].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[6].imgPath}}" ng-show="imgData[6].imgPath"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="selectImage(imgData[7].imgPath);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[7].imgPath}}" ng-show="imgData[7].imgPath"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                    
+                    <div class="row dadesUsuariCentre" style="padding-left: 0; padding-right: 0; padding-top: 30px;">
+                        <div class="col-xs-6">
+                        </div>
+                        <div class="col-xs-6">
+                            <button type="reset" class="btn-gray pull-right" data-dismiss="modal">{{searchArasaacImgsContent.exit}}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row verticalMarginTop"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+<link rel="stylesheet" type="text/css" href="css/home.css">
+<link rel="stylesheet" type="text/css" href="css/generico.css">
+<link rel="stylesheet" type="text/css" href="libraries/scrollbarPanel.css">
+
+<style>
+    html, body, .container-table{height: 100%;height: 100vh;background: url('{{img.fons}}') no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}
+</style>
+
+<div ng-include="'/angular_templates/logoutModal.html'"></div>
+<!--menu superior dropdown-->
+<div ng-include="'/angular_templates/dropdownMenuBar.html'"></div>
+
+<div id="main-container">
+    
+    <div class="row">
+        <div class="col-xs-6 col-xs-offset-3 home-logo" ng-click="linkHome();">
+            <img src="img/srcWeb/home/jocomunicologo.png" class="home-logo-img" width="300" />
+            <span class='home-subtitle'>{{text.subtitle}}</span>
+        </div>        
+    </div>
+    
+    <!-- Opcion 4: 2 botones en la columna de la izquierda, 3 botones en la columna central junto con el video y 2 botones en la columna de la derecha -->
+    <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 home-buttons container">
+            <div class="col-xs-3">
+                <div class="row home-button" ng-mouseenter="linkColor('link-2', '#898989', true)"
+                    ng-mouseleave="linkColor('link-2', '#3b93af', false)" ng-click="linkLogin();"
+                    style="margin-bottom: 5px;">
+                   <img ng-src="{{img.button2}}" class="home-button-img" width="120"/>
+                   <span style="color:{{link2color}};" class='home-links'>{{text.login}}</span>
+               </div>    
+                
+                <div class="row home-button" ng-mouseenter="linkColor('link-3', '#898989', true)"
+                    ng-mouseleave="linkColor('link-3', '#edb95d', false)" ng-click="linkCollaborators();">
+                   <img ng-src="{{img.button3}}" class="home-button-img" width="120"/>
+                   <span style="color:{{link3color}};" class='home-links'>{{text.sponsors}}</span>
+               </div>
+                    
+            </div>
+
+            <div class="col-xs-6">
+              <div class="row">
+                <img src="img/srcWeb/home/video.png" style="max-width: 100%; z-index: 1; float: right;" />
+                <div class="home-video-wrapper">
+                    <iframe ng-if="langabbr === 'CA'" src="https://www.youtube.com/embed/AQ5m0ZZO7no" frameborder="0" allowfullscreen></iframe>
+                    <iframe ng-if="langabbr !== 'CA'" src="https://www.youtube.com/embed/iQdy3JVO1J4" frameborder="0" allowfullscreen></iframe>
+                </div>
+              </div>
+
+              <div class="row" style="padding-top:5%;">
+                <div class="col-xs-4" ng-mouseenter="linkColor('link-5', '#898989', true)" ng-mouseleave="linkColor('link-5', '#7cb342', false)" 
+                     ng-click="linkFAQ();" style="padding-left: 2px; padding-right: 2px;">
+                    <img ng-src="{{img.button5}}" class="home-button-img" width="120"/>
+                    <span style="color:{{link5color}};" class='home-links'>{{text.faqtitle}}</span>
+                </div>
+
+                <div class="col-xs-4" ng-mouseenter="linkColor('link-6', '#898989', true)" ng-mouseleave="linkColor('link-6', '#ff6e3d', false)" 
+                     ng-click="linkTutoriales();" style="padding-left: 2px; padding-right: 2px;">
+                    <img ng-src="{{img.button6}}" class="home-button-img" width="120"/>
+                    <span style="color:{{link6color}};" class='home-links'>{{text.tutorialestitle}}</span>
+                </div>
+
+                <div class="col-xs-4" ng-mouseenter="linkColor('link-7', '#898989', true)" ng-mouseleave="linkColor('link-7', '#6fa39a', false)" 
+                     ng-click="linkDownloads();" style="padding-left: 2px; padding-right: 2px;">
+                    <img ng-src="{{img.button7}}" class="home-button-img" width="120"/>
+                    <span style="color:{{link7color}};" class='home-links'>{{text.descargastitle}}</span>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-xs-3">
+
+                <div class="row home-button" ng-mouseenter="linkColor('link-1', '#898989', true)"
+                    ng-mouseleave="linkColor('link-1', '#f0a22e', false)" ng-click="linkAbout();"
+                    style="margin-bottom: 5px;">
+                   <img ng-src="{{img.button1}}" class="home-button-img" width="120"/>
+                   <span style="color:{{link1color}};" class='home-links'>{{text.about}}</span>
+               </div>
+                
+                <div class="row home-button" ng-mouseenter="linkColor('link-4', '#898989', true)"
+                     ng-mouseleave="linkColor('link-4', '#3b93af', false)" ng-click="linkCC();">
+                    <img ng-src="{{img.button4}}" class="home-button-img" width="120"/>
+                    <span style="color:{{link4color}};" class='home-links'>{{text.opensource}}</span>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="{{footerUpdateClass}}" ng-show="showUpdateFooter" ng-click="okUpdates()">
+        <span bind-html-compile="text.updatesPopup"></span>
+    </div>
+    
+    <div class="{{footerclass}}" ng-click="okCookies();">
+        <span bind-html-compile="text.cookiespopup"></span>
+        <span class="closecookiespopup">x</span>
+    </div>
+    
+</div>
+
+
+
+

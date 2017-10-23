@@ -1,0 +1,83 @@
+<!--RecoverBackup Modal-->
+<link rel="stylesheet" type="text/css" href="css/responsiveForm.css">
+<div ng-include="'/angular_templates/infoModal.html'"></div>
+
+<div class="modal fade" id="RecoverBackupModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="row marginModalTopOwl"><img class="img-owl pull-right" src={{img.lowSorpresaFlecha}}/></div>
+        <div class="row" id="boxUserConfig" style="background-image: url(img/srcWeb/patterns/pattern6.png)">
+            <div id="header" class="row">
+                <div class="col-xs-10 headerTitle">{{content.recbtitle}}</div>
+            </div>
+            <div class="row backgroundUserConfigBox">
+              <div class="row infoIconBox" style="float:left;margin-left:10px;margin-top:10px;">
+                <input type="image" class="img-icon" ng-src="/img/icons/info.png" ng-click="toggleInfoModal(content.modalInfoTitle, content.restoreBackupInfo);">
+              </div>
+                <div ng-init="searchAddWord('', 'Tots')" class="fonsAlert row">
+                    <div class="col-xs-5 contentEditWordPadding" style="line-height: 1.3em !important;">
+                      <div class="col-xs-12" style="display: block; position: relative; margin-top: 1vh;">
+                          <div class="col-xs-offset-1 col-xs-11 text-left radioEditWord">
+                                <label id='lpanel' class="radio-inline">
+                                    <input id='panel' type="checkbox" ng-model="panelb" ng-init="panelb=true" />
+                                    <strong>{{content.panelesbackup}}</strong>
+                                </label>
+                          </div>  
+                          <div class="col-xs-offset-1 col-xs-11 text-left radioEditWord">
+                                <label id='lcfg' class="radio-inline">
+                                    <input id='cfg' type="checkbox"  ng-model="cfg" ng-init="cfg=true"/>
+                                    {{content.cfgbackup}}
+                                </label>
+                          </div>
+                        </div>
+                  </div>
+                    <div class="col-xs-7 contentEditWordPadding" style="line-height: 1.3em !important;">
+                        <div class="col-xs-12" style="display: block; position: relative; margin-top: 1vh;">
+                          <div class="col-xs-offset-1 col-xs-11 text-left radioEditWord">
+                              <label id='lfold' class="radio-inline">
+                                  <input id='fold' type="checkbox" ng-disabled="panelb"
+                                  ng-model="folder" ng-init="folder=true" />
+                                  {{content.carpetabackup}}
+                              </label>
+                          </div>
+                          <div class="col-xs-offset-1 col-xs-11 text-left radioEditWord">
+                              <label id='lvoc' class="radio-inline">
+                                  <input id='voc' type="checkbox" ng-disabled="panelb || folder"
+                                  ng-model="voc" ng-init="voc=true"/>
+                                  {{content.vocabulariobackup}}
+                              </label>
+                          </div>
+                          <div class="col-xs-offset-1 col-xs-11 text-left radioEditWord">
+                              <label id='limgrec' class="radio-inline">
+                                  <input type="checkbox" ng-model="images" ng-disabled="panelb || folder || voc"
+                                   ng-init="images=true"/>
+                                  {{content.imagenesbackup}}
+                              </label>
+                          </div>
+                      </div>
+                    </div>
+                    <!-- IMPORTANT -->
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-1">
+                            <span style="font-size: 0.7em; line-height: 1.3em; text-align: justify;
+                                  display: block; color: black; margin-top: 20px;">
+                                <strong>{{searchArasaacImgsContent.important}}</strong><br />
+                                {{content.guide}}
+                                <div ng-if="nocheckbox" style="color: red;"><br />{{content.RPicont}}</div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row dadesUsuariCentre">
+                  <div class="col-xs-6">
+                      <button type="reset" id="recparcial" class="btn-gray"
+                      ng-click="showparcialBackup(images,voc,folder,cfg,panelb,foldername)">{{content.parcial}}</button>
+                  </div>
+                    <div class="col-xs-6">
+                        <button type="reset" class="btn-gray" data-dismiss="modal" ng-click="closeThisDialog(); reloadView();" style="float:right;">{{content.cancel}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row verticalMarginTop"></div>
+    </div>
+</div>

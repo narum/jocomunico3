@@ -1,0 +1,28 @@
+<link rel="stylesheet" type="text/css" href="css/home.css">
+<link rel="stylesheet" type="text/css" href="css/generico.css">
+<link rel="stylesheet" type="text/css" href="css/userConfig.css">
+<link rel="stylesheet" type="text/css" href="css/responsiveForm.css">
+
+<style>
+    html, body, .container-table{height: 100%;height: 100vh;background: url('{{img.fons}}') no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}
+</style>
+
+<!--menu superior dropdown-->
+<div ng-include="'/angular_templates/dropdownMenuBar.html'"></div>
+<div ng-include="'/angular_templates/logoutModal.html'"></div>
+<div ng-include="'/angular_templates/infoModal.html'"></div>
+
+<div class="row">
+    <div class="col-xs-12 home-logo" ng-click="linkHome();">
+        <img src="img/srcWeb/home/tutorials-{{langabbr}}.png" class="section-logo-img" />
+    </div>
+</div>
+
+<div ng-controller="infoCtrl" class="row" style="padding-top:65px;">
+
+  <div ng-repeat="x in videotutoriales" class="col-xs-12 col-sm-6 col-md-4" style="text-align:center;">
+    <iframe ng-src="{{trustSrc(x.Url)}}" frameborder="0" allowfullscreen></iframe>
+    <p>{{x.Descripcion}}</p>
+  </div>
+
+</div>

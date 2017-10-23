@@ -1,0 +1,547 @@
+@charset "UTF-8";
+/* CSS Document */
+@media (max-width:1000px){
+
+    input[type="radio"]{
+        margin: 0px;
+    }
+    html *{
+        font-size: 1.3vw;
+    }
+}
+.folderVerbContainer{
+    padding: 4vh 10vw;
+    height: 100vh;
+    width: 100%;
+}
+.imgAddWordVerbImg{
+    height: 101%;
+    width: 100%;
+    padding: 6%;
+    background-color: white;
+    background-clip: content-box;
+}
+.imgAddWordVerb{
+    height: 101%;
+    width: 100%;
+    padding: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.Sujeto{
+    height: 34%;
+    width: 44%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.paddingPattern{
+    padding: 1.5vh;
+}
+
+.paddingDeletePattern{
+    padding: 3vh 1.5vh 1.5vh 1.5vh;
+}
+
+.no-padding{
+    padding: 0 !important;
+}
+
+.Complemento{
+    height: 34%;
+    width: 33%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.ComplementoPattern2{
+    height: 34%;
+    width: 33%;
+    margin: 1.5vh 1.5vh 1.5vh 0vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.DeletePattern2{
+    height: 34%;
+    width: 16%;
+    margin: 1.5vh 0vh 1.5vh 0vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.Receiver{
+    height: auto;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.Beneficiary{
+    height: 52%;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.Acomp{
+    height: 40%;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.Tool{
+    height: 40%;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.Modo{
+    height: 40%;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.Locativo{
+    height: 47%;
+    width: 38%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.ComplementoDirecto{
+    height: auto;
+    width: 41%;
+    margin: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.FraseEjemplo{
+    height: 17%;
+    width: 100%;
+    padding: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+
+.full-width{
+    width: 100%;
+}
+
+.patternPrepositionText{
+    color: #4c4c4c;
+    font-weight: bold;
+    width: 51%;
+    padding-top: 1vh;
+}
+
+.patternFraseEjemploText{
+    color: #4c4c4c;
+    font-weight: bold;
+    width: 73%;
+    padding-top: 1vh;
+}
+
+.paddingComplementBtn{
+    padding-top: 1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+}
+
+.removePattern{
+    height: 15px !important;
+    width: 15px !important;
+    margin-top: 1.5vh;
+    right: 8%;
+    top: 4.5%;
+    /*max-width: 10%;*/
+    max-width: 18%;
+    height: auto;
+    /*max-height: 10%;*/
+    max-height: 18%;
+    width: auto;
+    z-index: 3;
+    position: absolute;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+.boxEditFeature{
+    width: 100%;
+    margin-left: 3%;
+    margin-right: 5%;
+    height: 4vh;
+    margin-top: 2%;
+    border: none;
+    padding-left: 5px;
+}
+.conjugation{
+    height: 27%;
+    width: 100%;
+    background-color: white;
+    background-clip: content-box;
+}
+.conjugationElement{
+    height: 62%;
+    width: 100%;
+    margin-bottom: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.conjugationImperativoElement{
+    height: 55%;
+    width: 100%;
+    margin-bottom: 1.5vh;
+    background-color: white;
+    background-clip: content-box;
+}
+.addConjugationText{
+    color: #4c4c4c;
+    font-weight: bold;
+    width: 100%;
+}
+.imgAddWordVerbContainer{
+    height: 100%;
+    padding: 1vh;
+}
+.VerbPatternContainer{
+    padding: 1vh;
+}
+.conjugationL{
+    margin-left: 1.5vh;
+}
+.conjugationR{
+    padding-top: 0;
+    padding-bottom: 1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    width: 70%;
+}
+.formasNoPersonales{
+    padding-top: 0;
+    padding-bottom: 1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    width: 54%;
+}
+.imgVerbResponsive {
+    pointer-events: none;
+    display: block;
+    max-width: 31%;
+    height: auto;
+    max-height: 85%;
+    width: auto;
+    top: 44%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    position: relative;
+    z-index: 2;
+}
+.paddingContainerAddVerbImg{
+    height: 70%;
+}
+.buttonAddPhotoVerb{
+    display: block;
+    max-width: 12%;
+    height: auto;
+    max-height: 15%;
+    width: auto;
+    top: 88%;
+    left: 78%;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
+}
+.imgResponsiveConfirmButton{
+    pointer-events: none;
+    display: block;
+    max-width: 70%;
+    height: auto;
+    max-height: 70%;
+    width: auto;
+    top: 4;
+    left: 30;
+    transform: translate(-40%,0%);
+    position: relative;
+    z-index: 2;
+}
+.fullheight{
+    height:100%;
+}
+.midheight{
+    height:58%;
+}
+.quarterheight{
+    height:25%;
+}
+.conjugationHeight{
+    height:80%;
+}
+.verbPatternHeight{
+    height: 73%;
+}
+.addVerbWidth{
+    width: 60%;
+}
+.container-fluid
+{
+    padding-right: 0;
+    padding-left: 0;
+}
+.confirmVerbContainer{
+    height: 20%;
+    padding-top: 1vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
+}
+.paddingConfirmVerb{
+    height: 100%;
+}
+.ButtonAddVerb {
+    margin-top: 8px;
+}
+/* Scroll bar */
+.scrollMenuPanels{
+    height: 100%;
+    margin-top: 5vh;
+    overflow: hidden;
+    position: relative;
+    width: 85%;
+}
+.scrollWidth{
+    width: 85%;
+}
+.addVerb{
+    margin-top: 3vh;
+}
+.addVerbPadding{
+    margin-left: 3vh;
+    margin-top: 3px;
+    padding-left: 1%;
+}
+.VerbContainer{
+    margin-left: 4%;
+}
+
+.buttonAddVerbPattern{
+    background-color:rgba(255, 255, 255, 0.3);
+    width: 95%;
+    height: 10vh;
+    border-radius: 15px;
+    border-color: white;
+    border-style: dashed;
+    line-height: 2.8vh;
+    padding-top: 2.8vh;
+    margin-bottom: 2.5vh;
+    font-size: 10vh;
+    font-weight: 900;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+.buttonAddVerbPattern:hover{
+    background-color:rgba(0, 0, 0, 0.3);
+}
+
+.scrollVerbPattern{
+
+
+    height: 76%;
+    overflow: hidden;
+    margin-top: 5vh;
+    margin-right: 5vh;
+    margin-bottom: 4.5%;
+    margin-left: 5vh;
+}
+
+.scrollbar-dynamic {
+    max-height: 300px;
+    overflow: auto;
+}
+
+.verbPatternBar{
+    width: 95%;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+}
+
+.verbHeaderBar{
+    background-color: white;
+    padding: 1vh;
+}
+
+.verbButtonBar{
+    cursor: pointer;
+}
+
+.arrowVerbBar{
+    margin-top: 0.5vh;
+    height: 2vh;
+    width: auto;
+}
+
+.paddingRight3{
+    padding-right: 5vh;
+}
+
+.paddingDown1 {
+    padding-bottom: 3vh;
+}
+
+.verbContentBar{
+    background-color: transparent;
+}
+.paddingPronominal {
+    padding-top: 0.4vh;
+    padding-left: 27px;
+}
+
+.paddingPronCheckbox {
+    padding-left: 1vh;
+}
+
+.ReqVerb{
+    border-style: solid;
+    border-color: rgb(230,25,25);
+    border-width: 2px;
+}
+
+.ReqImgVerb{
+    border-style: solid;
+    border-color: rgb(230,25,25);
+    border-width: 3px;
+}
+
+.ReqPatternVerb{
+    border-style: solid;
+    border-color: rgb(230,25,25);
+    border-width: 3px;
+}
+
+.deleteP2Button {
+    top: 2%;
+}
+
+.conjugationPadding {
+    padding: 1vh;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.fixText {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.no-margin-left {
+  margin-left: 0 !important;
+}
+
+.margin-prsubj {
+    margin-left: 1.5vh;
+}
+
+.backgroundConfirmVerb{
+    height: 100%;
+}
+
+.ButtonAddVerb{
+    background: -moz-linear-gradient(top, rgba(74, 74, 74,0) 0%, rgba(74, 74, 74,0.20) 20%, rgba(74, 74, 74,0.40) 40%, rgba(74, 74, 74,0.60) 60%, rgba(74, 74, 74,00) 80%, rgba(74, 74, 74,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(74, 74, 74,0)), color-stop(20%,rgba(74, 74, 74,0.20)), color-stop(40%,rgba(74, 74, 74,0.40)), color-stop(60%,rgba(74, 74, 74,0.60)), color-stop(80%,rgba(74, 74, 74,0.80)), color-stop(100%,rgba(74, 74, 74,1)));
+    background: -webkit-linear-gradient(top, rgba(74, 74, 74,0) 0%,rgba(74, 74, 74,0.2) 20%,rgba(74, 74, 74,0.4) 40%,rgba(74, 74, 74,0.6) 60%,rgba(74, 74, 74,0.8) 80%,rgba(74, 74, 74,1) 100%);
+    background: -o-linear-gradient(top, rgba(74, 74, 74,0) 0%,rgba(74, 74, 74,0.2) 20%,rgba(74, 74, 74,0.4) 40%,rgba(74, 74, 74,0.6) 60%,rgba(74, 74, 74,0.8) 80%,rgba(74, 74, 74,1) 100%);
+    background: -ms-linear-gradient(top, rgba(74, 74, 74,0) 0%,rgba(74, 74, 74,0.2) 20%,rgba(74, 74, 74,0.4) 40%,rgba(74, 74, 74,0.6) 60%,rgba(74, 74, 74,0.8) 80%,rgba(74, 74, 74,1) 100%);
+    background: linear-gradient(to bottom, rgba(74, 74, 74,0) 0%,rgba(74, 74, 74,0.2) 20%,rgba(74, 74, 74,0.4) 40%,rgba(74, 74, 74,0.6) 60%,rgba(74, 74, 74,0.8) 80%,rgba(74, 74, 74,1) 100%);
+    height: 25%;
+    color: white;
+    cursor: pointer;
+    background-color: #2d2d2d;
+    max-width: 75%;
+    min-width: 60%;
+    margin: 0 auto;
+}
+.ButtonAddVerb:active{
+    box-shadow: 0px -0px 0px 1px #333;
+    transform: translate(2px, -2px);
+}
+
+.paddingButtonAddVerb{
+    margin-top: 12px;
+}
+
+.paddingButtonAddVerb2{
+    margin-top: 4px;
+}
+
+.paddingTextConfirm{
+    left: 10%;
+    margin-top: 5px;
+}
+.paddingTextConfirm2{
+    left: 9%;
+    margin-top: 5px;
+}
+.paddingImg{
+    padding: 5px;
+}
+
+.headerTitleVerb{
+    color:white;
+    padding-top: 10px;
+}
+.infoIconBoxPatterns {
+    margin: 10px 0px 0px 12px;
+}
+.infoIconBoxVerb{
+    margin: 10px 0px 0px 10px;
+}
+.infoIconBoxConjugations {
+    margin: 10px 0px 0px 12px;
+}
+.addImgPadding{
+    margin-left: 8%;
+}
+.paddingNoPersonales{
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+}
+
+.imgResponsiveVerb {
+    pointer-events: none;
+    display: block;
+    max-width: 80%;
+    height: auto;
+    max-height: 50%;
+    width: auto;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    z-index: 2;
+}
+
+.imgResponsiveVerbPicto {
+    pointer-events: none;
+    display: block;
+    max-width: 40%;
+    height: auto;
+    max-height: 40%;
+    width: auto;
+    top: 66%;
+    left: 40%;
+    transform: translate(-50%,-50%);
+    position: absolute;
+    z-index: 2;
+}

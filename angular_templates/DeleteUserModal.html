@@ -1,0 +1,31 @@
+<!-- Delete User-->
+    <div class="modal fade" id="DeleteUserModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="row marginModalTopOwl"><img class="img-owl pull-right" src={{img.lowDormFlecha}}/></div>
+            <div class="row" id="boxUserConfig" style="background-image: url({{img.Patterns1_12}})">
+                <div id="header" class="row">
+                    <div class="col-xs-10 col-xs-offset-3 headerTitle"></div>
+                </div>
+                <div class="row backgroundUserDataBox">
+                    <div id="EliminarUsuario" class="col-xs-12">
+                        <div class="spacer col-xs-12">
+                            <div class="offset col-xs-10 col-xs-offset-1 verticalMarginTop"
+                                 style="text-align: justify;">
+                                <div class="spacer center-block" bind-html-compile="content.deleteUserText"></div>
+                            </div>
+                            <div class="offset col-xs-10 col-xs-offset-1 verticalMarginBottom" style="margin-top: 20px;">
+                                <div class="col-xs-6" style="text-align: left;">
+                                    <button type="reset" class="btn-lightred" data-dismiss="modal"  ng-click="deleteUser(); logout()">{{content.delete}}</button>
+                                </div>
+                                <div class="col-xs-6" style="text-align: right;">
+                                    <button type="reset" class="btn-turquoise" data-dismiss="modal">{{content.cancel}}</button>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- END Delete User-->

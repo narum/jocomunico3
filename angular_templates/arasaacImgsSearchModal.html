@@ -1,0 +1,145 @@
+<!--Search ARASAAC Imgs Modal-->
+<div class="modal fade" id="arasaacImgsSearchModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="row" id="boxUserConfig" style="background-image: url({{img.Patterns6}})">
+            <div id="header" class="row">
+                <div class="col-xs-10 headerTitle">{{searchArasaacImgsContent.searchTitle}}</div>
+            </div>
+            <div class="row backgroundUserConfigBox">
+                <div class="row fonsAlert">
+                    
+                    <div ng-if="internetOn" class="row">
+                        <div class="col-xs-8" ng-init="searchImgArasaac('', 'color')">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <input type="text" class="historicInputText" ng-model="imgAACSearch" ng-keyup="searchImgArasaac(imgAACSearch, typeImgAACSearch);" placeholder="{{searchArasaacImgsContent.placeholder}}"/><br>
+                                </div>
+                                <div class="col-xs-2">
+                                    <div class="buttonsSearchView" ng-click="searchImgArasaac(imgAACSearch, typeImgAACSearch);">
+                                          <img class="buttonAddImg pull-right" ng-src="img/icons/lupa.png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row radioText">
+                                <form role="form" class="text-center col-xs-12" name="SearchImgForm" ng-init="typeImgAACSearch='color'">
+                                    <div class="col-xs-6 text-left">
+                                        <label class="radio-inline">
+                                            <input type="radio" ng-model="typeImgAACSearch" ng-click="searchImgArasaac(imgAACSearch, typeImgAACSearch);" value="color"/>
+                                            {{searchArasaacImgsContent.color}}
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-6 text-left">
+                                        <label class="radio-inline">
+                                            <input type="radio" ng-model="typeImgAACSearch" ng-click="searchImgArasaac(imgAACSearch, typeImgAACSearch);" value="bw"/>
+                                            {{searchArasaacImgsContent.bw}}
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[0].imagePNGURL; addedImage.name=imgData[0].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[0].imagePNGURL}}" ng-show="imgData[0].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[1].imagePNGURL; addedImage.name=imgData[1].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[1].imagePNGURL}}" ng-show="imgData[1].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[2].imagePNGURL; addedImage.name=imgData[2].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[2].imagePNGURL}}" ng-show="imgData[2].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[3].imagePNGURL; addedImage.name=imgData[3].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[3].imagePNGURL}}" ng-show="imgData[3].imagePNGURL"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[4].imagePNGURL; addedImage.name=imgData[4].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[4].imagePNGURL}}" ng-show="imgData[4].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[5].imagePNGURL; addedImage.name=imgData[5].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[5].imagePNGURL}}" ng-show="imgData[5].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[6].imagePNGURL; addedImage.name=imgData[6].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[6].imagePNGURL}}" ng-show="imgData[6].imagePNGURL"/>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3">
+                                    <div class="imgCell" ng-click="addedImage.path=imgData[7].imagePNGURL; addedImage.name=imgData[7].name;
+                                         uploadARASAACImage(addedImage.path, addedImage.name);">
+                                        <img class="img-rounded imgAdapted" ng-src="{{imgData[7].imagePNGURL}}" ng-show="imgData[7].imagePNGURL"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-xs-offset-1">
+                            <div class=" row imgCellLg2">
+                                <img class="img-rounded imgAdapted" ng-src="{{addedImage.path}}" ng-show="addedImage.path"/>
+                            </div>
+                            <div class="row">
+                                <span style="font-size: 0.7em; line-height: 1em; width: 100%; display: block;
+                                      margin-top: 15px; font-weight: bold; font-style: italic;">
+                                    {{addedImage.name}}
+                                </span>
+                            </div>
+                            <div class="row">
+                                <span style="display: block; font-size: 0.8em; font-weight: bold; margin-top: 5px;">
+                                    <div ng-if="uploadedOK === 'waiting'"></div>
+                                    <div ng-if="uploadedOK === 'ok'"><span style="color: green;">{{searchArasaacImgsContent.ok}}</span></div>
+                                    <div ng-if="uploadedOK === 'error'"><span style="color: crimson;">{{searchArasaacImgsContent.error}}</span></div>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- INSTRUCCIONES -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span style="font-size: 0.9em; line-height: 1.3em; text-align: justify;
+                                      display: block; color: black; margin-top: 30px;">
+                                    <strong>{{searchArasaacImgsContent.important}}</strong><br />
+                                    {{searchArasaacImgsContent.guide}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div ng-if="!internetOn">
+                        <div class="row" style="background-color: white;">
+                            <div class="col-xs-12">
+                                <span style="font-size: 1.3em; line-height: 1.4em; text-align: justify;
+                                      display: block; color: crimson;">
+                                    {{searchArasaacImgsContent.internetNeeded}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row dadesUsuariCentre" style="padding-left: 0; padding-right: 0; padding-top: 30px;">
+                        <div class="col-xs-6">
+                        </div>
+                        <div class="col-xs-6">
+                            <button type="reset" class="btn-gray pull-right" data-dismiss="modal">{{searchArasaacImgsContent.exit}}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row verticalMarginTop"></div>
+            </div>
+        </div>
+    </div>
+</div>

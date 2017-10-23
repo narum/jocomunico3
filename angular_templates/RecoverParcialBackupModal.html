@@ -1,0 +1,28 @@
+<!--Logout Modal-->
+<link rel="stylesheet" type="text/css" href="css/responsiveForm.css">
+<div class="modal fade" id="recmbackup" role="dialog">
+    <div class="modal-dialog">
+        <div class="row marginModalTopOwl"><img class="img-owl pull-right" src={{img.lowSorpresaFlecha}}/></div>
+        <div class="row" id="boxUserConfig" style="background-image: url(img/srcWeb/patterns/pattern6.png)">
+            <div id="header" class="row">
+                <div class="col-xs-10 headerTitle">{{content.recbtitle}}</div>
+            </div>
+            <div class="row backgroundUserConfigBox">
+                <div ng-init="searchAddWord('', 'Tots')" class="fonsAlert row"
+                     style="padding-top: 4vh; font-size: 0.75em !important; line-height: 1.3em; text-align: justify;">
+                  {{content.all}}
+                </div>
+                <div class="row dadesUsuariCentre" style="padding-left: 5vh; padding-right: 5vh;">
+                  <div class="col-xs-6">
+                        <button ng-if="panelb" type="reset" class="btn-gray" data-dismiss="modal" ng-click="recparcialBackup_OW(imagesr,voc,folder,cfg,panelb,foldername)">{{content.overwrite}}</button>
+                  </div>
+                  <div class="col-xs-6" style="text-align: right;">
+                      <button type="reset" class="btn-gray" data-dismiss="modal"
+                      ng-click="recparcialBackup_NOW(images,voc,folder,cfg,panelb,foldername)">{{content.write}}</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="row verticalMarginTop"></div>
+    </div>
+</div>

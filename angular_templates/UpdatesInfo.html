@@ -1,0 +1,48 @@
+<div class="row" ng-if="view.Updates">
+    <div class="col-xs-6 col-xs-offset-3">
+      <div class="row">
+
+          <!-- Updates Title -->
+          <div class="row">
+            <div class="col-xs-6" bind-html-compile="text.updatesDownloadTitle" style="text-align:start;"></div>
+            <div class="col-xs-6" style="text-align:end;">
+              <a ng-href="{{base_url}}/#/updates">
+                {{text.updatesDownloadTextList}}
+              </a>
+            </div>
+          </div>
+
+          <!-- Instructions Title -->
+          <div class="row">
+            <div class="col-xs-12 text-justify" bind-html-compile="text.updatesDownloadText1"></div>
+          </div>
+          
+          <!-- Update Buttons -->
+          <div class="row" style="margin-top:5%;margin-bottom:5%;">
+            <div class="col-xs-4 col-xs-offset-1">
+                <a ng-href="http://jocomunico.com/files/jocomunico-update.exe" target="_self">
+                    <button class="btn-gray2">
+                        <p style="text-align:center;">{{text.downloadButtonUpdateWin}}</p>
+                        <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download-2"/>
+                    </button>
+                </a>
+            </div>
+            <div class="col-xs-4 col-xs-offset-2">
+                <a ng-href="http://jocomunico.com/files/jocomunico-mac-update.zip" target="_self">
+                    <button class="btn-gray2">
+                        <p style="text-align:center;">{{text.downloadButtonUpdateMac}}</p>
+                        <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download-2"/>
+                    </button>
+                </a>
+            </div>
+          </div>
+
+        <!-- Windows -->
+        <span class="section-content" bind-html-compile="text.updateWindows"></span>
+
+        <!-- MAC OS -->
+        <span class="section-content" bind-html-compile="text.updateMac" style="margin-top: 25px;"></span>
+
+      </div>
+    </div>
+</div>

@@ -1,0 +1,607 @@
+<link rel="stylesheet" type="text/css" href="css/style-jc.css">
+<link rel="stylesheet" type="text/css" href="css/generico.css">
+<link rel="stylesheet" type="text/css" href="css/addWord.css">
+<link rel="stylesheet" type="text/css" href="css/addWordVerb.css">
+<link rel="stylesheet" type="text/css" href="libraries/scrollbarPanel.css">
+<link rel="stylesheet" type="text/css" href="css/panelGroup.css">
+<link rel="stylesheet" type="text/css" href="css/panelGroup.css">
+
+<style>html, body, .container-table{height: 100%;height: 100vh;background: url('{{img.fons}}') no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}
+</style>
+<div ng-include="'/angular_templates/errorImgModal.html'"></div>
+<!-- menu superior dropdown -->
+<div ng-include="'/angular_templates/dropdownMenuBar.html'"></div>
+<div ng-include="'/angular_templates/logoutModal.html'"></div>
+<div id="main" style="background-image: url('/img/srcWeb/patterns/fons.png');background-size:100% 100%">
+    <div class="row folderVerbContainer">
+        <div class="col-xs-8 fullheight">
+            <div class="row quarterheight">
+                <!-- Añadir imagen -->
+                <div class="col-xs-3 imgRounded imgAddWordVerbContainer container-fluid">
+                        <div class="col-xs-12 imgRounded imgAddWordVerbContainer">
+                        <div class="imgRounded" style="background-image: url(img/srcWeb/patterns/pattern4.png)">
+                            <div id="header" class="row headerAddWord">
+                                <div class="col-xs-12 headerTitle headerAdd">{{content.addImg}}</div>
+                            </div>
+                            <div class="paddingContainerAddVerbImg">
+                                <div class="imgAddWordVerbImg">
+                                    <div class="midheight"s>
+                                        <img class="imgVerbResponsive" ng-src="{{'img/pictos/'+imgPicto}}"/>
+                                    </div>
+                                </div>
+                                <div class="buttonUploadImg">
+                                    <label for="file-input" class="fullheight fullwidth">
+                                        <img class="imgRounded buttonAddPhotoVerb" ng-src="img/icons/add_photo.png"width="100%" height="100%"/>
+                                    </label>
+                                    <input type="file" id="file-input" onchange="angular.element(this).scope().uploadFileToWord()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Añadir verbo -->
+                <div class="col-xs-9 imgRounded imgAddWordVerbContainer container-fluid">
+                    <div class="col-xs-12 imgRounded imgAddWordVerbContainer">
+                        <div class="imgRounded" style="background-image: url(img/srcWeb/patterns/pattern3.png)">
+                            <div id="header" class="row headerAddWord">
+                                <div class="col-xs-12 headerTitle headerAdd">{{content.addVerb}}</div>
+                            </div>
+                            <div class="paddingContainerAddVerbImg">
+                                <div class="imgAddWordVerb">
+                                    <div class="fullheight addVerb">
+                                        <div class="row col-xs-12">
+                                            <div class="col-xs-2 addVerbPadding"> Verbo: </div>
+                                            <div class="col-xs-5 VerbContainer">
+                                                <form id="custom-search-form" class="form-search form-horizontal pull-right">
+                                                    <div class="input-append span12">
+                                                        <input type="text" class="search-query mac-style" placeholder="buscar conjugaciones..." ng-model="verb">
+                                                        <button type="submit" class="btn"><i class="icon-search" ng-click="getConjugations();"></i></button>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Añadir patrones verbales -->
+                    <div class="col-xs-12 imgRounded VerbPatternContainer">
+                        <div class="midheight imgRounded verbPatternHeight" style="background-image: url(img/srcWeb/patterns/pattern7.png)">
+                            <div id="header" class="row headerAddWord">
+                                <div class="col-xs-10 headerTitle headerAdd">{{content.addVerbPattern}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 Sujeto paddingSujeto">
+                                    <div class="row">
+                                        <div class="col-xs-4 paddingSujeto">Sujeto:</div>
+                                        <div class="col-xs-7" style="padding-top: 0.5vh">
+                                            <select class="boxEditFeature dropdown-arrow">
+                                                <optgroup label="{{content.comunes}}">
+                                                    <option ng-repeat="suj in subjOptions | filter: { common:true } | orderBy: 'name'">
+                                                        {{suj.name}}
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="{{content.otros}}">
+                                                    <option ng-repeat="suj in subjOptions | filter: { common:false } | orderBy: 'name'">
+                                                        {{suj.name}}
+                                                    </option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 paddingSujeto">Persona:</div>
+                                        <div class="col-xs-7" style="padding-top: 0.5vh">
+                                            <select class="boxEditFeature dropdown-arrow">
+                                                <option ng-repeat="p in persona">
+                                                    {{p.name}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 Complemento paddingSujeto">
+                                    <div class="row">
+                                        <div class="col-xs-12 paddingSujeto text-center">Añadir complementos</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-11" style="padding-left: 1vh">
+                                            <select class="boxEditFeature dropdown-arrow" style="font-size:95%"
+                                                    ng-options="c as c.name for c in complementos" ng-model="complementoSelected">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row col-xs-12 paddingComplementBtn">
+                                        <button type="button" class="center-block btn btn-success btn-lg" style="padding: 1vh"
+                                        ng-click="addComp();"><span class="glyphicon glyphicon-plus"></span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 ComplementoDirecto paddingSujeto">
+                                    <div class="row">
+                                        <div class="col-xs-12 paddingSujeto text-center">Complemento Directo</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-3 paddingSujeto">Prioridad:</div>
+                                        <div class="col-xs-8" style="padding: 0.5vh">
+                                            <select class="boxEditFeature dropdown-arrow">
+                                                <option ng-repeat="theme in themeOptions">
+                                                    {{theme.name}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-3 paddingSujeto">Tipo:</div>
+                                        <div class="col-xs-8" style="padding: 0.5vh">
+                                            <select class="boxEditFeature dropdown-arrow">
+                                                <optgroup label="{{content.comunes}}">
+                                                    <option ng-repeat="suj in themetipusOptions | filter: { common:true } | orderBy: 'name'">
+                                                        {{suj.name}}
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="{{content.otros}}">
+                                                    <option ng-repeat="suj in themetipusOptions | filter: { common:false } | orderBy: 'name'">
+                                                        {{suj.name}}
+                                                    </option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-3 paddingSujeto">Precede artículo definido:</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <!-- Conjugaciones -->
+        <div class="col-xs-4 imgRounded imgAddWordVerbContainer fullheight">
+            <div class ="row conjugationHeight">
+                <div class="col-xs-12 imgRounded imgAddWordVerbContainer">
+                    <div class="fullheight imgRounded" style="background-image: url(img/srcWeb/patterns/pattern1.png)">
+                        <div id="header" class="row headerAddWord">
+                            <div class="col-xs-10 headerTitle headerAdd">{{content.conjugations}}</div>
+                        </div>
+                        <!-- scroll -->
+                        <div id="scroll" class="col-xs-offset-1 scrollMenuPanels" ng-style="{'width': '85%'}" ng-scrollbar rebuild-on-resize rebuild-on="buildScrollbar">
+                            <div class="scrollWidth">
+                                <!-- presente -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                        <div class="row" style="padding-bottom: 1vh">
+                                            <div class="col-xs-offset-3" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.presente}} </div>
+                                        </div>
+                                        <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="presente.persona.ps1" />
+                                        </div>
+                                        </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="presente.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="presente.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="presente.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="presente.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="presente.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- perfecto -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-3" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.perfecto}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="perfecto.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="perfecto.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="perfecto.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="perfecto.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="perfecto.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="perfecto.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- imperfecto -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-3" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.imperfecto}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="imperfecto.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="imperfecto.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="imperfecto.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="imperfecto.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="imperfecto.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="imperfecto.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- pluscuamperfecto -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-2" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.pluscuamperfecto}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="pluscuamperfecto.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="pluscuamperfecto.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="pluscuamperfecto.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="pluscuamperfecto.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="pluscuamperfecto.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="pluscuamperfecto.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- pasado -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-4" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.pasado}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="pasado.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="pasado.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="pasado.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="pasado.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="pasado.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="pasado.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- futuro -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-4" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.futuro}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="futuro.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="futuro.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="futuro.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="futuro.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="futuro.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="futuro.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- prsubj -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-3" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.prsubj}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="prsubj.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="prsubj.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="prsubj.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="prsubj.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="prsubj.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="prsubj.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- impsubj -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-2" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.impsubj}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps1" ng-model="impsubj.persona.ps1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="impsubj.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="impsubj.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="impsubj.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="impsubj.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="impsubj.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- imperativo -->
+                                <div class="row col-xs-offset-1 conjugationElement">
+                                    <div class="row" style="padding-bottom: 1vh">
+                                        <div class="col-xs-offset-4" style="padding-top: 1vh; padding-bottom: 1vh; padding-left: 1vh"> {{content.imperativo}} </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps2" ng-model="imperativo.persona.ps2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.ps3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="ps3" ng-model="imperativo.persona.ps3" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp1}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp1" ng-model="imperativo.persona.pp1" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp2}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp2" ng-model="imperativo.persona.pp2" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.pp3}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText" name="pp3" ng-model="imperativo.persona.pp3" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- infinitivo, gerundio y participio -->
+                                <div class="row col-xs-offset-1 conjugation" style="padding-top: 0vh">
+                                    <div class="row" style="padding-top: 1vh">
+                                        <div class="col-xs-4 conjugationL">{{content.infinitivo}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText"  name="infinitivo" ng-model="infinitivo" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.gerundio}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText"  name="gerundio" ng-model="gerundio" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 conjugationL">{{content.participio}}</div>
+                                        <div class="col-xs-6 conjugationR">
+                                            <input type="text" class="addConjugationText"  name="participio" ng-model="participio" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- Confirmar formulario -->
+            <div class ="row imgRounded confirmVerbContainer">
+                <div class="col-xs-12 imgRounded">
+                    <div class="imgRounded paddingContainerButtons paddingConfirmVerb" style="background-image: url(img/srcWeb/patterns/pattern6.png)">
+                        <div class="col-xs-5" style="padding-left: 2vh">
+                            <div class=" imgRounded ButtonAddWord paddingButtonAddVerb fullheight row" ng-click="CancelAddVerb()">
+                                <div class="col-xs-offset-2 col-xs-4 text-center TextAddWord">Cancelar</div>
+                                <div class="col-xs-2">
+                                    <img class="imgResponsiveConfirmButton" ng-src="{{baseurl}}img/srcWeb/imagenesvarias/cross_gris.png"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-offset-2 col-xs-5" style="padding-right: 2vh">
+                            <div class=" imgRounded ButtonAddWord paddingButtonAddVerb fullheight row" ng-click="saveVerb()">
+                                <div class="col-xs-offset-2 col-xs-4 text-center TextAddWord">Guardar</div>
+                                <div class="col-xs-2">
+                                    <img class="imgResponsiveConfirmButton" ng-src="{{baseurl}}img/srcWeb/imagenesvarias/save_as_gris.png"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+    </div>
+</div>
+
+
+
+

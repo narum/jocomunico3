@@ -1,0 +1,76 @@
+<link rel="stylesheet" type="text/css" href="css/home.css">
+<link rel="stylesheet" type="text/css" href="css/generico.css">
+<link rel="stylesheet" type="text/css" href="css/userConfig.css">
+<link rel="stylesheet" type="text/css" href="css/responsiveForm.css">
+
+<style>
+    html, body, .container-table{height: 100%;height: 100vh;background: url('{{img.fons}}') no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}
+</style>
+
+<!--menu superior dropdown-->
+<div ng-include="'/angular_templates/dropdownMenuBar.html'"></div>
+<div ng-include="'/angular_templates/logoutModal.html'"></div>
+<div ng-include="'/angular_templates/infoModal.html'"></div>
+
+<div class="row">
+    <div class="col-xs-6 col-xs-offset-3 home-logo" ng-click="linkHome();">
+        <img src="img/srcWeb/home/actualizacionesBanner-{{langabbr}}.png" class="section-logo-img" />
+    </div>
+</div>
+<div ng-controller="updatesCtrl" class="row" style="margin-top:25px;">
+
+  <div ng-repeat="x in updates" class="col-xs-12" style="margin-top:25px;">
+    <div class="col-xs-8 col-xs-offset-2">
+        <div class="row col-xs-12" id="boxUserConfig" style="background-image: url({{img.Patterns1_08}})">
+            <div id="header" class="row" style="text-align:center;">
+                <div class="col-xs-11 headerTitle">
+                    {{x.title}}
+                </div>
+            </div>
+            <div class="marginBoxCentral">
+                <div class="row">
+                    <div class="row headerBar buttonBar" ng-click="contentBar11=!contentBar11">
+                        <div class="col-xs-11 text-indent-up">
+                          {{text.updatesVersion}}{{x.version}}
+                        </div>
+                        <div class="col-xs-1">&nbsp;
+                            <img class="arrowMenuBar pull-right" src={{img.orangeArrow}}/>
+                        </div>
+                    </div>
+                    <div class="row col-xs-12 contentBar" uib-collapse="!contentBar11">
+
+                      <div class="col-xs-8">
+                        <div class="col-xs-11 text-indent-up">
+                            <strong>{{text.updatesDescripcion}}</strong>
+                          <div bind-html-compile="x.descripcion" style="font-size: 0.8em;"></div>
+                        </div>
+                        <div class="col-xs-11 text-indent-up"> <br />
+                            <strong>{{text.updatesFecha}}</strong>
+                            {{x.dateUpdate}}
+                        </div>
+                      </div>
+
+                      <div class="col-xs-4" >
+                        <div class="col-xs-12 col-sm-6" style="padding:5px;">
+                          <a ng-href="{{x.urlWin}}" target="_self">
+                            <button class="btn-gray3">
+                                <p class="col-xs-12" class="">Windows</p>
+                                <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" width="10px" height="10px"/>
+                            </button>
+                          </a>
+                        </div>
+                        <div class="col-xs-12 col-sm-6" style="padding:5px;">
+                          <a ng-href="{{x.urlMac}}" target="_self">
+                            <button class="btn-gray3">
+                                <p class="col-xs-12">Mac</p>
+                                <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" width="10px" height="10px"/>
+                            </button>
+                          </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
