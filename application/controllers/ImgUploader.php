@@ -93,7 +93,7 @@ $this->response($response, REST_Controller::HTTP_OK);
         $error = false;
         for ($i = 0; $i < count($_FILES); $i++) {
             $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']));
-            if (!($_FILES['file' . $i]['type'] == "application/zip"
+            if (!(strpos($_FILES['file' . $i]['type'], 'zip')
             || $_FILES['file' . $i]['type'] == "application/octet-stream")) {
                 $errorProv = ["errorImg1", $_FILES['file' . $i]['name']];
                 array_push($errorText, $errorProv);
@@ -123,7 +123,9 @@ $this->response($response, REST_Controller::HTTP_OK);
             }
                $dir12=md5(date('l jS \of F Y h:i:s A'));
                 mkdir("./Temp/$dir12");
-               $this->Unzip->extract('./Temp/'.basename($_FILES['file' . $i]['name']),
+                chmod('./Temp/'.basename($_FILES['file' . $i]['name']), 0777);
+                chmod("./Temp/$dir12", 0777);
+               $this->unzip->extract('./Temp/'.basename($_FILES['file' . $i]['name']),
                 "./Temp/$dir12");
         }
         $response = [
