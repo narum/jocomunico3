@@ -39,7 +39,7 @@
             <select class="folderBox dropdown-arrow color" style="background-color: #{{$parent.fv.colorPaintingSelected}};" ng-model="$parent.fv.colorPaintingSelected" ng-change="$parent.startPainting();">
                 <option ng-repeat="color in $parent.colors"
                         style="background-color: #{{color.tagString}}"
-                        ng-value="color.tagString">{{color.content}}</option>
+                        value="{{color.tagString}}">{{color.content}}</option>
             </select>
         </div>
         <div class="col-xs-5">
