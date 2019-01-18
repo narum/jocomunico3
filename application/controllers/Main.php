@@ -6,9 +6,10 @@ class Main extends REST_Controller {
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct('rest', TRUE);
         $this->load->model('main_model');
         $this->load->library('Myaudio');
+        $this->load->library('session');
     }
 
      public function getOS_get()
@@ -99,7 +100,7 @@ class Main extends REST_Controller {
     /* Nueva función para probar como lanzar el popup */
 
 
-  public function confirmPassword_post(){
+    public function confirmPassword_post(){
 
       $postdata = file_get_contents("php://input");
       $request = json_decode($postdata);
@@ -174,6 +175,8 @@ class Main extends REST_Controller {
     public function getVoices_get(){
         $audio = new Myaudio();
 
+        $interfaceVoicesOffline = array();
+        $expansionVoicesOffline = array();
         $interfaceVoices = $audio->listInterfaceVoices(true);
         $expansionVoices = $audio->listExpansionVoices(true);
 
@@ -181,14 +184,15 @@ class Main extends REST_Controller {
         if ($appRunning == 'local'){
             $interfaceVoicesOffline = $audio->listInterfaceVoices(false);
             $expansionVoicesOffline = $audio->listExpansionVoices(false);
-        }else{
+        }
+        else{
             $interfaceVoicesOffline = array (
-                [0] => 'App on server',
-                [1] => false
+                0 => 'App on server',
+                1 => false
             );
             $expansionVoicesOffline = array (
-                [0] => 'App on server',
-                [1] => false
+                0 => 'App on server',
+                1 => false
             );
         }
 
@@ -610,5 +614,5 @@ class Main extends REST_Controller {
             'appRunning'=>$appRunning
             ];
         $this->response($response, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
-    }
+    } 
 }

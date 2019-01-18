@@ -8,7 +8,7 @@ require APPPATH . '/libraries/REST_Controller.php';
 class ImgUploader extends REST_Controller {
 
     public function __construct() {
-        parent::__construct();
+        parent::__construct('rest', TRUE);
         $this->load->model('ImgUploader_model');
         $this->load->library('Unzip');
 

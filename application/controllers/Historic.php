@@ -1,8 +1,7 @@
 
 <?php
 
-if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
 
@@ -11,6 +10,7 @@ class Historic extends REST_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('HistoricInterface');
+        $this->load->library('session');
     }
 
     public function index_get() {
@@ -50,7 +50,7 @@ class Historic extends REST_Controller {
         $this->response($response, REST_Controller::HTTP_OK);
     }
     
-    function getFolder_post(){
+    public function getFolder_post(){
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $idfolder = $request->folder;
@@ -74,16 +74,16 @@ class Historic extends REST_Controller {
         $this->response($response, REST_Controller::HTTP_OK);
     }
 
-    function getHistorialState_get() {
+    public function getHistorialState_post() {
         
-        $this->response(
-            [
-                'state' => $this->HistoricInterface->getHistorialState()
-            ],
-        REST_Controller::HTTP_OK);
+        $state = $this->HistoricInterface->getHistorialState();
+        $response = [
+            'state' => $state
+        ];
+        $this->response($response, REST_Controller::HTTP_OK);
     }
 
-    function changeHistorialState_post() {
+    public function changeHistorialState_post() {
         $newstate = $this->post('newState');
         $prevstate = $this->HistoricInterface->getHistorialState();
         $this->HistoricInterface->changeHistorialState($newstate);
@@ -93,7 +93,7 @@ class Historic extends REST_Controller {
         $this->response(null, REST_Controller::HTTP_OK);
     }
     
-    function deleteHistoric_post(){
+    public function deleteHistoric_post(){
         $this->HistoricInterface->deleteHistoric();
     }
     
