@@ -56,7 +56,7 @@ class TranslateClient
     /**
      * @var string Google Translate URL base
      */
-    private $urlBase = 'http://translate.google.com/translate_a/single';
+    private $urlBase = 'https://translate.google.com/translate_a/single';
 
     /**
      * @var array Dynamic guzzleHTTP client options
@@ -209,9 +209,25 @@ class TranslateClient
             self::$staticInstance = new self();
         }
     }
+    
+    /**
+     * Set the api we are used to translete.
+     *
+     * @param string $source Google translate api, default is https://translate.google.com/translate_a/single
+     *
+     * @return TranslateClient
+     */
+    public function setApi($api = null)
+    {
+        if ($api) {
+            $this->urlBase = $api;
+        }
+
+        return $this;
+    }
 
     /**
-     * Set source language we are transleting from.
+     * Set source language we are translating from.
      *
      * @param string $source Language code
      *
@@ -225,7 +241,7 @@ class TranslateClient
     }
 
     /**
-     * Set translation language we are transleting to.
+     * Set translation language we are translating to.
      *
      * @param string $target Language code
      *
@@ -234,6 +250,20 @@ class TranslateClient
     public function setTarget($target)
     {
         $this->targetLanguage = $target;
+
+        return $this;
+    }
+
+    /**
+     * Set Google Translate URL base
+     *
+     * @param string $urlBase  Google Translate URL base
+     *
+     * @return TranslateClient
+     */
+    public function setUrlBase($urlBase)
+    {
+        $this->urlBase = $urlBase;
 
         return $this;
     }
@@ -347,8 +377,8 @@ class TranslateClient
         // Detect languages
         $detectedLanguages = [];
 
-        // the response contains only single translation, dont create loop that will end with
-        // invalide foreach and warning
+        // the response contains only single translation, don't create loop that will end with
+        // invalid foreach and warning
         if ($isArray || !is_string($responseArray)) {
             $responseArrayForLanguages = ($isArray) ? $responseArray[0] : [$responseArray];
             foreach ($responseArrayForLanguages as $itemArray) {

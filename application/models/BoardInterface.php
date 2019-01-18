@@ -794,7 +794,7 @@ private function InsertRBoardCell($ID_Cell){
             'isFixedInGroupBoards' => $row->isFixedInGroupBoards,
             'imgCell' => $row->imgCell,
             'ID_CPicto' => $row->ID_CPicto,
-            'ID_CSentence' => $row->D_CSentence,
+            'ID_CSentence' => $row->ID_CSentence,
             'sentenceFolder' => $row->sentenceFolder,
             'boardLink' => $row->boardLink,
             'color' => $row->color,

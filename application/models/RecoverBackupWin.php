@@ -251,7 +251,7 @@ print_r($pictokeys);
 
 $file = file_get_contents($Folder."/Cell.json");
 $files = file_get_contents($Folder."/Boards.json");
-$filesent = file_get_contents($Folder."/S_sentence.json");
+$filesent = file_get_contents($Folder."/S_Sentence.json");
 $filefol= file_get_contents($Folder."/S_Folder.json");
 $picto=file_get_contents($Folder."/Pictograms.json");
 

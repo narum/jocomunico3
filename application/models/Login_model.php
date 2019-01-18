@@ -22,7 +22,7 @@ class Login_model extends CI_Model {
         }
             
         $output = $query->result();
-        $tokenId    = base64_encode(mcrypt_create_iv(32));
+        $tokenId    = "d7V2EzR3vOimjlnMbnUACa9322oIug/joM6MQjdv1xQ";
         $issuedAt   = time();
         $notBefore  = $issuedAt;                            // Is valid right away
         $expire     = $notBefore + (60 * 60  * 24 * 365 * 50);     // Token expires in 5 years

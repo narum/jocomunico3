@@ -172,5 +172,3 @@ class WordDocument_Model extends CI_Model {
   }
 
 }
-
-?>

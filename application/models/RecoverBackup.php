@@ -139,7 +139,7 @@ private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLangu
     $adjclass->class[$i]
   ));
 }
-return $pictokey;
+return;
 }
 //Inserta en la base de datos los registros correspondientes a adjectives
 private function InsertAdjectives($Folder, $pcont, $overwrite){
@@ -264,10 +264,16 @@ private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite){
  
  echo "Num. pictos originals: ".$pcont;
  print_r($pictokeys);
+ echo "Num. sentences originals: ".$scont;
+ print_r($sentencekeys);
+ echo "Num. folders originals: ".$fcont;
+ print_r($folderkeys);
+ echo "Num. boards originals: ".$bcont;
+ print_r($boardkeys);
 
  $file = file_get_contents($Folder."/Cell.json");
  $files = file_get_contents($Folder."/Boards.json");
- $filesent = file_get_contents($Folder."/S_sentence.json");
+ $filesent = file_get_contents($Folder."/S_Sentence.json");
  $filefol= file_get_contents($Folder."/S_Folder.json");
  $picto=file_get_contents($Folder."/Pictograms.json");
 

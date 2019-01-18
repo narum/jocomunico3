@@ -11,8 +11,9 @@ class AddVerbModel extends CI_Model {
      function conjugateVerb($verb) {
         $verb = str_replace(' ', '', $verb);
         $language = $this->session->userdata('ulangabbr');//CA or ES
-        $infinitive = $this->getInfinitive($language, $verb)[0]->verb;
-        return $this->getConjugations($language, $infinitive);
+        //$aux = $this->getInfinitive($language, $verb);
+        //$infinitive = $aux[0]->verb;
+        return $this->getConjugations($language, $verb);
     }
 
      function getInfinitive($language, $verb){
@@ -57,7 +58,6 @@ class AddVerbModel extends CI_Model {
      }
 
     function getXpathConjugations($url){
-        
         $filepath = "";
         $Fname = "conj-".$this->session->userdata('idusu').".html";
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -66,7 +66,7 @@ class AddVerbModel extends CI_Model {
         else {
             $filepath = "./Temp/".$Fname;
         }
-        
+                
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);

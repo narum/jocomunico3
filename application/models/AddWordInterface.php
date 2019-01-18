@@ -66,8 +66,8 @@ class AddWordInterface extends CI_Model {
         $userlanguage = $this->session->userdata('ulangabbr');
         $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
         $this->db->where('adjid', $id);
-        $this->db->join('Pictograms', 'adjective' . $userlanguage . '.adjid = Pictograms.pictoid', 'left');
-        $query = $this->db->get('adjective' . $userlanguage);
+        $this->db->join('Pictograms', 'Adjective' . $userlanguage . '.adjid = Pictograms.pictoid', 'left');
+        $query = $this->db->get('Adjective' . $userlanguage);
 
         if ($query->num_rows() > 0) {
             $output = $query->result();
@@ -96,7 +96,7 @@ class AddWordInterface extends CI_Model {
         $userlanguage = $this->session->userdata('ulangabbr');
         $this->db->where('adjid', $id);
         $this->db->select('class');
-        $query = $this->db->get('adjclass' . $userlanguage);
+        $query = $this->db->get('AdjClass' . $userlanguage);
 
         if ($query->num_rows() > 0) {
             $output = $query->result();

@@ -4572,13 +4572,15 @@ angular.module('controllers', [])
             };
 
             $scope.isActivated = false;
-            $http.get('Historic/getHistorialState')
+            var URL = $scope.baseurl + "Historic/getHistorialState";
+            $http.post(URL)
             .success(function(response){
                 $scope.isActivated = (response.state == '1') ? true : false;
-            })
+            });
 
             $scope.enable_disableHistorial = function(newValue){
-                $http.post('Historic/changeHistorialState',
+                var URL = $scope.baseurl + "Historic/changeHistorialState";
+                $http.post(URL,
                           {
                             newState : newValue
                           } )

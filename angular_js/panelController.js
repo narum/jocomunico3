@@ -662,7 +662,8 @@ angular.module('controllers')
 
 
             $scope.getHistorialState = function () {
-                $http.get('Historic/getHistorialState').success(function (response) {
+                var URL = $scope.baseurl + "Historic/getHistorialState";
+                $http.post(URL).success(function (response) {
                     $scope.HistoricState = (response.state === '1') ? true : false;
                     console.log(response.state);
                 });
@@ -676,7 +677,8 @@ angular.module('controllers')
                  * - newState : new Historic State (enable or disable)
                  */
                 $('#HistoricModal').modal('hide');
-                $http.post('Historic/changeHistorialState'
+                var URL = $scope.baseurl + "Historic/changeHistorialState";
+                $http.post(URL
                     , {
                         newState: ($scope.HistoricState) ? 0 : 1
                     })
@@ -866,7 +868,7 @@ angular.module('controllers')
                           $scope.uploading = true;
                           var i;var uploadUrl;
                           if (navigator.appVersion.indexOf("Win")!=-1){
-                          uploadUrl=$scope.baseurl + "ImgUploader/uploadBackup";
+                          uploadUrl=$scope.baseurl + "ImgUploader/uploadBackupWin";
                         }else {
                              uploadUrl= $scope.baseurl + "ImgUploader/uploadBackup";
 
