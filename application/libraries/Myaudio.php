@@ -606,14 +606,15 @@ function synthesizeOnline($vocalwareLID, $vocalwareVID, $text, $filename)
         $url = "http://www.vocalware.com/tts/gen.php";
         $secret_phrase = "5a823f715692c02de9e215fef94c5dc2";
 
+        // needs Vocalware API
         $data = array(
             'EID' => '2',
             'LID' => $vocalwareLID,
             'VID' => $vocalwareVID,
             'TXT' => $text,
             'EXT' => 'mp3',
-            'ACC' => '5795433',
-            'API' => '2490514'                    
+            'ACC' => '',
+            'API' => ''                    
         );
 
         $data['CS'] = md5($data['EID'].$data['LID'].$data['VID'].$data['TXT'].$data['EXT'].$data['ACC'].$data['API'].$secret_phrase);
