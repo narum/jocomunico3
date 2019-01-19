@@ -868,7 +868,7 @@ angular.module('controllers')
                           $scope.uploading = true;
                           var i;var uploadUrl;
                           if (navigator.appVersion.indexOf("Win")!=-1){
-                          uploadUrl=$scope.baseurl + "ImgUploader/uploadBackupWin";
+                          uploadUrl=$scope.baseurl + "ImgUploader/uploadBackup";
                         }else {
                              uploadUrl= $scope.baseurl + "ImgUploader/uploadBackup";
 

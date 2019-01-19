@@ -333,7 +333,8 @@ class Main_model extends CI_Model {
         $this->db->where('ID_SHUser', $idusu);
         $this->db->order_by('ID_SHistoric', 'desc');
         $query = $this->db->get('S_Historic');
-        return $query->result_array()[0];
+        $aux = $query->result_array();
+        return $aux[0];
     }
     //get historic sentences with pictos
     function getSentencesWithPictos($idusu, $ID_Folder){
@@ -450,14 +451,18 @@ class Main_model extends CI_Model {
   }
 
   public function getLatestUpdateChecked(){
-      return $this->db->query(
-        'SELECT showPopUp, version
-        FROM Updates u
-        WHERE u.version >= (SELECT version
-                            FROM Updates
-                            LIMIT 1
-					        )
-        LIMIT 1'
-      )->result()[0];
+        $output = array();
+        $this-> db->select('showPopUp, version');
+        $this-> db->from('Updates');
+        $this -> db->order_by('version', 'DESC');
+        $this -> db->order_by('idUpdate', 'DESC');
+        $query = $this->db->get();
+        if ($query->num_rows() > 0) {
+            $aux = $query->result();
+            $output = $aux[0];
+        } else{
+            $output = null;
+        }
+        return $output;
   }
 }
