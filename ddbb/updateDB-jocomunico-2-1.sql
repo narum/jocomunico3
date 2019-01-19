@@ -8,6 +8,9 @@
 	  
 	  UPDATE `Updates` SET `urlWin` = 'https://jocomunico.com/files/jocomunico-setup-2.exe' WHERE `Updates`.`IDUpdate` = 2;
 	  UPDATE `Updates` SET `urlMac` = 'https://jocomunico.com/files/jocomunico-mac-2.zip' WHERE `Updates`.`IDUpdate` = 2;
+	  
+	  UPDATE `Updates` SET `urlWin` = 'https://jocomunico.com/files/jocomunico-update-1.exe' WHERE `Updates`.`IDUpdate` = 3;
+	  UPDATE `Updates` SET `urlMac` = 'https://jocomunico.com/files/jocomunico-mac-update-1.zip' WHERE `Updates`.`IDUpdate` = 3;
 
 INSERT INTO `Updates` (`IDUpdate`, `ID_ULanguage`, `title`, `version`, `descripcion`, `urlWin`, `urlMac`, `dateUpdate`, `showPopUp`) VALUES
 (4, 1, 'Jocomunico 2.1', '2.1', 'Paquet amb la versió 2.1 completa de Jocomunico.', 'https://jocomunico.com/files/jocomunico-setup-2-1.exe', 'https://jocomunico.com/files/jocomunico-mac-2-1.zip', '2019-01-18', 1),
