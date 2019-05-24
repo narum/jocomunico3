@@ -951,7 +951,7 @@ private function UpdateSuperUser($Folder,$ow){
     cfgMenuDeleteAllActive=?, cfgSentenceBarUpDown=?, cfgBgColorPanel=?, cfgBgColorPred=?,
     cfgTextInCell=?, cfgUserExpansionFeedback=?, cfgHistOnOff=?, cfgBlackOnWhiteVSWhiteOnBlack=?,
     cfgTimeLapseSelectOnOff=?, cfgTimeLapseSelect=?, cfgTimeNoRepeatedClickOnOff=?,
-    cfgTimeNoRepeatedClick=?, UserValidated=?, insertDate=?, cfgMenuCopyClipboard=?, 
+    cfgTimeNoRepeatedClick=?, insertDate=?, cfgMenuCopyClipboard=?, 
     cfgMenuCopyTxtImgClipboard=?, cfgCellWithBorder=?, cfgTxtRdngBarOnOff=?, cfgMenuDeleteSelectedPicto=?, 
     cfgMenuBlock=? WHERE ID_SU=?";
     $this->db->query($sql,
@@ -993,7 +993,6 @@ private function UpdateSuperUser($Folder,$ow){
         $su->cfgTimeLapseSelect,
         $su->cfgTimeNoRepeatedClickOnOff,
         $su->cfgTimeNoRepeatedClick,
-        $su->UserValidated,
         $su->insertDate,
         $su->cfgMenuCopyClipboard,
         $su->cfgMenuCopyTxtImgClipboard,

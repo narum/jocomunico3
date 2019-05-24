@@ -686,7 +686,7 @@ if($ow){
   cfgMenuDeleteAllActive=?, cfgSentenceBarUpDown=?, cfgBgColorPanel=?, cfgBgColorPred=?,
   cfgTextInCell=?, cfgUserExpansionFeedback=?, cfgHistOnOff=?, cfgBlackOnWhiteVSWhiteOnBlack=?,
   cfgTimeLapseSelectOnOff=?, cfgTimeLapseSelect=?, cfgTimeNoRepeatedClickOnOff=?,
-  cfgTimeNoRepeatedClick=?, UserValidated=? WHERE ID_SU=?";
+  cfgTimeNoRepeatedClick=? WHERE ID_SU=?";
   $this->db->query($sql,
   array(
   $ID_User,
@@ -723,7 +723,6 @@ if($ow){
   $su->cfgTimeLapseSelect,
   $su->cfgTimeNoRepeatedClickOnOff,
   $su->cfgTimeNoRepeatedClick,
-  $su->UserValidated,
   $ID_SU
 ));
 }
