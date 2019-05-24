@@ -17,7 +17,7 @@ https://jocomunico.com/#/about
 KNOWN BUGS
 -----------------------
 
-- Uploading a backup made on version 2.0 to a version 2.1 Jocomunico. To fix, please update your Jocomunico to version 2.1, redo de backup and upload it again.
+- Uploading a backup made on version 2.0 to a version 2.1 Jocomunico. To fix, please update your Jocomunico to version 2.1, redo the backup and upload it again.
 
 -----------------------
 README FOR INSTALLATION
