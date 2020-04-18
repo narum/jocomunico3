@@ -1,4 +1,4 @@
-Jocomunico version 2.1.
+Jocomunico version 2.2.
 
 Jocomunico by Joan Pahisa is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
 
@@ -12,6 +12,14 @@ https://jocomunico.com/#/cc
 https://jocomunico.com/#/about
 
 *Jocomunico is optimized for Google Chrome.
+
+-----------------------
+KNOWN BUGS
+-----------------------
+
+- Uploading a backup made on version 2.0 to a version 2.1 (or higher) Jocomunico. To fix, please update your Jocomunico to version 2.1 (and follow later updates if available), redo the backup and upload it again.
+
+- Trying to update from Jocomunico 2.0 directly to 2.2. Updates need to be done in sequence: from 2.0 to 2.1 and then from 2.1 to 2.2.
 
 -----------------------
 README FOR INSTALLATION
