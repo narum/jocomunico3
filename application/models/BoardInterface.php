@@ -74,8 +74,33 @@ class BoardInterface extends CI_Model {
         $query = $this->db->get('R_BoardCell');
         if ($query->num_rows() > 0) {
             $output = $query->result();
-        } else
+        } else {
             $output = null;
+        }
+        
+        // Every time that a board is loaded, we update the date (insertDate) that the SuperUser
+        // used the application (as login can be remembered through cookies it could
+        // not be used)
+        
+        $this->db->where('ID_User', $idusu);
+        $query2 = $this->db->get('User');
+        
+        $output2 = $query2->result();
+        
+        $idsu = $output2[0]->ID_USU;
+        
+        $datestring = "%Y/%m/%d";
+        $time = time();
+        $avui = mdate($datestring, $time);
+        
+        $data2 = array(
+            'insertDate' => $avui,
+        );
+                
+        $this->db->where('ID_SU', $idsu);
+        $this->db->update('SuperUser', $data2);
+        
+        // return the cells in the board
         return $output;
     }
     /*
