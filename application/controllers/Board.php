@@ -22,26 +22,73 @@ class Board extends REST_Controller {
         $this->load->library('session');
     }
 
+    // NOT IN USE ANYMORE
     public function index_get() {
         // CHECK COOKIES
         if (!$this->session->userdata('uname')) {
             redirect(base_url(), 'location');
         } else {
             if (!$this->session->userdata('cfguser')) {
-                $this->BoardInterface->loadCFG($this->session->userdata('uname'));
+                $this->BoardInterface->loadCFG();
                 $this->load->view('MainBoard', true);
             } else {
                 $this->load->view('MainBoard', true);
             }
         }
     }
-    public function AddBoards_get(){
-      $data=$this->BoardInterface->AddBoards();
-      $response = [
-          'data' => $data
-      ];
-      $this->response($response, REST_Controller::HTTP_OK);
+    
+    public function DestroySession_get() {
+        
+        $this->session->unset_userdata('idsu');
+        $this->session->unset_userdata('idusu');
+        $this->session->unset_userdata('uname');
+        $this->session->unset_userdata('ulanguage');
+        $this->session->unset_userdata('uinterfacelangauge');
+        $this->session->unset_userdata('uinterfacelangtype');
+        $this->session->unset_userdata('uinterfacelangnadjorder');
+        $this->session->unset_userdata('uinterfacelangncorder');
+        $this->session->unset_userdata('uinterfacelangabbr');
+        $this->session->unset_userdata('cfgAutoEraseSentenceBar');
+        $this->session->unset_userdata('isfem');
+        $this->session->unset_userdata('cfgExpansionOnOff');
+        $this->session->unset_userdata('cfgPredBarNumPred');
+        
+        session_destroy();
+        
+        $response = [
+            'data' => "Session destroyed"
+        ];
+        $this->response($response, REST_Controller::HTTP_OK);
     }
+    
+    public function AddBoards_post(){
+      
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+      
+        $data=$this->BoardInterface->AddBoards($idusu, $idlang);
+        $response = [
+            'data' => $data
+        ];
+        $this->response($response, REST_Controller::HTTP_OK);
+    }
+    
+    public function AddKBBoards_post(){
+        
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        
+        $data=$this->BoardInterface->AddKBBoards($idusu, $idlang);
+        $response = [
+            'data' => $data
+        ];
+        $this->response($response, REST_Controller::HTTP_OK);
+    }
+    
     public function loadCFG_post() {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
@@ -61,8 +108,9 @@ class Board extends REST_Controller {
         $request = json_decode($postdata);
         $pos = $request->pos;
         $idboard = $request->idboard;
+        $idlang = $request->idlang;
 
-        $info = $this->BoardInterface->getCell($pos, $idboard);
+        $info = $this->BoardInterface->getCell($pos, $idboard, $idlang);
 
 
         $response = [
@@ -90,8 +138,9 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $idboard = $request->idboard;
+        $idusu = $request->idusu;
 
-        $output = $this->BoardInterface->getBoardStruct($idboard);
+        $output = $this->BoardInterface->getBoardStruct($idboard, $idusu);
         $columns = $output[0]->width;
         $rows = $output[0]->height;
         $name = $output[0]->Bname;
@@ -116,16 +165,19 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $idboard = $request->idboard;
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
 
         $array = array();
 
-        $output = $this->BoardInterface->getBoardStruct($idboard);
+        $output = $this->BoardInterface->getBoardStruct($idboard, $idusu);
         if ($output != null) {
             $columns = $output[0]->width;
             $rows = $output[0]->height;
             $autoRead = $output[0]->autoRead;
 
-            $array = $this->BoardInterface->getCellsBoard($idboard);
+            $array = $this->BoardInterface->getCellsBoard($idboard, $idusu, $idlang, $lang);
 
 
             $response = [
@@ -174,8 +226,9 @@ class Board extends REST_Controller {
         $c = $request->c;
         $r = $request->r;
         $idboard = $request->idboard;
+        $idusu = $request->idusu;
 
-        $output = $this->BoardInterface->getBoardStruct($idboard);
+        $output = $this->BoardInterface->getBoardStruct($idboard, $idusu);
         $this->BoardInterface->updateNumCR($c, $r, $idboard);
         $columnsDiff = $c - $output[0]->width;
         $rowsDiff = $r - $output[0]->height;
@@ -287,15 +340,26 @@ class Board extends REST_Controller {
         $request = json_decode($postdata);
         $id = $request->id;
         $imgtemp = $request->imgtemp;
+        $text = $request->text;
+        $idusu = $request->idusu;
+        $lang = $request->lang;
 
-        $idusu = $this->session->userdata('idusu');
-        $this->Lexicon->afegirParaula($idusu, $id, $imgtemp);
+        $this->Lexicon->afegirParaula($idusu, $id, $imgtemp, $text);
 
-        $data = $this->Lexicon->recuperarFrase($idusu);
+        $data = $this->Lexicon->recuperarFrase($idusu, $lang);
         $newdata = $this->inserty($data);
+        
+        $auxTemp = "";
+        
+        for ($i = 0; $i < count($newdata); $i++) {
+            $auxTemp .= $newdata[$i]->text." ";
+        }
+        
+        $stringTemp = trim($auxTemp);
 
         $response = [
-            'data' => $newdata
+            'data' => $newdata,
+            'stringTemp' => $stringTemp
         ];
 
         $this->response($response, REST_Controller::HTTP_OK);
@@ -306,14 +370,27 @@ class Board extends REST_Controller {
      */
 
     public function getTempSentence_post() {
-        $idusu = $this->session->userdata('idusu');
 
-        $data = $this->Lexicon->recuperarFrase($idusu);
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $lang = $request->lang;
+        
+        $data = $this->Lexicon->recuperarFrase($idusu, $lang);
 
         $newdata = $this->inserty($data);
-
+        
+        $auxTemp = "";
+        
+        for ($i = 0; $i < count($newdata); $i++) {
+            $auxTemp .= $newdata[$i]->text." ";
+        }
+        
+        $stringTemp = trim($auxTemp);
+        
         $response = [
-            'data' => $newdata
+            'data' => $newdata,
+            'stringTemp' => $stringTemp
         ];
         $this->response($response, REST_Controller::HTTP_OK);
     }
@@ -343,12 +420,16 @@ class Board extends REST_Controller {
 
     public function deleteLastWord_post() {
 
-        $idusu = $this->session->userdata('idusu');
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $lang = $request->lang;
+        
         $id = $this->BoardInterface->getLastWord($idusu);
 
         $this->Lexicon->eliminarParaula($id->ID_RSTPSentencePicto);
 
-        $data = $this->Lexicon->recuperarFrase($idusu);
+        $data = $this->Lexicon->recuperarFrase($idusu, $lang);
 
         $newdata = $this->inserty($data);
 
@@ -364,10 +445,14 @@ class Board extends REST_Controller {
 
     public function deleteAllWords_post() {
 
-        $idusu = $this->session->userdata('idusu');
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $lang = $request->lang;
+        
         $this->BoardInterface->removeSentence($idusu);
 
-        $data = $this->Lexicon->recuperarFrase($idusu);
+        $data = $this->Lexicon->recuperarFrase($idusu, $lang);
 
         $newdata = $this->inserty($data);
 
@@ -383,16 +468,19 @@ class Board extends REST_Controller {
     */
 
     public function deleteSelectedWord_post(){
-      $idusu = $this-> session -> userdata('idusu');
+      
       $postdata = file_get_contents("php://input");
       $request = json_decode($postdata);
 
       //Crear $pos para definir que posicion es la que queremos eliminar.
       $pos = $request->pos;
+      $idusu = $request->idusu;
+      $lang = $request->lang;
+      
       $id = $this->BoardInterface->getWordSelected($idusu, $pos);
 
       $this->Lexicon->eliminarParaula($id->ID_RSTPSentencePicto);
-      $data = $this->Lexicon->recuperarFrase($idusu);
+      $data = $this->Lexicon->recuperarFrase($idusu, $lang);
       $newdata = $this->inserty($data);
 
       $response = [
@@ -421,8 +509,17 @@ class Board extends REST_Controller {
         $tense = $request->tense;
         $tipusfrase = $request->tipusfrase;
         $negativa = $request->negativa;
-        $idusu = $this->session->userdata('idusu');
-        $this->Lexicon->insertarFrase($idusu, $tipusfrase, $tense, $negativa);
+        $idusu = $request->idusu;
+        $idlang = $request->idlang; 
+        $lang = $request->lang;
+        $autoerase = $request->autoerase;
+        $expansion = $request->expansion;
+        $isfem = $request->isfem;
+        $langType = $request->langType;
+        $adjOrder = $request->adjOrder;
+        $ncOrder = $request->ncOrder;
+        
+        $this->Lexicon->insertarFrase($idusu, $tipusfrase, $tense, $negativa, $lang, $autoerase, $idlang);
 
 
         $this->BoardInterface->commitTrans();
@@ -434,14 +531,14 @@ class Board extends REST_Controller {
             $this->response($response, 500);
         } else {
             $expander = new Myexpander();
-            $expander->expand();
+            $expander->expand($idusu, $lang, $expansion, $isfem, $langType, $adjOrder, $ncOrder);
 
             $info = $expander->info;
             $errorText = "";
 
             if ($info[error]) {
                 $errorCode = $info[errorcode];
-                $errorText = $this->BoardInterface->get_errorText($errorCode);
+                $errorText = $this->BoardInterface->get_errorText($errorCode, $idlang);
 
                 $response = [
                     'info' => $info,
@@ -464,7 +561,11 @@ class Board extends REST_Controller {
 
     public function getFunctions_post() {
 
-        $functions = $this->BoardInterface->getFunctions();
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $lang = $request->lang;
+        
+        $functions = $this->BoardInterface->getFunctions($lang);
 
         $response = [
             'functions' => $functions
@@ -477,8 +578,12 @@ class Board extends REST_Controller {
      */
 
     public function getPrimaryUserBoard_post() {
+        
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
 
-        $board = $this->BoardInterface->getPrimaryGroupBoard();
+        $board = $this->BoardInterface->getPrimaryGroupBoard($idusu);
         $primaryBoard = $this->BoardInterface->getPrimaryBoard($board[0]->ID_GB);
 
         $response = [
@@ -520,15 +625,18 @@ class Board extends REST_Controller {
         $tense = $request->tense;
         $tipusfrase = $request->tipusfrase;
         $negativa = $request->negativa;
+        $idusu = $request->idusu;
+        $lang = $request->lang;
 
         $control = "";
+        $key = "";
         $function = $this->BoardInterface->getFunction($id);
         $value = $function[0]->functValue;
         $type = $function[0]->functType;
+        $link = "";
 
         switch ($type) {
             case "modif":
-                $idusu = $this->session->userdata('idusu');
                 $this->Lexicon->afegirModifNom($idusu, $value);
                 break;
             case "tense":
@@ -543,9 +651,18 @@ class Board extends REST_Controller {
             case "control":
                 $control = $value;
                 break;
+            case "key":
+                $aux = $value;
+                $aux2 = explode("key", $aux);
+                $aux3 = strtolower($aux2[1]);
+                $key = $aux3;
+                break;
+            case "link":
+                $link = $value;
+                break;
         }
-        $idusu = $this->session->userdata('idusu');
-        $data = $this->Lexicon->recuperarFrase($idusu);
+        
+        $data = $this->Lexicon->recuperarFrase($idusu, $lang);
 
         $newdata = $this->inserty($data);
 
@@ -554,6 +671,9 @@ class Board extends REST_Controller {
             'tipusfrase' => $tipusfrase,
             'negativa' => $negativa,
             'control' => $control,
+            'key' => $key,
+            'type' => $type,
+            'link' => $link,
             'data' => $newdata
         ];
 
@@ -570,13 +690,15 @@ class Board extends REST_Controller {
         $id = $request->id;
         $pos = $request->pos;
         $idboard = $request->idboard;
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
 
         $cell = $this->BoardInterface->getIDCell($pos, $idboard);
         $this->BoardInterface->updateDataCell($id, $cell[0]->ID_RCell);
 
-        $data = $this->BoardInterface->getCellsBoard($idboard);
-        $idusu = $this->session->userdata('idusu');
-        $this->Lexicon->addWordStatsX1($id, $idusu, true);
+        $data = $this->BoardInterface->getCellsBoard($idboard, $idusu, $idlang, $lang);
+        $this->Lexicon->addWordStatsX1($id, $idusu, true, NULL);
         $response = [
             'data' => $data
         ];
@@ -593,12 +715,15 @@ class Board extends REST_Controller {
         $pos1 = $request->pos1;
         $pos2 = $request->pos2;
         $idboard = $request->idboard;
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
 
         $this->BoardInterface->updatePosCell($pos1, -1, $idboard);
         $this->BoardInterface->updatePosCell($pos2, $pos1, $idboard);
         $this->BoardInterface->updatePosCell(-1, $pos2, $idboard);
 
-        $data = $this->BoardInterface->getCellsBoard($idboard);
+        $data = $this->BoardInterface->getCellsBoard($idboard, $idusu, $idlang, $lang);
 
         $response = [
             'data' => $data
@@ -615,11 +740,14 @@ class Board extends REST_Controller {
         $request = json_decode($postdata);
         $pos = $request->pos;
         $idboard = $request->idboard;
-        //$boardid = $request->boardid;
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
+        
         $cell = $this->BoardInterface->getIDCell($pos, $idboard);
         $this->BoardInterface->removeDataCell($cell[0]->ID_RCell);
 
-        $data = $this->BoardInterface->getCellsBoard($idboard);
+        $data = $this->BoardInterface->getCellsBoard($idboard, $idusu, $idlang, $lang);
 
         $response = [
             'data' => $data
@@ -635,8 +763,8 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $search = $request->search;
+        $idusu = $request->idusu;
 
-        $idusu = $this->session->userdata('idusu');
         $sentence = $this->BoardInterface->getSentences($idusu, $search);
 
         $response = [
@@ -649,7 +777,7 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $id = $request->id;
-
+        
         $sentence = $this->BoardInterface->getSentence($id);
 
         $response = [
@@ -666,8 +794,8 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $search = $request->search;
+        $idusu = $request->idusu;
 
-        $idusu = $this->session->userdata('idusu');
         $sFolder = $this->BoardInterface->getSFolders($idusu, $search);
 
         $response = [
@@ -719,10 +847,13 @@ class Board extends REST_Controller {
         $id = $request->idboard;
         $posInBoard = $request->pos;
         $imgCell = $request->imgCell;
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
+
         $cell = $this->BoardInterface->getIDCell($posInBoard, $id);
         $idPicto = $this->BoardInterface->updateImgCell($cell[0]->ID_RCell, $imgCell);
-        $data = $this->BoardInterface->getCellsBoard($id);
+        $data = $this->BoardInterface->getCellsBoard($id, $idusu, $idlang, $lang);
         $this->Lexicon->addImgTempStatsX1($idPicto, $idusu, $imgCell);
         $response = [
             'data' => $data
@@ -762,9 +893,9 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $id = $request->id;
+        $idusu = $request->idusu;
 
-
-        $board = $this->BoardInterface->getBoardStruct($id);
+        $board = $this->BoardInterface->getBoardStruct($id, $idusu);
 
         $idPrimaryBoard = null;
 
@@ -783,9 +914,9 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $id = $request->id;
+        $idusu = $request->idusu;
 
-
-        $board = $this->BoardInterface->getBoardStruct($id);
+        $board = $this->BoardInterface->getBoardStruct($id, $idusu);
 
         $response = [
             'read' => $board[0]->autoReadSentence
@@ -817,6 +948,9 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $id = $request->id;
+        $idusu = $request->idusu;
+        $idlang = $request->idlang;
+        $lang = $request->lang;
 
         $board = $this->BoardInterface->getIDGroupBoards($id);
         $primaryboard = $this->BoardInterface->getPrimaryBoard($board[0]->ID_GBBoard);
@@ -824,7 +958,7 @@ class Board extends REST_Controller {
         $primaryboardID = $primaryboard[0]->ID_Board;
         if ($id == $primaryboardID) {
             for ($x = 0; $boards[$x] != NULL; $x++) {
-                $cell = $this->BoardInterface->getCellsBoard($boards[$x]->ID_Board);
+                $cell = $this->BoardInterface->getCellsBoard($boards[$x]->ID_Board, $idusu, $idlang, $lang);
                 for ($i = 0; $i < count($cell); $i++) {
                     $this->BoardInterface->removeCell($cell[$i]->ID_RCell, $boards[$x]->ID_Board);
                 }
@@ -840,7 +974,7 @@ class Board extends REST_Controller {
             $this->response($response, REST_Controller::HTTP_OK);
         } else {
 
-            $cell = $this->BoardInterface->getCellsBoard($id);
+            $cell = $this->BoardInterface->getCellsBoard($id, $idusu, $idlang, $lang);
             for ($i = 0; $i < count($cell); $i++) {
                 $this->BoardInterface->removeCell($cell[$i]->ID_RCell, $id);
             }
@@ -1001,12 +1135,31 @@ class Board extends REST_Controller {
     public function getPrediction_post() {
         // CARGA recommenderArray
         $prediction = new Myprediction();
-        $recommenderArray = $prediction->getPrediction();
-
+        
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $kbword = $request->kbword;
+        $idusu = $request->idusu;
+        $langid = $request->langid;
+        $lang = $request->lang;
+        $expansion = $request->expansion;
+        $predbarnum = $request->predbarnum;
+        
+        $prediction->initialise($idusu, $langid, $lang, $expansion, $predbarnum);
+        
+        $recommenderArray = $prediction->getPrediction($kbword);
+        
         for ($i = 0; $i < count($recommenderArray); $i++) {
-            $img = $this->BoardInterface->getImgCell($recommenderArray[$i]->pictoid);
-            $recommenderArray[$i]->imgtemp = $img;
+            
+            if ($kbword == "") {
+                $img = $this->BoardInterface->getImgCell($recommenderArray[$i]->pictoid, $idusu);
+                $recommenderArray[$i]->imgtemp = $img;
+            }
+            else {
+                $recommenderArray[$i]->imgtemp = null;
+            }
         }
+        
         $response = [ 'recommenderArray' => $recommenderArray];
         $this->response($response, REST_Controller::HTTP_OK);
     }
@@ -1015,8 +1168,8 @@ class Board extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $score = $request->score;
+        $idusu = $request->idusu;
 
-        $idusu = $this->session->userdata('idusu');
         $id = $this->BoardInterface->getIdLastSentence($idusu);
         if ($id === null) {
             $this->response(300);
@@ -1043,8 +1196,8 @@ class Board extends REST_Controller {
         $request = json_decode($postdata);
         $text = $request->text;
         $interface = $request->interface;
-        $idusu = $this->session->userdata('idusu');
-
+        $idusu = $request->idusu;
+        
         // GENERAR AUDIO
         $audio = new Myaudio();
         $aux = $audio->generateAudio($idusu, $text, $interface);
@@ -1053,7 +1206,7 @@ class Board extends REST_Controller {
 
         // We save the audio error code in the database
         if ($aux[1]) {
-            $this->BoardInterface->ErrorAudioToDB($aux[3]);
+            $this->BoardInterface->ErrorAudioToDB($aux[3], $idusu);
         }
 
         $response = [
@@ -1064,7 +1217,11 @@ class Board extends REST_Controller {
     }
 
     public function getColors_post() {
-        $data = $this->BoardInterface->getColors();
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idlang = $request->idlang;
+        
+        $data = $this->BoardInterface->getColors($idlang);
 
         $response = [
             'data' => $data
@@ -1074,3 +1231,4 @@ class Board extends REST_Controller {
     }
 
 }
+

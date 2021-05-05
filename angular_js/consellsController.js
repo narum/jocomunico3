@@ -3,11 +3,13 @@ angular.module('controllers')
         
         //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -76,9 +78,15 @@ angular.module('controllers')
         
         // Language
         $rootScope.langabbr = $rootScope.contentLanguageUserNonLogedAbbr;
+        
+        var idioma = $rootScope.contentLanguageUserNonLoged;
+        if (window.localStorage.getItem('contentLanguageUserNonLoged')) {
+            idioma = window.localStorage.getItem('contentLanguageUserNonLoged')
+            $rootScope.langabbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
+        }
 
         // Get content for the home view from ddbb           
-        Resources.register.get({'section': 'tips', 'idLanguage': $rootScope.contentLanguageUserNonLoged}, {'funct': "content"}).$promise
+        Resources.register.get({'section': 'tips', 'idLanguage': idioma}, {'funct': "content"}).$promise
         .then(function (results) {
             $scope.text = results.data;
             $scope.viewActived = true;

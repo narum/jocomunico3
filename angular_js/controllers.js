@@ -29,11 +29,12 @@ angular.module('controllers', [])
 
             //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -85,14 +86,19 @@ angular.module('controllers', [])
                 // Petición del login
                 loginResource.save(body).$promise  // POST (en angular 'save') del user y pass
                         .then(function (result) {				// respuesta ok!
-                            var token = result.data.token;
-                            var userConfig = result.data.userConfig;
-                            if (userConfig.UserValidated == '1' || userConfig.UserValidated == '2') {
-                                AuthService.login(token, userConfig);
-                                $location.path('/');
-                                $rootScope.dropdownMenuBarValue = '/'; //Button selected on this view
-                            } else {
-                                $scope.state = 'has-warning';
+                            if (result.data.token) {
+                                var token = result.data.token;
+                                var userConfig = result.data.userConfig;
+                                if (userConfig.UserValidated == '1' || userConfig.UserValidated == '2') {
+                                    AuthService.login(token, userConfig);
+                                    $location.path('/');
+                                    $rootScope.dropdownMenuBarValue = '/'; //Button selected on this view
+                                } else {
+                                    $scope.state = 'has-warning';
+                                }
+                            }
+                            else {
+                                $location.path('/login');
                             }
                         })
                         .catch(function (error) {	// no respuesta
@@ -160,11 +166,12 @@ angular.module('controllers', [])
 
             //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -489,11 +496,13 @@ angular.module('controllers', [])
                     });
             //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -566,11 +575,12 @@ angular.module('controllers', [])
                     });
             //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -813,6 +823,7 @@ angular.module('controllers', [])
 
                             //Necessary for preselected ng-options (select) works
                             $scope.userData.cfgPredBarNumPred = $scope.numPictosBarPred[results.userConfig.cfgPredBarNumPred - 2];
+                            $rootScope.predBarNum = results.userConfig.cfgPredBarNumPred;
 
                             //Parse string to integer
                             $scope.userData.cfgTimeLapseSelect = parseInt(results.userConfig.cfgTimeLapseSelect, 10);
@@ -823,12 +834,15 @@ angular.module('controllers', [])
 
                             //change string (0,1) to boolean (true,false)
                             $scope.userData.cfgExpansionOnOff = ($scope.userData.cfgExpansionOnOff === "1");
+                            $rootScope.expansionOnOff = $scope.userData.cfgExpansionOnOff;
+                            $rootScope.isFem = $scope.userData.cfgIsFem;
                             $scope.userData.cfgPredOnOff = ($scope.userData.cfgPredOnOff === "1");
                             $scope.userData.cfgMenuHomeActive = ($scope.userData.cfgMenuHomeActive === "1");
                             $scope.userData.cfgMenuReadActive = ($scope.userData.cfgMenuReadActive === "1");
                             $scope.userData.cfgMenuDeleteLastActive = ($scope.userData.cfgMenuDeleteLastActive === "1");
                             $scope.userData.cfgMenuDeleteAllActive = ($scope.userData.cfgMenuDeleteAllActive === "1");
                             $scope.userData.cfgAutoEraseSentenceBar = ($scope.userData.cfgAutoEraseSentenceBar === "1");
+                            $rootScope.autoEraseSB = $scope.userData.cfgAutoEraseSentenceBar;
                             $scope.userData.cfgTimeLapseSelectOnOff = ($scope.userData.cfgTimeLapseSelectOnOff === "1");
                             $scope.userData.cfgScanningOnOff = ($scope.userData.cfgScanningOnOff === "1");
                             $scope.userData.cfgScanningAutoOnOff = ($scope.userData.cfgScanningAutoOnOff === "1");
@@ -890,7 +904,9 @@ angular.module('controllers', [])
                                         $scope.errorMessage = content.data['errorVoicesText2'] + content.data[errorcode];
                                         $scope.errorCode = content.data['errorVoicesTitle'] + " " + errorcode;
 
-                                        Resources.main.get({'funct': "errorVoicesSeen"});
+                                        Resources.main.get({'idusu': $rootScope.userId}, {'funct': "errorVoicesSeen"}).$promise
+                                                .then(function (results) {
+                                                });
 
                                         $scope.toggleInfoModal($scope.errorCode, $scope.errorMessage);
                                     });
@@ -1172,7 +1188,9 @@ angular.module('controllers', [])
                     || ($scope.local && $scope.userData.cfgExpansionVoiceOnline == null && $scope.local)) {
                     Resources.main.save({'IdSu': $rootScope.sUserId, 'data': 'UserValidated', 'value': '2'}, {'funct': "userValidate2"}).$promise
                     //Cargamos la board inicial (Oscar)
-                    $http.post($scope.baseurl + "PanelGroup/copyDefaultGroupBoard");
+                    var postdata = {idusu: $rootScope.userId};
+                    
+                    $http.post($scope.baseurl + "PanelGroup/copyDefaultGroupBoard", postdata);
                 }
             };
 
@@ -1267,8 +1285,10 @@ angular.module('controllers', [])
             };
 
              $scope.deleteUser = function () {
+                 
+                var postdata = {idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
                 var URL = $scope.baseurl + "DeleteUser/deleteUser";
-                $http.get(URL).success(function (response) {
+                $http.post(URL, postdata).success(function (response) {
                     console.log(response);
                 });
             };
@@ -1296,7 +1316,7 @@ angular.module('controllers', [])
                     }
                 }
             });
-
+            
             $scope.viewActived = false;
             $timeout(function () {
                 $scope.viewActived = true;
@@ -1376,6 +1396,11 @@ angular.module('controllers', [])
                                 //redirecciona a configuración de usuario para el primer acceso a la aplicación
                                 $location.path('/userConfig');
                             }
+                            console.log("COOKIES");
+                            console.log("Super User");
+                            console.log(decodeURIComponent(results.idsu));
+                            console.log("User");
+                            console.log(decodeURIComponent(results.idusu));
                         });
             }
 
@@ -2077,7 +2102,7 @@ angular.module('controllers', [])
 
 
                               var url = $scope.baseurl + "Board/deleteSelectedWord";
-                              var postdata = {pos: posicion};
+                              var postdata = {pos: posicion, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId};
                               $http.post(url, postdata).success(function (response){
                                   $scope.dataTemp = response.data;
                               });
@@ -2180,12 +2205,8 @@ angular.module('controllers', [])
             {
                 //-----------Iniciacion-----------
                 var userConfig = JSON.parse(localStorage.getItem('userData'));
-                var url = $scope.baseurl + "Board/loadCFG";
 
-                var postdata = {lusuid: userConfig.ID_ULanguage};
-                //MODIF: borrar
-                $http.post(url, postdata);
-
+                $scope.idusu = userConfig.ID_User;
                 $scope.userViewHeight = 100;
                 $scope.searchFolderHeight = 0;
 
@@ -2206,6 +2227,7 @@ angular.module('controllers', [])
                 $scope.cfgPredOnOff = userConfig.cfgPredOnOff;
                 $scope.cfgPredBarVertHor = userConfig.cfgPredBarVertHor;
                 $scope.cfgPredBarNumPred = userConfig.cfgPredBarNumPred;
+                $rootScope.predBarNum = userConfig.cfgPredBarNumPred;
 
                 $scope.sentenceViewHeight = 16;
                 $scope.userViewWidth = 12;
@@ -2233,6 +2255,7 @@ angular.module('controllers', [])
                 //#Jorge nuevo codigo
                 $scope.pictoBarWidth = 12 - $scope.cfgMenuHomeActive - $scope.cfgMenuReadActive - $scope.cfgMenuDeleteLastActive - $scope.cfgMenuCopyClipboard - $scope.cfgMenuCopyTxtImgClipboard - $scope.cfgMenuDeleteAllActive - $scope.cfgMenuDeleteSelectedPicto;
                 $scope.cfgAutoEraseSentenceBar = userConfig.cfgAutoEraseSentenceBar;
+                $rootScope.autoEraseSB = userConfig.cfgAutoEraseSentenceBar;
                 $scope.cfgScanningCustomRowCol = userConfig.cfgScanningCustomRowCol;
                 $scope.longclick = userConfig.cfgScanningAutoOnOff == 0 ? true : false;
                 $scope.timerScan = userConfig.cfgScanningAutoOnOff == 1 ? true : false;
@@ -2267,6 +2290,8 @@ angular.module('controllers', [])
                 $scope.cfgBgColorPred = userConfig.cfgBgColorPred;
                 $scope.cfgScanColor = userConfig.cfgScanColor;
                 $scope.cfgExpansionOnOff = userConfig.cfgExpansionOnOff == 1 ? true : false;
+                $rootScope.expansionOnOff = userConfig.cfgExpansionOnOff;
+                $rootScope.isFem = userConfig.cfgIsFem;
                 $scope.cfgInterfaceVoiceOnOff = userConfig.cfgInterfaceVoiceOnOff == 1 ? true : false;
                 if (userConfig.cfgUsageMouseOneCTwoC == 0) {
                     $scope.longclick = false;
@@ -2287,7 +2312,12 @@ angular.module('controllers', [])
                     $scope.cfgScanStartClick = false;
                     $scope.cfgCancelScanOnOff = false;
                 }
+                                
                 $scope.getSentence();
+                
+                // Initialize variable to store keyboard key presses
+                $scope.keyboardWord = "";
+                
                 $scope.getPred();
                 //If there are some request from another controller, it's loaded
                 if ($rootScope.editPanelInfo != null) {
@@ -2308,10 +2338,16 @@ angular.module('controllers', [])
             //Get the current sentence in order to show to the user
             $scope.getSentence = function () {
                 var url = $scope.baseurl + "Board/getTempSentence";
-
-                return $http.post(url).success(function (response)
+                var postdata = {idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
+                
+                return $http.post(url, postdata).success(function (response)
                 {
                     $scope.dataTemp = response.data;
+                    $scope.stringTemp = response.stringTemp;
+                                        
+                    $scope.shiftPressed = false;
+                    $scope.AccObPressed = false;
+                    $scope.AccTPressed = false;
                     // console.log(response.data);
                 });
 
@@ -2319,15 +2355,21 @@ angular.module('controllers', [])
             //Get priamry user board (primary board in the priamry group) and show it. if the user have scannigOn start Scan
             $scope.getPrimaryUserBoard = function () {
                 var url = $scope.baseurl + "Board/getPrimaryUserBoard";
+                var postdata = {idusu: $rootScope.userId};
+                
+                console.log("getPrimaryUserBoard");
+                console.log($rootScope.userId);
 
-                $http.post(url).success(function (response)
+                $http.post(url, postdata).success(function (response)
                 {
+                    console.log(response.idboard);
+                    
                     $scope.idboard = response.idboard;
                     //If the user doesn't have one or some gone wrong a error modal is displayed
                     if ($scope.idboard === null) {
                         $('#errorNoPrimaryBoard').modal({backdrop: 'static'});
                     } else {
-                        $scope.showBoard('0').then(function () {
+                        $scope.showBoard($scope.idboard).then(function () {
                             if ($scope.cfgScanningOnOff == 1) {
                                 $scope.InitScan();
                             }
@@ -2361,6 +2403,9 @@ angular.module('controllers', [])
              */
             $scope.showBoard = function (id)
             {
+                console.log("ShowBoard");
+                console.log(id);
+                console.log($scope.idboard);
 
                 //If the id is 0, show (reload) the actual board. Else the current board is changed (and showed)
                 if (id === '0') {
@@ -2370,16 +2415,17 @@ angular.module('controllers', [])
                 }
 
                 var url = $scope.baseurl + "Board/showCellboard";
-                var postdata = {idboard: id};
+                var postdata = {idboard: id, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
 
                 return $http.post(url, postdata).success(function (response)
                 {
+                    console.log(response.data);
                     $scope.columns = response.col;
                     $scope.rows = response.row;
                     $scope.data = response.data;
                     $scope.autoRead = response.autoRead;
                     //Something gone wrong... (maybe he/she tried to access to another user's board)
-                    if ($scope.data == null) {
+                    if ($scope.data === null) {
                         $location.path('/panelGroups');
                     }
                 });
@@ -2387,14 +2433,23 @@ angular.module('controllers', [])
             //Load the recommenderArray that will be displayed in the prediction bar.
             $scope.getPred = function ()
             {
-                console.log("What's happening...");
+                console.log("Pred array...");
+                
+                console.log($rootScope.userId);
+                
                 var url = $scope.baseurl + "Board/getPrediction";
-                $http.post(url).success(function (response)
+                
+                if ($scope.keyboardWord === " ") {
+                    console.log("Blank space IN");
+                }
+                
+                var postdata = {kbword: $scope.keyboardWord, idusu: $rootScope.userId, langid: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr, expansion: $rootScope.expansionOnOff, predbarnum: $rootScope.predBarNum};
+                $http.post(url, postdata).success(function (response)
                 {
                     $scope.recommenderArray = response.recommenderArray;
+                    console.log($scope.recommenderArray);
                 });
             };
-            console.log($scope.recommenderArray);
 
             /*
              * Show edit view board
@@ -2426,7 +2481,7 @@ angular.module('controllers', [])
                 $scope.getColors();
 
                 var url = $scope.baseurl + "Board/getCellboard";
-                var postdata = {idboard: $scope.idboard};
+                var postdata = {idboard: $scope.idboard, idusu: $rootScope.userId};
 
                 $http.post(url, postdata).success(function (response)
                 {
@@ -2441,7 +2496,9 @@ angular.module('controllers', [])
 
             $scope.getColors = function () {
                 var url = $scope.baseurl + "Board/getColors";
-                $http.post(url).success(function (response)
+                var postdata = {idlang: $rootScope.interfaceLanguageId};
+                
+                $http.post(url, postdata).success(function (response)
                 {
                     $scope.colors = response.data;
                 });
@@ -2534,7 +2591,7 @@ angular.module('controllers', [])
             {
 
                 var url = $scope.baseurl + "Board/getCellboard";
-                var postdata = {idboard: $scope.idboard};
+                var postdata = {idboard: $scope.idboard, idusu: $rootScope.userId};
 
                 $http.post(url, postdata).success(function (response)
                 {
@@ -2548,7 +2605,7 @@ angular.module('controllers', [])
                     } else {
                         $newW = $scope.oldW;
                     }
-                    var postdata = {r: $newH, c: $newW, idboard: $scope.idboard};
+                    var postdata = {r: $newH, c: $newW, idboard: $scope.idboard, idusu: $rootScope.userId};
                     if ($newH < $scope.oldH || $newW < $scope.oldW) {
                         $scope.openConfirmSize($newH, $scope.oldH, $newW, $scope.oldW);
                     } else {
@@ -2568,7 +2625,7 @@ angular.module('controllers', [])
              */
             $scope.openConfirmSize = function ($newH, $oldH, $newW, $oldW) {
 
-                var postdata = {r: $newH, c: $newW, idboard: $scope.idboard};
+                var postdata = {r: $newH, c: $newW, idboard: $scope.idboard, idusu: $rootScope.userId};
                 //Object of all new/old sizes
                 $scope.FormData = {
                     newH: $newH,
@@ -2702,7 +2759,7 @@ angular.module('controllers', [])
             $scope.readText = function (text, bool) {
                 if (((bool && $scope.cfgInterfaceVoiceOnOff) || (!bool)) && (text !== "")) {
                     $scope.sound = "mp3/empty.m4a";
-                    var postdata = {text: text, interface: bool};
+                    var postdata = {text: text, interface: bool, idusu: $rootScope.userId};
                     var url = $scope.baseurl + "Board/readText";
                     $http.post(url, postdata).success(function (response) {
                         $scope.dataAudio = response.audio;
@@ -2784,8 +2841,7 @@ angular.module('controllers', [])
                       }, $scope.cfgTimeOver);
                     }
 
-                } else if (type === 3)
-                {
+                } else if (type === 3) {
                     if (object === 'Good')
                     {
                         $scope.OverAutoClick = $timeout(function () {
@@ -2797,6 +2853,14 @@ angular.module('controllers', [])
                             $scope.feedback(0);
                         }, $scope.cfgTimeOver);
                     }
+                }
+                // Prediction bar
+                else if (type === 4) {
+                    $scope.OverAutoClick = $timeout(function () {
+                        var imgurl = object.imgFolder + object.imgPicto;
+                        if (object.imgtemp) imgurl = object.imgtemp;
+                        $scope.addToSentence(object.pictoid, imgurl, object.pictotext);
+                    }, $scope.cfgTimeOver);
                 }
             };
             // Cancel the timer that control the lapsus time click
@@ -2822,12 +2886,20 @@ angular.module('controllers', [])
                     }
 
                     var url = $scope.baseurl + "Board/addWord";
-                    var postdata = {id: id, imgtemp: img};
+                    var postdata = {id: id, imgtemp: img, text: text, idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
 
                     $http.post(url, postdata).success(function (response)
                     {
                         $scope.dataTemp = response.data;
+                        $scope.stringTemp = response.stringTemp;
                         $scope.info = "";
+                        
+                        if (id !== 1900) {
+                            $scope.keyboardWord = "";
+                        }
+                        else {
+                            $scope.keyboardWord = " ";
+                        }
 
                         $scope.readText(text, true);
                         $scope.getPred();
@@ -2846,7 +2918,7 @@ angular.module('controllers', [])
             //Check if autoReturn is '1'. If so, return to the primary board
             $scope.autoReturn = function () {
                 var url = $scope.baseurl + "Board/autoReturn";
-                var postdata = {id: $scope.idboard};
+                var postdata = {id: $scope.idboard, idusu: $rootScope.userId};
 
                 $http.post(url, postdata).success(function (response)
                 {
@@ -2859,7 +2931,7 @@ angular.module('controllers', [])
             //Check if autoReadSentence is '1'. If so, generate the sentence
             $scope.automaticRead = function () {
                 var url = $scope.baseurl + "Board/autoReadSentence";
-                var postdata = {id: $scope.idboard};
+                var postdata = {id: $scope.idboard, idusu: $rootScope.userId};
 
                 $http.post(url, postdata).success(function (response)
                 {
@@ -2874,23 +2946,244 @@ angular.module('controllers', [])
              */
             $scope.clickOnFunction = function (id, text, readed) {
                 var url = $scope.baseurl + "Board/getFunction";
-                var postdata = {id: id, tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, pos: $scope.chooseElementDeleted};
+                var postdata = {id: id, tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
 
                 $http.post(url, postdata).success(function (response){
                     var control = response.control;
                     console.log(control);
+                    var key = response.key;
+                    console.log(key);
+                    var linkvalue = response.link;
+                    console.log(linkvalue);
                     $scope.dataTemp = response.data;
                     $scope.tense = response.tense;
                     $scope.tipusfrase = response.tipusfrase;
                     $scope.negativa = response.negativa;
+                    $scope.functType = response.type;
 
                     /*New code*/
                     $scope.chooseElementDeleted = response.pos;
                     /*New code*/
+                    
+                    if (key !== "") {
+                        switch (key)
+                            {
+                                case "shift":
+                                    $scope.shiftPressed = !$scope.shiftPressed;
+                                    break;
+                                    
+                                case "apostrof":
+                                    $scope.keyboardWord += "'";
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "space":
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    
+                                    $scope.keyboardWord = $scope.keyboardWord.trim();
+                                    if ($scope.keyboardWord !== "") {
+                                        $scope.addToSentence(1900, null, $scope.keyboardWord);
+                                    }
+                                    $scope.keyboardWord = " ";
+                                    break;
+                                    
+                                case "dash":
+                                    $scope.keyboardWord += "-";
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "accob":
+                                    $scope.AccObPressed = !$scope.AccObPressed;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "acct":
+                                    $scope.AccTPressed = !$scope.AccTPressed;
+                                    $scope.AccObPressed = false;
+                                    break;
+                                    
+                                case "backspace":
+                                    if (!$scope.AccObPressed && !$scope.AccTPressed) { 
+                                        
+                                        if ($scope.keyboardWord === " " || $scope.keyboardWord === "") {
+                                            $scope.deleteLast();
+                                        }
+                                        else {
+                                            if ($scope.keyboardWord.length === 1) {
+                                                $scope.keyboardWord = " ";
+                                            }
+                                            else {
+                                                $scope.keyboardWord = $scope.keyboardWord.slice(0, -1);
+                                            }
+                                        }
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "a":
+                                    
+                                    var aux = "a";
+                                    if ($scope.AccObPressed) {
+                                        aux = "à";
+                                    }
+                                    else if ($scope.AccTPressed) {
+                                        aux = "á";
+                                    }
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += aux.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += aux;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                
+                                case "e":
+                                    
+                                    var aux = "e";
+                                    if ($scope.AccObPressed) {
+                                        aux = "è";
+                                    }
+                                    else if ($scope.AccTPressed) {
+                                        aux = "é";
+                                    }
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += aux.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += aux;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "i":
+                                    
+                                    var aux = "i";
+                                    if ($scope.AccObPressed) {
+                                        aux = "ì";
+                                    }
+                                    else if ($scope.AccTPressed) {
+                                        aux = "í";
+                                    }
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += aux.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += aux;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "o":
+                                    
+                                    var aux = "o";
+                                    if ($scope.AccObPressed) {
+                                        aux = "ò";
+                                    }
+                                    else if ($scope.AccTPressed) {
+                                        aux = "ó";
+                                    }
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += aux.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += aux;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "u":
+                                    
+                                    var aux = "u";
+                                    if ($scope.AccObPressed) {
+                                        aux = "ù";
+                                    }
+                                    else if ($scope.AccTPressed) {
+                                        aux = "ú";
+                                    }
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += aux.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += aux;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                    break;
+                                    
+                                case "Ñ":
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += "Ñ";
+                                    }
+                                    else {
+                                        $scope.keyboardWord += "ñ";
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                
+                                    break;
+                                    
+                                case "Ç":
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += "Ç";
+                                    }
+                                    else {
+                                        $scope.keyboardWord += "ç";
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                                
+                                    break;
+                                    
+                                default:
+                                    
+                                    if ($scope.shiftPressed) {
+                                        $scope.keyboardWord += key.toUpperCase();
+                                    }
+                                    else {
+                                        $scope.keyboardWord += key;
+                                    }
+                                    
+                                    $scope.AccObPressed = false;
+                                    $scope.AccTPressed = false;
+                            }
+                            
+                        if (key !== "space") {
+                            $scope.getPred();
+                        }
+                    }
+                    
+                    else if (linkvalue === "keyboard") {
+                        $timeout(function () {
+                            $scope.keyboardWord = " ";
+                            $scope.getPred();
+                        }, 500);
+                    }
 
-                    if ((control !== "") && (control !== "home") && (control !== "historic") && (control !== "stopAudio")) {
+                    else if ((control !== "") && (control !== "home") && (control !== "historic") && (control !== "stopAudio")) {
                         var url = $scope.baseurl + "Board/" + control;
-                        var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, pos: $scope.chooseElementDeleted};
+                        var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, pos: $scope.chooseElementDeleted, idusu: $rootScope.userId};
 
                         $http.post(url, postdata).success(function (response)
                         {
@@ -2947,7 +3240,7 @@ angular.module('controllers', [])
                             } else {
                                 $scope.tense = "defecte";
                                 $scope.tipusfrase = "defecte";
-                                $scope.negativa = false
+                                $scope.negativa = false;
 
                                 $scope.readText($scope.info.frasefinal, false);
                             }
@@ -2975,8 +3268,9 @@ angular.module('controllers', [])
             $scope.deleteLast = function () {
 
                 var url = $scope.baseurl + "Board/deleteLastWord";
+                var postdata = {idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
 
-                $http.post(url).success(function (response)
+                $http.post(url, postdata).success(function (response)
                 {
                     $scope.dataTemp = response.data;
                     $scope.getPred();
@@ -2988,8 +3282,9 @@ angular.module('controllers', [])
             $scope.deleteAll = function () {
 
                 var url = $scope.baseurl + "Board/deleteAllWords";
+                var postdata = {idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
 
-                $http.post(url).success(function (response)
+                $http.post(url, postdata).success(function (response)
                 {
 
                     $scope.tense = "defecte";
@@ -2997,6 +3292,9 @@ angular.module('controllers', [])
                     $scope.negativa = false;
                     $scope.dataTemp = response.data;
                     $scope.info = "";
+                    if ($scope.keyboardWord !== "") {
+                        $scope.keyboardWord = " ";
+                    }
                     $scope.getPred();
                 });
             };
@@ -3007,7 +3305,7 @@ angular.module('controllers', [])
 
           $scope.deleteSelectedPicto = function(){
             var url = $scope.baseurl + "Board/deleteSelectedWord";
-            var postdata = {pos: $scope.chooseElementDeleted};
+            var postdata = {pos: $scope.chooseElementDeleted, idusu: $rootScope.userId, lang: $rootScope.languageAbbr};
 
             var ngDeleteSelectedPicto = angular.element($window.document.getElementById('txtImgContainer'));
             var children = ngDeleteSelectedPicto.children();
@@ -3147,7 +3445,8 @@ angular.module('controllers', [])
 
             $scope.generate = function () {
                 var url = $scope.baseurl + "Board/generate";
-                var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa};
+
+                var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr, autoerase: $rootScope.autoEraseSB, expansion: $rootScope.expansionOnOff, isfem: $rootScope.isFem, langType: $rootScope.langType, adjOrder: $rootScope.AdjOrder, ncOrder: $rootScope.NCOrder};
                 $http.post(url, postdata).success(function (response)
                 {
                     //$scope.dataTemp = response.data;
@@ -3182,7 +3481,7 @@ angular.module('controllers', [])
             $scope.feedback = function (point) {
 
                 var url = $scope.baseurl + "Board/score";
-                var postdata = {score: point};
+                var postdata = {score: point, idusu: $rootScope.userId};
                 $http.post(url, postdata).success(function (response)
                 {
 
@@ -3196,6 +3495,7 @@ angular.module('controllers', [])
 
             };
 
+            // NOT IN USE
             $scope.playSentenceAudio = function () //MODIF esto se usa?
             {
                 var postdata = {voice: 0, sentence: $scope.info.frasefinal};//MODIF: canviar ek voice per cfg
@@ -3221,6 +3521,8 @@ angular.module('controllers', [])
 
                         });
             };
+            
+            // NOT IN USE
             $scope.playPictoAudio = function (text) //esto se usa?
             {
                 var postdata = {voice: 0, sentence: text};//MODIF: canviar ek voice per cfg
@@ -3254,7 +3556,7 @@ angular.module('controllers', [])
             {
 
                 var URL = "";
-                var postdata = {id: name};
+                var postdata = {id: name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, langid: $rootScope.interfaceLanguageId};
                 //Radio button function parameter, to set search type
                 switch (Searchtype)
                 {
@@ -3306,7 +3608,7 @@ angular.module('controllers', [])
                  URL = $scope.baseurl + "ImgUploader/getImagesUploads";
                  break;
                }
-        var postdata = {name: name};
+        var postdata = {name: name, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
         $http.post(URL, postdata).
                 success(function (response)
                 {
@@ -3319,7 +3621,7 @@ angular.module('controllers', [])
             $scope.searchFoto = function (name)
             {
                 var URL = $scope.baseurl + "SearchWord/getDBAll";
-                var postdata = {id: name};
+                var postdata = {id: name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, langid: $rootScope.interfaceLanguageId};
                 //Request via post to controller search data from database
                 $http.post(URL, postdata).
                         success(function (response)
@@ -3336,6 +3638,7 @@ angular.module('controllers', [])
 
                 var fd = new FormData();
                 fd.append('vocabulary', angular.toJson(false));
+                fd.append('idusu', $rootScope.userId);
                 for (i = 0; i < $scope.myFile.length; i++) {
                     fd.append('file' + i, $scope.myFile[i]);
                 }
@@ -3344,6 +3647,16 @@ angular.module('controllers', [])
                 })
                         .success(function (response) {
                             $scope.uploading = false;
+                            
+                            URL = $scope.baseurl + "ImgUploader/getImagesUploads";
+                            var postdata = {name: "", idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                            $http.post(URL, postdata).
+                                success(function (response)
+                                {
+                                    $scope.imgData = response.data;
+                                    //console.log($scope.imgData);
+                                });
+                            
                             if (response.error) {
                                 //open modal
                                 console.log(response.errorText);
@@ -3360,6 +3673,7 @@ angular.module('controllers', [])
 
                 var fd = new FormData();
                 fd.append('vocabulary', angular.toJson(false));
+                fd.append('idusu', $rootScope.userId);
                 for (i = 0; i < $scope.myFile.length; i++) {
                     fd.append('file' + i, $scope.myFile[i]);
                 }
@@ -3384,14 +3698,14 @@ angular.module('controllers', [])
                 var URL = "";
                 //Significa que no hay que hacer swap, solo cambiar la imagen
                 if (data.imgPath) {
-                    var postdata = {pos: posInBoard, idboard: $scope.idboard, imgCell: data.imgPath};
+                    var postdata = {pos: posInBoard, idboard: $scope.idboard, imgCell: data.imgPath, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                     URL = $scope.baseurl + "Board/changeImgCell";
                 }//Significa que no hay que hacer swap, solo medio swap...
                 else if (data.idpicto) {
                     URL = $scope.baseurl + "Board/addPicto";
-                    var postdata = {id: data.idpicto, pos: posInBoard, idboard: $scope.idboard};
+                    var postdata = {id: data.idpicto, pos: posInBoard, idboard: $scope.idboard, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                 } else {
-                    var postdata = {pos1: data.posInBoardPicto, pos2: posInBoard, idboard: $scope.idboard};
+                    var postdata = {pos1: data.posInBoardPicto, pos2: posInBoard, idboard: $scope.idboard, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                     URL = $scope.baseurl + "Board/swapPicto";
                 }
 
@@ -3403,7 +3717,7 @@ angular.module('controllers', [])
                         });
             };
             $scope.removePicto = function (data) {
-                var postdata = {pos: data.posInBoard, idboard: $scope.idboard};
+                var postdata = {pos: data.posInBoard, idboard: $scope.idboard, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                 var URL = $scope.baseurl + "Board/removePicto";
                 $http.post(URL, postdata).
                         success(function (response)
@@ -3413,7 +3727,7 @@ angular.module('controllers', [])
                         });
             };
             $scope.onDropRemove = function (data, evt) {
-                var postdata = {pos: data.posInBoardPicto, idboard: $scope.idboard};
+                var postdata = {pos: data.posInBoardPicto, idboard: $scope.idboard, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                 var URL = $scope.baseurl + "Board/removePicto";
                 $http.post(URL, postdata).
                         success(function (response)
@@ -3466,7 +3780,7 @@ angular.module('controllers', [])
                 $('#ConfirmRemoveBoard').modal({backdrop: 'static'});
             };
             $scope.ConfirmRemoveBoard = function () {
-                var postdata = {id: $scope.idboard};
+                var postdata = {id: $scope.idboard, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr};
                 var URL = $scope.baseurl + "Board/removeBoard";
                 $http.post(URL, postdata).success(function (response)
                 {
@@ -3488,9 +3802,11 @@ angular.module('controllers', [])
                 $http.post(URL, postdata).success(function (response)
                 {
                     $scope.idGroupBoard = response.idGroupBoard;
+                    
+                    var postdata2 = {idusu: $rootScope.userId};
                     var URL = $scope.baseurl + "PanelGroup/getUserPanelGroups";
 
-                    $http.post(URL).
+                    $http.post(URL, postdata2).
                             success(function (response)
                             {
                                 $scope.panels = response.panels;
@@ -3545,10 +3861,10 @@ angular.module('controllers', [])
         })
 
         // Edit controller
-        .controller('Edit', function ($scope, $http, ngDialog, $timeout) {
+        .controller('Edit', function ($scope, $http, ngDialog, $timeout, $rootScope) {
             // Get the cell clicked (the cell in the cicked position in the current board
             var url = $scope.baseurl + "Board/getCell";
-            var postdata = {pos: $scope.idEditCell, idboard: $scope.idboard};
+            var postdata = {pos: $scope.idEditCell, idboard: $scope.idboard, idlang: $rootScope.interfaceLanguageId};
 
             $http.post(url, postdata).success(function (response)
             {
@@ -3566,8 +3882,11 @@ angular.module('controllers', [])
                 };
                 // Gets functions from database and shows them the dropmenu
                 $scope.getFunctions = function () {
+                    
                     var url = $scope.baseurl + "Board/getFunctions";
-                    $http.post(url).success(function (response)
+                    var postdata = {lang: $rootScope.languageAbbr};
+                    
+                    $http.post(url, postdata).success(function (response)
                     {
                         $scope.functions = response.functions;
                         //Inicializa el dropdown menu
@@ -3604,7 +3923,7 @@ angular.module('controllers', [])
                 };
                 // Gets all pre-record sentences from database and shows it the dropmenu
                 $scope.searchSentece = function (sentence) {
-                    var postdata = {search: sentence};
+                    var postdata = {search: sentence, idusu: $rootScope.userId};
                     var URL = $scope.baseurl + "Board/searchSentence";
 
                     $http.post(URL, postdata).
@@ -3632,7 +3951,7 @@ angular.module('controllers', [])
                 };
                 // Gets all sentence folders from database and shows it the dropmenu
                 $scope.searchSFolder = function (sFolder) {
-                    var postdata = {search: sFolder};
+                    var postdata = {search: sFolder, idusu: $rootScope.userId};
                     var URL = $scope.baseurl + "Board/searchSFolder";
 
                     $http.post(URL, postdata).
@@ -3736,7 +4055,7 @@ angular.module('controllers', [])
                         postdata.idSFolder = null;
                     }
                     if ($scope.uploadedFile === null) {
-                        var postdataimg = {pos: response.info.posInBoard, idboard: response.info.ID_RBoard, imgCell: null};
+                        var postdataimg = {pos: response.info.posInBoard, idboard: response.info.ID_RBoard, imgCell: null, idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId, lang: $rootScope.languageAbbr};
                         var URLimg = $scope.baseurl + "Board/changeImgCell";
                         $http.post(URLimg, postdataimg);
                     }
@@ -3769,12 +4088,11 @@ angular.module('controllers', [])
                     template: $scope.baseurl + '/angular_templates/ConfirmLogout.html',
                     scope: $scope,
                     className: 'ngdialog-theme-default dialogLogOut'
-                }).then(function () {
+                }).then(function () {                  
                     AuthService.logout();
                 });
 
             };
-
 
             $scope.home = function () {
                 if ($location.path() == '/') {
@@ -3790,7 +4108,7 @@ angular.module('controllers', [])
             };
         })
 
-        .controller('historicCtrl', function ($scope, $rootScope, txtContent, $location, $http, dropdownMenuBarInit, AuthService, Resources, $timeout, $interval,md5) {
+        .controller('historicCtrl', function ($scope, $rootScope, txtContent, $location, $http, dropdownMenuBarInit, AuthService, Resources, $timeout, $interval, md5) {
             // Comprobación del login   IMPORTANTE!!! PONER EN TODOS LOS CONTROLADORES
             if (!$rootScope.isLogged) {
                 $rootScope.dropdownMenuBarValue = '/home'; //Dropdown bar button selected on this view
@@ -4016,7 +4334,8 @@ angular.module('controllers', [])
                         day = 31;
                         break;
                 }
-                var postdata = {day: day, pagHistoric: $scope.pagHistoric};
+                var postdata = {day: day, pagHistoric: $scope.pagHistoric, idusu: $rootScope.userId};
+                console.log("Day: " + day + "; Pag: " + $scope.pagHistoric + "; Usu: " + $rootScope.userId);
                 var url = $scope.baseurl + "historic/getHistoric";
 
                 $http.post(url, postdata).
@@ -4091,9 +4410,11 @@ angular.module('controllers', [])
             };
 
             $scope.getSFolders = function () {
+                
+                var postdata = {idusu: $rootScope.userId};
                 var URL = $scope.baseurl + "historic/getSFolder";
 
-                $http.post(URL).
+                $http.post(URL, postdata).
                         success(function (response)
                         {
                             $scope.sFolderResult = response.sFolder;
@@ -4110,7 +4431,7 @@ angular.module('controllers', [])
             };
 
             $scope.getFolder = function () {
-                var postdata = {folder: $scope.folder, pagHistoric: $scope.pagHistoric};
+                var postdata = {folder: $scope.folder, pagHistoric: $scope.pagHistoric, idusu: $rootScope.userId};
                 var url = $scope.baseurl + "historic/getFolder";
 
                 $http.post(url, postdata).
@@ -4132,7 +4453,7 @@ angular.module('controllers', [])
             $scope.readText = function (text, bool) {
                 if (text !== "") {
                     $scope.sound = "mp3/empty.m4a";
-                    var postdata = {text: text, interface: bool};
+                    var postdata = {text: text, interface: bool, idusu: $rootScope.userId};
                     var url = $scope.baseurl + "Board/readText";
                     $http.post(url, postdata).success(function (response) {
                         $scope.dataAudio = response.audio;
@@ -4161,6 +4482,104 @@ angular.module('controllers', [])
             $scope.clickOnSentence = function (text) {
                 $scope.readText(text, false);
                 $scope.initScan();
+            };
+            
+            /*
+             * DWELL
+             */
+
+             /*
+             * If this option is true on confing, it will automatic click when mouse is over the div and the timeout ends.
+             */
+            $scope.TimeoutOverClick = function (type, object)
+            {
+                if ($scope.inScan) {
+                    return false;
+                }
+                //This timeout.cancel avoid possible multiple calls.
+                $timeout.cancel($scope.OverAutoClick);
+                //Check the element over we are
+                if (type === 0)
+                {
+                    $scope.OverAutoClick = $timeout(function () {
+                        $scope.back();
+                    }, $scope.cfgTimeOver);
+                } else if (type === 1)
+                {
+                    $scope.OverAutoClick = $timeout(function () {
+                        $scope.home();
+                    }, $scope.cfgTimeOver);
+                } else if (type === 2) {
+                    $scope.OverAutoClick = $timeout(function () {
+                        $scope.showModalHistorial();
+                    }, $scope.cfgTimeOver);
+
+                } else if (type === 3) {
+                    if (object === 'Good')
+                    {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.enable_disableHistorial(1);
+                        }, $scope.cfgTimeOver);
+                    } else if (object === 'Bad')
+                    {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.enable_disableHistorial(0);
+                        }, $scope.cfgTimeOver);
+                    }
+                } else if (type === 4) {
+                    if (object === 'today')
+                    {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.getTodayHistoric();
+                        }, $scope.cfgTimeOver);
+                    } else if (object === 'week') {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.getLastWeekHistoric();
+                        }, $scope.cfgTimeOver);
+                    } else if (object === 'month') {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.getLastMonthHistoric();
+                        }, $scope.cfgTimeOver);
+                    }
+                } else if (type === 5) {
+                    if (object === 'prev')
+                    {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.previousPagHistoric();
+                        }, $scope.cfgTimeOver);
+                    } else if (object === 'next') {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.nextPagHistoric();
+                        }, $scope.cfgTimeOver);
+                    } 
+                } else if (type === 6) {
+                    if (object === 'prev')
+                    {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.previousPagSFolder();
+                        }, $scope.cfgTimeOver);
+                    } else if (object === 'next') {
+                        $scope.OverAutoClick = $timeout(function () {
+                            $scope.nextPagSFolder();
+                        }, $scope.cfgTimeOver);
+                    } 
+                } else if (type === 7) {
+                    $scope.OverAutoClick = $timeout(function () {
+                        $scope.changeFolder(object.ID_Folder);
+                    }, $scope.cfgTimeOver);
+                } else if (type === 8) {
+                    $scope.OverAutoClick = $timeout(function () {
+                        $scope.clickOnSentence(object);
+                    }, $scope.cfgTimeOver);
+                }
+            };
+            // Cancel the timer that control the lapsus time click
+            $scope.CancelTimeoutOverClick = function ()
+            {
+                if ($scope.inScan) {
+                    return false;
+                }
+                $timeout.cancel($scope.OverAutoClick);
             };
 
             /*
@@ -4573,7 +4992,7 @@ angular.module('controllers', [])
 
             $scope.isActivated = false;
             var URL = $scope.baseurl + "Historic/getHistorialState";
-            $http.post(URL)
+            $http.post(URL, {idusu: $rootScope.userId})
             .success(function(response){
                 $scope.isActivated = (response.state == '1') ? true : false;
             });
@@ -4582,8 +5001,9 @@ angular.module('controllers', [])
                 var URL = $scope.baseurl + "Historic/changeHistorialState";
                 $http.post(URL,
                           {
-                            newState : newValue
-                          } )
+                            newState : newValue,
+                            idusu: $rootScope.userId
+                          })
                 .success(function (response) {
                     $scope.showDeleteHistoricmodal = false;
                     location.reload(true);

@@ -14,7 +14,7 @@ class ImgUploader_model extends CI_Model {
             'imgPath' => $path.$md5Name
         );
 
-        $this->db->insert('Images', $data);
+        $this->db->insert('Images', $data); 
     }
 
     function getImages($idusu, $name) {

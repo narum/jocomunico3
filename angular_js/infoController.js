@@ -14,11 +14,12 @@ angular.module('controllers')
 
         //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
+            var languageId = 1;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -90,12 +91,12 @@ angular.module('controllers')
             */
             $http.get($scope.baseurl + 'Register/getLatestUpdateChecked').success(function(response){
                 $scope.version = response.latestUpdateChecked.version;
-                $scope.showUpdateFooter = (window.localStorage.getItem('updateAccepted') != 'true') && (response.latestUpdateChecked.showPopUp == 1);
+                $scope.showUpdateFooter = (window.localStorage.getItem('updateAccepted') != $scope.version) && (response.latestUpdateChecked.showPopUp == 1);
                 $scope.footerUpdateClass = ($scope.showUpdateFooter) ? "footer-updates" : "footer-cookies-fade";
             });
 
             $scope.okUpdates = function() {
-                window.localStorage.setItem('updateAccepted', true);
+                window.localStorage.setItem('updateAccepted', $scope.version);
                 $scope.footerUpdateClass = "footer-cookies-fade";
             };
 
@@ -124,9 +125,14 @@ angular.module('controllers')
             $scope.link6color = "#ff6e3d";
             $scope.link7color = "#6fa39a";
 
+            var idioma = $rootScope.contentLanguageUserNonLoged;
+            if (window.localStorage.getItem('contentLanguageUserNonLoged')) {
+                idioma = window.localStorage.getItem('contentLanguageUserNonLoged')
+                $rootScope.langabbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
+            }
 
             // Get content for the home view from ddbb
-            Resources.register.get({'section': 'home', 'idLanguage': $rootScope.contentLanguageUserNonLoged}, {'funct': "content"}).$promise
+            Resources.register.get({'section': 'home', 'idLanguage': idioma}, {'funct': "content"}).$promise
                 .then(function (results) {
                     $scope.text = results.data;
                 });

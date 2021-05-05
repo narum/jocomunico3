@@ -5,13 +5,10 @@ class DeleteUserModel extends CI_Model {
     function __construct() {
         parent::__construct();
         $this->load->database();
-        $this->load->library("session");
     }
 
-    function deleteUserBD() {
+    function deleteUserBD($superUserid, $userid) {
        
-        $superUserid = $this->session->userdata('idsu');
-        $userid = $this->session->userdata('idusu');
         $this->DeleteAll($superUserid,$userid);
     }
     

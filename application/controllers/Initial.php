@@ -1,7 +1,7 @@
 <?php
 defined("BASEPATH" or die("El acceso al script no está permitido"));
  
-/*
+/* INITIAL CALL FROM CODEIGNITER TO ANGULARJS
  *clase para hacer de puente entre angularjs y codeigniter
 */
  
@@ -13,6 +13,6 @@ class Initial extends CI_Controller
 	}
 	public function index()
 	{
-		$this->load->view('../../angular_templates/index', TRUE);
+		$this->load->view('../../angular_templates/index', TRUE); 
 	}
 }

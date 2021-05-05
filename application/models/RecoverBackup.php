@@ -3,26 +3,27 @@
 tambien varias funciones auxiliares al final del fichero las cuales cogen las claves recien insertadas para
 evitar colisiones entre claves, en la funcion LaunchTotalRecover es muy importante el orden en el que se ejecutan las
 funciones*/
+
+// It opens backup files and dumps contents into the database
 class RecoverBackup extends CI_Model {
     
     var $isWin = false;
     
     public function __construct(){
         parent::__construct();
-        $this->load->library('session');
         $this->load->database();
         
         $this->isWin = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
     }
     
-    function getKeyCounts()
+    function getKeyCounts($idusu)
     {
-        $gbcont=count($this->getGBkeys());
-        $bcont=count($this->getBoardkey());
-        $scont=count($this->getSentencekey());
-        $fcont=count($this->getfolderkey());
-        $hcont=count($this->getHistorickey());
-        $pcont=count($this->getPictokeys());
+        $gbcont=count($this->getGBkeys($idusu));
+        $bcont=count($this->getBoardkey($idusu));
+        $scont=count($this->getSentencekey($idusu));
+        $fcont=count($this->getfolderkey($idusu));
+        $hcont=count($this->getHistorickey($idusu));
+        $pcont=count($this->getPictokeys($idusu));
         
         $data = array(
             "gbcont" => $gbcont,
@@ -51,55 +52,62 @@ class RecoverBackup extends CI_Model {
     }
 
     //llama a la recuperacion parcial de imagenes
-    function LaunchParcialRecover_images($Fname){
+    function LaunchParcialRecover_images($Fname, $idusu){
       $Fname = $this->folderName($Fname);
-      $this->InsertImages($Fname);
+      $this->InsertImages($Fname, $idusu);
       return ":d";
     }
     
-    function LaunchParcialRecover_Pictograms($Fname, $overwrite){
+    function LaunchParcialRecover_Pictograms($Fname, $overwrite, $idusu, $langid, $pcont){
       $Fname = $this->folderName($Fname);
-      $pcont=count($this->getPictokeys());
-      $this->InsertPictograms($Fname);
-      $this->InsertAdjectives($Fname, $pcont, $overwrite);
-      $this->InsertNames($Fname, $pcont, $overwrite);
-      $this->InsertVerbs($Fname, $pcont, $overwrite);
+      $this->InsertPictograms($Fname, $idusu, $langid);
+      $this->InsertAdjectives($Fname, $pcont, $overwrite, $idusu, $langid);
+      $this->InsertNames($Fname, $pcont, $overwrite, $idusu, $langid);
+      $this->InsertVerbs($Fname, $pcont, $overwrite, $idusu, $langid);
       return "sdfasdf";
     }
       //llama a la recuperacion parcial de la carpetas tematicas
-    function LaunchParcialRecover_Folder($Fname, $cfold, $sscont, $hcont, $overwrite){
+    function LaunchParcialRecover_Folder($Fname, $cfold, $sscont, $hcont, $overwrite, $idusu){
       $Fname = $this->folderName($Fname);
-      $this->InsertSFolder($Fname);
-      $this->InsertSSentence($Fname, $cfold, $overwrite);
-      $this->InsertSHistoric($Fname);
-      $this->InsertRSHistoricPictograms($Fname,$hcont, $overwrite);
-      $bla=$this->InsertRSSentencePictograms($Fname,$sscont, $overwrite);
+            
+      // Check if its Jocomunico 3.0+ or lower version
+      $isHigherVersion = true;
+      $file = file_get_contents($Fname."/Version.txt");
+      if (!$file) $isHigherVersion = false;
+      
+      $this->InsertSFolder($Fname, $idusu);
+      $this->InsertSSentence($Fname, $cfold, $overwrite, $idusu);
+      $this->InsertSHistoric($Fname, $idusu);
+      $this->InsertRSHistoricPictograms($Fname,$hcont, $overwrite, $isHigherVersion, $idusu);
+      $bla=$this->InsertRSSentencePictograms($Fname,$sscont, $overwrite, $isHigherVersion, $idusu);
       return $bla;
     }
       //llama a la recuperacion parcial de configuracion
-    function LaunchParcialRecover_cfg($ow,$Fname){
+    function LaunchParcialRecover_cfg($ow,$Fname, $idsu, $idusu){
       $Fname = $this->folderName($Fname);
-      $this->UpdateSuperUser($Fname,$ow);
-      // $this->UpdateUser($Fname);
+      $this->UpdateSuperUser($Fname,$ow, $idsu, $idusu);
+      // $this->UpdateUser($Fname, $idsu, $idusu);
       return $Fname;
     }
-    function checkifPictogramsexists(){
+    
+    // NOT IN USE
+    private function checkifPictogramsexists($idusu){
      $exists=true;
-       if(count($this->getPictokeys())== 0) $exists=false;
+       if(count($this->getPictokeys($idusu))== 0) $exists=false;
      return $exists;
    }
 
       //llama a la recuperacion parcial de paneles
-    function LaunchParcialRecover_panels($mainGboard,$Fname, $gbcont, $bcont, $scont, $fcont, $pcont, $overwrite){
+    function LaunchParcialRecover_panels($mainGboard,$Fname, $gbcont, $bcont, $scont, $fcont, $pcont, $overwrite, $idusu){
       $Fname = $this->folderName($Fname);
-      $this->InsertGroupBoards($Fname,$mainGboard);
-      $this->InsertBoards($Fname,$gbcont, $overwrite);
-      $this->InsertCells($Fname,$bcont,$scont,$fcont,$pcont, $overwrite);
+      $this->InsertGroupBoards($Fname, $mainGboard, $idusu);
+      $this->InsertBoards($Fname,$gbcont, $overwrite, $idusu);
+      $this->InsertCells($Fname,$bcont,$scont,$fcont,$pcont, $overwrite, $idusu);
       return $Fname;
     }
 
 //Inserta en la base de datos los registros correspondientes a adjectiveClass
-private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLanguage){
+private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLanguage, $idusu, $ID_Language){
     $tableBackup = "";
     $tableInsert = "";
     
@@ -111,9 +119,7 @@ private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLangu
         $tableBackup="AdjClassES";
         break;
     }
-        
-  $ID_Language=$this->session->ulanguage;
-  
+          
   switch($ID_Language){
         case 1:
         $tableInsert="AdjClassCA";
@@ -123,7 +129,7 @@ private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLangu
         break;
   }
     
-    $pictokeys=$this->getPictokeys();
+    $pictokeys=$this->getPictokeys($idusu);
 
  $file = file_get_contents($Folder."/".$tableBackup.".json");
  $pics=file_get_contents($Folder."/Pictograms.json");
@@ -142,7 +148,7 @@ private function InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLangu
 return;
 }
 //Inserta en la base de datos los registros correspondientes a adjectives
-private function InsertAdjectives($Folder, $pcont, $overwrite){
+private function InsertAdjectives($Folder, $pcont, $overwrite, $idusu, $ID_Language){
   $tableBackup = "";
   $tableInsert = "";
     
@@ -158,9 +164,7 @@ private function InsertAdjectives($Folder, $pcont, $overwrite){
         $tableBackup="AdjectiveES";
         break;
     }
-        
-  $ID_Language=$this->session->ulanguage;
-  
+          
   switch($ID_Language){
         case 1:
         $tableInsert="AdjectiveCA";
@@ -170,7 +174,7 @@ private function InsertAdjectives($Folder, $pcont, $overwrite){
         break;
   }
     
-  $pictokeys=$this->getPictokeys();
+  $pictokeys=$this->getPictokeys($idusu);
 
  $file = file_get_contents($Folder."/".$tableBackup.".json");
  $pics=file_get_contents($Folder."/Pictograms.json");
@@ -191,11 +195,11 @@ private function InsertAdjectives($Folder, $pcont, $overwrite){
     $adj->subjdef[$i]
   ));
 }
-$this->InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLanguage);
+$this->InsertAdjectivesClass($Folder, $pcont, $overwrite, $backupLanguage, $idusu, $ID_Language);
 }
 //Inserta en la base de datos los registros correspondientes a boards
-private function InsertBoards($Folder,$gbcont, $overwrite){
- $gbkeys=$this->getGBkeys();
+private function InsertBoards($Folder,$gbcont, $overwrite, $idusu){
+ $gbkeys=$this->getGBkeys($idusu);
  $file = file_get_contents($Folder."/Boards.json");
  $fileGB = file_get_contents($Folder."/GroupBoards.json");
  $boards=json_decode($file);
@@ -222,8 +226,7 @@ private function InsertBoards($Folder,$gbcont, $overwrite){
 }
 return count($gbkeys);
 }
-private function InsertSHistoric($Folder){
-  $ID_User=$this->session->idusu;
+private function InsertSHistoric($Folder, $ID_User){
   $file = file_get_contents($Folder."/S_Historic.json");
   $hs=json_decode($file);
   $count=count($hs->isNegative);
@@ -253,23 +256,23 @@ private function InsertSHistoric($Folder){
   return $count;
 }
 //Inserta en la base de datos los registros correspondientes a cells
-private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite){
+private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite, $idusu){
  $picts = null;
  $ID_Cell=array();
  $a=array();
- $sentencekeys=$this->getSentencekey();
- $folderkeys=$this->getfolderkey();
- $boardkeys=$this->getBoardkey();
- $pictokeys=$this->getPictokeys();
+ $sentencekeys=$this->getSentencekey($idusu);
+ $folderkeys=$this->getfolderkey($idusu);
+ $boardkeys=$this->getBoardkey($idusu);
+ $pictokeys=$this->getPictokeys($idusu);
  
- echo "Num. pictos originals: ".$pcont;
- print_r($pictokeys);
- echo "Num. sentences originals: ".$scont;
- print_r($sentencekeys);
- echo "Num. folders originals: ".$fcont;
- print_r($folderkeys);
- echo "Num. boards originals: ".$bcont;
- print_r($boardkeys);
+// echo "Num. pictos originals: ".$pcont;
+// print_r($pictokeys);
+// echo "Num. sentences originals: ".$scont;
+// print_r($sentencekeys);
+// echo "Num. folders originals: ".$fcont;
+// print_r($folderkeys);
+// echo "Num. boards originals: ".$bcont;
+// print_r($boardkeys);
 
  $file = file_get_contents($Folder."/Cell.json");
  $files = file_get_contents($Folder."/Boards.json");
@@ -301,11 +304,11 @@ private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite){
    }
    if(!(is_null($cells->ID_CSentence[$i]))){
        
-       echo "ID SENTENCE CELL JSON: ".$cells->ID_CSentence[$i]." - ";
+       // echo "ID SENTENCE CELL JSON: ".$cells->ID_CSentence[$i]." - ";
        
        $poscs=array_search($cells->ID_CSentence[$i],$sentences->ID_SSentence);
        
-       echo $poscs;
+       // echo $poscs;
        
     }else{
        $poscs=null;
@@ -316,7 +319,7 @@ private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite){
        $posf=null;
    }
    if($cells->ID_CPicto[$i]>2019){
-   echo "IN?";
+   // echo "IN?";
           $posp=array_search($cells->ID_CPicto[$i],$pic->pictoid);
           $picts=$pictokeys[$posp];
    }else{
@@ -347,17 +350,16 @@ private function InsertCells($Folder,$bcont,$scont,$fcont,$pcont, $overwrite){
     $res=$query->result();
     array_push($ID_Cell,$res[0]->s2);
 }
- $this->InsertRBoardCell($Folder,$ID_Cell,$bcont, $overwrite);
+ $this->InsertRBoardCell($Folder,$ID_Cell,$bcont, $overwrite, $idusu);
  return $sentencekeys;
 }
 //Inserta en la base de datos los registros correspondientes a groupboards
-private function InsertGroupBoards($Folder){
- $ID_User=$this->session->idusu;
+private function InsertGroupBoards($Folder, $mainGboard, $ID_User){
  $file = file_get_contents($Folder."/GroupBoards.json");
  $gboards=json_decode($file);
  $count=count($gboards->ID_GBUser);
    for($i=0;$i<$count;$i++){
-     if($i==0 && !$this->existsmain()) $mainGboard="1"; else $mainGboard="0";
+     if($i==0 && !$this->existsmain($ID_User)) $mainGboard="1"; else $mainGboard="0";
     $sql="INSERT INTO GroupBoards(ID_GBUser,GBname,primaryGroupBoard,defWidth,defHeight,imgGB)VALUES (?,?,?,?,?,?)";
     $this->db->query($sql,
      array(
@@ -371,8 +373,7 @@ private function InsertGroupBoards($Folder){
   }
 }
 //Inserta en la base de datos los registros correspondientes a images
-private function InsertImages($Folder){
- $ID_User=$this->session->idsu;
+private function InsertImages($Folder, $ID_User){
  $file = file_get_contents($Folder."/Images.json");
  $images=json_decode($file);
  $count=count($images->ID_Image);
@@ -388,7 +389,7 @@ private function InsertImages($Folder){
 }
 }
 //Inserta en la base de datos los registros correspondientes a nameclass
-private function InsertNameClass($Folder,$pcont,$overwrite, $backupLanguage){
+private function InsertNameClass($Folder,$pcont,$overwrite, $backupLanguage, $idusu, $ID_Language){
     $tableBackup = "";
     $tableInsert = "";
     
@@ -400,9 +401,7 @@ private function InsertNameClass($Folder,$pcont,$overwrite, $backupLanguage){
         $tableBackup="NameClassES";
         break;
     }
-        
-  $ID_Language=$this->session->ulanguage;
-  
+          
   switch($ID_Language){
         case 1:
         $tableInsert="NameClassCA";
@@ -412,7 +411,7 @@ private function InsertNameClass($Folder,$pcont,$overwrite, $backupLanguage){
         break;
   }
     
- $pictokeys=$this->getPictokeys();
+ $pictokeys=$this->getPictokeys($idusu);
 
  $file = file_get_contents($Folder."/".$tableBackup.".json");
  $nclass=json_decode($file);
@@ -430,7 +429,7 @@ private function InsertNameClass($Folder,$pcont,$overwrite, $backupLanguage){
 }
 }
 //Inserta en la base de datos los registros correspondientes a names
-private function InsertNames($Folder,$pcont, $overwrite){
+private function InsertNames($Folder,$pcont, $overwrite, $idusu, $ID_Language){
     $a=array();
     $tableBackup = "";
     $tableInsert = "";
@@ -448,7 +447,6 @@ private function InsertNames($Folder,$pcont, $overwrite){
         break;
     }
     
-  $ID_Language=$this->session->ulanguage;
   switch($ID_Language){
         case 1:
         $tableInsert="NameCA";
@@ -457,7 +455,7 @@ private function InsertNames($Folder,$pcont, $overwrite){
         $tableInsert="NameES";
         break;
   }
-  $pictokeys=$this->getPictokeys();
+  $pictokeys=$this->getPictokeys($idusu);
   
  $file = file_get_contents($Folder."/".$tableBackup.".json");
  $name=json_decode($file);
@@ -484,12 +482,12 @@ private function InsertNames($Folder,$pcont, $overwrite){
     $name->fempl[$i]
   ));
 }
-  $this->InsertNameClass($Folder,$pcont, $overwrite, $backupLanguage);
+  $this->InsertNameClass($Folder,$pcont, $overwrite, $backupLanguage, $idusu, $ID_Language);
   return $name->nameid;
 }
 
 //Inserta en la base de datos los registros correspondientes a names
-private function InsertVerbs($Folder, $pcont, $overwrite){
+private function InsertVerbs($Folder, $pcont, $overwrite, $idusu, $ID_Language){
     $a = array();
     $tableBackup = "";
     $tableInsert = "";
@@ -507,7 +505,6 @@ private function InsertVerbs($Folder, $pcont, $overwrite){
         break;
     }
     
-    $ID_Language=$this->session->ulanguage;
     switch($ID_Language){
         case 1:
         $tableInsert="VerbCA";
@@ -517,7 +514,7 @@ private function InsertVerbs($Folder, $pcont, $overwrite){
         break;
     }
     
-    $pictokeys=$this->getPictokeys();
+    $pictokeys=$this->getPictokeys($idusu);
     
     $file = file_get_contents($Folder."/".$tableBackup.".json");
     $verb=json_decode($file);
@@ -538,13 +535,13 @@ private function InsertVerbs($Folder, $pcont, $overwrite){
             $verb->actiu[$i]
         ));
     }
-    $this->InsertVerbConjugation($Folder, $pcont, $overwrite, $backupLanguage);
+    $this->InsertVerbConjugation($Folder, $pcont, $overwrite, $backupLanguage, $idusu, $ID_Language);
     
     return $verb->verbid;
 }
 
 //Inserta en la base de datos los registros correspondientes a verbconjugation
-private function InsertVerbConjugation($Folder,$pcont,$overwrite, $backupLanguage){
+private function InsertVerbConjugation($Folder,$pcont,$overwrite, $backupLanguage, $idusu, $ID_Language){
     $tableBackup = "";
     $tableInsert = "";
     
@@ -556,9 +553,7 @@ private function InsertVerbConjugation($Folder,$pcont,$overwrite, $backupLanguag
         $tableBackup="VerbConjugationES";
         break;
     }
-        
-    $ID_Language=$this->session->ulanguage;
-  
+          
     switch($ID_Language){
         case 1:
         $tableInsert="VerbConjugationCA";
@@ -568,7 +563,7 @@ private function InsertVerbConjugation($Folder,$pcont,$overwrite, $backupLanguag
         break;
     }
     
-    $pictokeys=$this->getPictokeys();
+    $pictokeys=$this->getPictokeys($idusu);
 
     $file = file_get_contents($Folder."/".$tableBackup.".json");
     $vconj = json_decode($file);
@@ -591,11 +586,11 @@ private function InsertVerbConjugation($Folder,$pcont,$overwrite, $backupLanguag
         ));
     }
     
-    $this->InsertPattern($Folder, $pcont, $overwrite, $backupLanguage);
+    $this->InsertPattern($Folder, $pcont, $overwrite, $backupLanguage, $idusu, $ID_Language);
 }
 
 //Inserta en la base de datos los registros correspondientes a pattern
-private function InsertPattern($Folder, $pcont, $overwrite, $backupLanguage){
+private function InsertPattern($Folder, $pcont, $overwrite, $backupLanguage, $idusu, $ID_Language){
     $tableBackup = "";
     $tableInsert = "";
     
@@ -607,9 +602,7 @@ private function InsertPattern($Folder, $pcont, $overwrite, $backupLanguage){
         $tableBackup="PatternES";
         break;
     }
-        
-    $ID_Language=$this->session->ulanguage;
-  
+          
     switch($ID_Language){
         case 1:
         $tableInsert="PatternCA";
@@ -619,7 +612,7 @@ private function InsertPattern($Folder, $pcont, $overwrite, $backupLanguage){
         break;
     }
     
-    $pictokeys=$this->getPictokeys();
+    $pictokeys=$this->getPictokeys($idusu);
 
     $file = file_get_contents($Folder."/".$tableBackup.".json");
     $patt = json_decode($file);
@@ -690,9 +683,8 @@ private function InsertPattern($Folder, $pcont, $overwrite, $backupLanguage){
 }
 
 //Inserta en la base de datos los registros correspondientes a pictograms
-private function InsertPictograms($Folder){
+private function InsertPictograms($Folder, $ID_User, $langid){
     $pictosid=array();
-  $ID_User=$this->session->idusu;
  $file = file_get_contents($Folder."/Pictograms.json");
  $pictos=json_decode($file);
  $count=count($pictos->pictoid);
@@ -711,11 +703,10 @@ private function InsertPictograms($Folder){
   array_push($pictosid,$res[0]->s2);
 }
 
-$this->InsertPictogramsLanguage($Folder, $pictosid);
+$this->InsertPictogramsLanguage($Folder, $pictosid, $langid);
 }
 //Inserta en la base de datos los registros correspondientes a pcitogramslanguage
-private function InsertPictogramsLanguage($Folder,$pictosid){
- $ID_Language=$this->session->ulanguage;
+private function InsertPictogramsLanguage($Folder,$pictosid, $ID_Language){
           
  $file = file_get_contents($Folder."/PictogramsLanguage.json");
  $plang=json_decode($file);
@@ -733,8 +724,8 @@ private function InsertPictogramsLanguage($Folder,$pictosid){
 }
 }
 //Inserta en la base de datos los registros correspondientes a R_BoardCell
-private function InsertRBoardCell($Folder,$ID_Cell,$bcont, $overwrite){
-   $boardkeys=$this->getBoardkey();
+private function InsertRBoardCell($Folder,$ID_Cell,$bcont, $overwrite, $idusu){
+   $boardkeys=$this->getBoardkey($idusu);
    $file = file_get_contents($Folder."/R_BoardCell.json");
    $fileB=file_get_contents($Folder."/Boards.json");
    $rbcell=json_decode($file);
@@ -763,12 +754,11 @@ private function InsertRBoardCell($Folder,$ID_Cell,$bcont, $overwrite){
   }
 }
 //Inserta en la base de datos los registros correspondientes a R_S_HistoricPictograms
-private function InsertRSHistoricPictograms($Folder,$scont, $overwrite){
+private function InsertRSHistoricPictograms($Folder,$scont, $overwrite, $isHigherVersion, $ID_User){
   $a=array();
- $histokeys=$this->getHistorickey();
- $pictokeys=$this->getPictokeys();
+ $histokeys=$this->getHistorickey($ID_User);
+ $pictokeys=$this->getPictokeys($ID_User);
  
- $ID_User=$this->session->idusu;
  $file = file_get_contents($Folder."/R_S_HistoricPictograms.json");
  $his=file_get_contents($Folder."/S_Historic.json");
  $picto=file_get_contents($Folder."/Pictograms.json");
@@ -798,9 +788,11 @@ private function InsertRSHistoricPictograms($Folder,$scont, $overwrite){
        $pictoid = $pictokeys[$posp];
    }
    
+   // Jocomunico 3.0+
+   if ($isHigherVersion) {
    array_push($a,$posh);
-  $sql="INSERT INTO R_S_HistoricPictograms(ID_RSHPSentence,pictoid,isplural,isfem,coordinated,ID_RSHPUser,imgtemp)
-  VALUES (?,?,?,?,?,?,?)";
+  $sql="INSERT INTO R_S_HistoricPictograms(ID_RSHPSentence,pictoid,isplural,isfem,coordinated,ID_RSHPUser,imgtemp,texttemp)
+  VALUES (?,?,?,?,?,?,?,?)";
   $this->db->query($sql,array(
     $histokeys[$posh],
     $pictoid,
@@ -808,18 +800,38 @@ private function InsertRSHistoricPictograms($Folder,$scont, $overwrite){
     $rshp->isfem[$i],
     $rshp->coordinated[$i],
     $ID_User,
-    $rshp->imgtemp[$i]
+    $rshp->imgtemp[$i],
+    $rshp->texttemp[$i]
   ));
+  
+   }
+   
+   // Jocomunico 2.0+
+   else {
+        array_push($a,$posh);
+        $sql="INSERT INTO R_S_HistoricPictograms(ID_RSHPSentence,pictoid,isplural,isfem,coordinated,ID_RSHPUser,imgtemp,texttemp)
+        VALUES (?,?,?,?,?,?,?,?)";
+        $this->db->query($sql,array(
+          $histokeys[$posh],
+          $pictoid,
+          $rshp->isplural[$i],
+          $rshp->isfem[$i],
+          $rshp->coordinated[$i],
+          $ID_User,
+          $rshp->imgtemp[$i],
+          ""
+        ));
+   }
+  
 }
 return $rshp;
 }
 //Inserta en la base de datos los registros correspondientes a R_S_SentencePictograms
-private function InsertRSSentencePictograms($Folder,$scont, $overwrite){
+private function InsertRSSentencePictograms($Folder,$scont, $overwrite, $isHigherVersion, $ID_User){
  $a=array();
- $sentkeys=$this->getSSentencekey();
- $pictokeys=$this->getPictokeys();
+ $sentkeys=$this->getSSentencekey($ID_User);
+ $pictokeys=$this->getPictokeys($ID_User);
  
- $ID_User=$this->session->idusu;
  $file = file_get_contents($Folder."/R_S_SentencePictograms.json");
  $sent = file_get_contents($Folder."/S_Sentence.json");
  $picto=file_get_contents($Folder."/Pictograms.json");
@@ -849,24 +861,45 @@ private function InsertRSSentencePictograms($Folder,$scont, $overwrite){
           $pictoid = $pictokeys[$posp];
       }
       
-      array_push($a,$posh);
-  $sql="INSERT INTO `R_S_SentencePictograms` (`ID_RSSPSentence`, `pictoid`, `isplural`, `isfem`, `coordinated`, `ID_RSSPUser`, `imgtemp`)
-  VALUES (?,?,?,?,?,?,?);";
-  $this->db->query($sql,array(
-    $sentkeys[$posh],
-    $pictoid,
-    $rssp->isplural[$i],
-    $rssp->isfem[$i],
-    $rssp->coordinated[$i],
-    $ID_User,
-    $rssp->imgtemp[$i]
-  ));
+      // Jocomunico 3.0+
+      if ($isHigherVersion) {
+      
+        array_push($a,$posh);
+        $sql="INSERT INTO `R_S_SentencePictograms` (`ID_RSSPSentence`, `pictoid`, `isplural`, `isfem`, `coordinated`, `ID_RSSPUser`, `imgtemp`, `texttemp`)
+        VALUES (?,?,?,?,?,?,?,?);";
+        $this->db->query($sql,array(
+          $sentkeys[$posh],
+          $pictoid,
+          $rssp->isplural[$i],
+          $rssp->isfem[$i],
+          $rssp->coordinated[$i],
+          $ID_User,
+          $rssp->imgtemp[$i],
+          $rssp->texttemp[$i]
+        ));
+      }
+      
+      // Jocomunico 2.0+
+      else {
+        array_push($a,$posh);
+        $sql="INSERT INTO `R_S_SentencePictograms` (`ID_RSSPSentence`, `pictoid`, `isplural`, `isfem`, `coordinated`, `ID_RSSPUser`, `imgtemp`, `texttemp`)
+        VALUES (?,?,?,?,?,?,?,?);";
+        $this->db->query($sql,array(
+          $sentkeys[$posh],
+          $pictoid,
+          $rssp->isplural[$i],
+          $rssp->isfem[$i],
+          $rssp->coordinated[$i],
+          $ID_User,
+          $rssp->imgtemp[$i],
+          ""
+        ));
+      }
 }
-return $sentkey;
+return $sentkeys;
 }
 //Inserta en la base de datos los registros correspondientes a S_Folder
-private function InsertSFolder($Folder){
- $ID_User=$this->session->idusu;
+private function InsertSFolder($Folder, $ID_User){
  $file = file_get_contents($Folder."/S_Folder.json");
  $sf=json_decode($file);
  $count=count($sf->ID_Folder);
@@ -885,9 +918,8 @@ private function InsertSFolder($Folder){
 return $sf;
 }
 //Inserta en la base de datos los registros correspondientes a S_Sentence
-private function InsertSSentence($Folder, $folds, $overwrite){
- $ID_User=$this->session->idusu;
- $folderkeys=$this->getfolderkey();
+private function InsertSSentence($Folder, $folds, $overwrite, $ID_User){
+ $folderkeys=$this->getfolderkey($ID_User);
  $file = file_get_contents($Folder."/S_Sentence.json");
  $filefol= file_get_contents($Folder."/S_Folder.json");
  $ss=json_decode($file);
@@ -936,13 +968,12 @@ private function InsertSSentence($Folder, $folds, $overwrite){
 }
 }
 //sobreescribe en la base de datos los registros correspondientes a SuperUser
-private function UpdateSuperUser($Folder,$ow){
- $ID_SU=$this->session->idsu;
- $ID_User=$this->session->idusu;
+private function UpdateSuperUser($Folder,$ow, $ID_SU, $ID_User){
+
  $file = file_get_contents($Folder."/SuperUser.json");
  $su=json_decode($file);
  if($ow){
-   $sql="UPDATE SuperUser SET realname=?, surnames=?, email=?, cfgDefUser=?, cfgIsFem=?, cfgUsageMouseOneCTwoC=?,
+   $sql="UPDATE SuperUser SET realname=?, surnames=?, cfgDefUser=?, cfgIsFem=?, cfgUsageMouseOneCTwoC=?,
     cfgTimeClick=?, cfgExpansionOnOff=?, cfgAutoEraseSentenceBar=?, cfgPredOnOff=?,
     cfgPredBarVertHor=?, cfgPredBarNumPred=?, cfgScanningOnOff=?, cfgScanningCustomRowCol=?,
     cfgScanningAutoOnOff=?, cfgCancelScanOnOff=?, cfgTimeScanning=?, cfgScanStartClick=?,
@@ -958,7 +989,6 @@ private function UpdateSuperUser($Folder,$ow){
     array(
         $su->realname,
         $su->surnames,
-        $su->email,
         $ID_User,
         $su->cfgIsFem,
         $su->cfgUsageMouseOneCTwoC,
@@ -1005,9 +1035,8 @@ private function UpdateSuperUser($Folder,$ow){
  }
 }
 //sobreescribe en la base de datos los registros correspondientes a User
-private function UpdateUser($Folder){
- $ID_User=$this->session->idusu;
- $ID_SU=$this->session->idsu;
+private function UpdateUser($Folder, $ID_SU, $ID_User){
+
  $file = file_get_contents($Folder."/User.json");
  $us=json_decode($file);
  $count=count($us->ID_User);
@@ -1025,9 +1054,8 @@ private function UpdateUser($Folder){
 }
 }
 //coge las claves de la tabla boards insertadas anteriormente
-private function getBoardkey(){
+private function getBoardkey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_Board FROM Boards,GroupBoards WHERE ID_GBUser=? AND ID_GB=ID_GBBoard";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1036,9 +1064,8 @@ private function getBoardkey(){
   return $keys;
 }
 //coge las claves de la tabla Pictograms insertadas anteriormente
-private function getPictokeys(){
+private function getPictokeys($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT pictoid FROM Pictograms WHERE ID_PUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1046,9 +1073,8 @@ private function getPictokeys(){
   }
   return $keys;
 }
-private function getPictokeysType($type){
+private function getPictokeysType($type, $ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT pictoid FROM Pictograms WHERE ID_PUser=? AND pictoType=?";
   $query=$this->db->query($sql,array($ID_User,$type));
   foreach ($query->result() as $row) {
@@ -1057,9 +1083,8 @@ private function getPictokeysType($type){
   return $keys;
 }
 //coge las claves de la tabla Groupboards insertadas anteriormente
-private function getGBkeys(){
+private function getGBkeys($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_GB FROM GroupBoards WHERE ID_GBUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1068,9 +1093,8 @@ private function getGBkeys(){
   return $keys;
 }
 //coge las claves de la tabla S_Folder insertadas anteriormente
-private function getfolderkey(){
+private function getfolderkey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_Folder FROM S_Folder WHERE ID_SFUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1079,9 +1103,8 @@ private function getfolderkey(){
   return $keys;
 }
 //coge las claves de la tabla S_Sentence insertadas anteriormente
-private function getSentencekey(){
+private function getSentencekey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_SSentence FROM S_Sentence WHERE ID_SSUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1089,9 +1112,8 @@ private function getSentencekey(){
   }
   return $keys;
 }
-private function getSSentencekey(){
+private function getSSentencekey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_SSentence FROM S_Sentence WHERE ID_SSUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -1099,17 +1121,15 @@ private function getSSentencekey(){
   }
   return $keys;
 }
-private function existsmain(){
+private function existsmain($ID_User){
   $exists=false;
-  $ID_User=$this->session->idusu;
   $sql="SELECT primaryGroupBoard FROM GroupBoards WHERE ID_GBUser=? AND primaryGroupBoard='1'";
   $query=$this->db->query($sql,$ID_User);
   if($query->num_rows()>0) $exists=true;
   return $exists;
 }
-private function getHistorickey(){
+private function getHistorickey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_SHistoric FROM S_Historic WHERE ID_SHUser=?";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {

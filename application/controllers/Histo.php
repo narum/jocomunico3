@@ -3,6 +3,7 @@
 
 require APPPATH . '/libraries/REST_Controller.php';
 
+// NOT IN USE ANYMORE
 class Histo extends REST_Controller {
     
     public function __construct()

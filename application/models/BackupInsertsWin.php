@@ -3,6 +3,9 @@
 El codigo es un 95% parsear los datos de backupselects en json
 la ultima funcion es la que coge las imagenes y las guarda en una carpeta.
 */
+
+// NOT IN USE ANYMORE
+
 class BackupInsertsWin extends CI_Model{
   function __construct(){
       parent::__construct();

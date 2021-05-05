@@ -1,5 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+// Creates ZIP file from json file contents and downloads the backup for Unix systems
+
 class DownloadBackup extends CI_Controller {
 
   public function __construct(){
@@ -74,6 +76,7 @@ $this->unzip->extract('uploads/my_archive.zip', '/path/to/directory/');
     $S_Sentence = file_get_contents($Fname."/S_Sentence.json");
     $SuperUser = file_get_contents($Fname."/SuperUser.json");
     $User = file_get_contents($Fname."/User.json");
+    $Version = file_get_contents($Fname."/Version.txt");
 
     $backup=array(
     $Adjtable,
@@ -96,7 +99,8 @@ $this->unzip->extract('uploads/my_archive.zip', '/path/to/directory/');
     $S_Folder,
     $S_Sentence,
     $SuperUser,
-    $User);
+    $User,
+    $Version);
 
     $Filenames=array(
     $Adj_name,
@@ -119,7 +123,8 @@ $this->unzip->extract('uploads/my_archive.zip', '/path/to/directory/');
     'S_Folder.json',
     'S_Sentence.json',
     'SuperUser.json',
-    'User.json');
+    'User.json',
+    'Version.txt');
 
     for($i=0;$i<count($backup);$i++){
       $this->zip->add_data($Filenames[$i],$backup[$i]);

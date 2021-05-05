@@ -91,6 +91,9 @@ class PanelInterface extends CI_Model {
         return $data;
     }
 
+    /*
+     * NOT IN USE
+     */
     function getUser($user, $pass) {
         $languageExp = $this->session->userdata('ulanguage');
         $this->db->join('User', 'SuperUser.ID_SU = User.ID_USU', 'left');
@@ -104,6 +107,18 @@ class PanelInterface extends CI_Model {
         } else
             $output = null;
 
+        return $output;
+    }
+    
+    function alreadyKBExample($idusu, $text) {
+        $output = false;
+        $this->db->where('GBname', $text);
+        $this->db->where('ID_GBUser', $idusu);
+        $query = $this->db->get('GroupBoards');
+
+        if ($query->num_rows() > 0) {
+            $output = true;
+        }
         return $output;
     }
 

@@ -8,7 +8,7 @@ class BoardInterface extends CI_Model {
     /*
      * Load the user config
      */
-    function loadCFG($user) {
+    function loadCFG() {
         $newdata = array(
             'cfguser' => 1,
             'cfgExpansionOnOff' => 1,
@@ -16,14 +16,20 @@ class BoardInterface extends CI_Model {
             'cfgPredBarVertHor' => 0,
             'cfgSentenceBarUpDown' => 1
         );
+        
+        $this->session->unset_userdata('cfguser');
+        $this->session->unset_userdata('cfgExpansionOnOff');
+        $this->session->unset_userdata('cfgPredOnOff');
+        $this->session->unset_userdata('cfgPredBarVertHor');
+        $this->session->unset_userdata('cfgSentenceBarUpDown');
+        
         $this->session->set_userdata($newdata);
     }
     /*
      * Get the board struct (columns, rows, name...)
      */
-    function getBoardStruct($id) {
+    function getBoardStruct($id, $idusu) {
         $output = array();
-        $idusu = $this->session->userdata('idusu');
         $this->db->where('ID_GBUser', $idusu);
         $this->db->where('ID_Board', $id);
         $this->db->join('GroupBoards', 'GroupBoards.ID_GB = Boards.ID_GBBoard');
@@ -55,10 +61,9 @@ class BoardInterface extends CI_Model {
     /*
      * Return all pictograms from board
      */
-    function getCellsBoard($id) {
+    function getCellsBoard($id, $idusu, $idlang, $lang) {
         $output = array();
-        $idlang = $this->session->userdata('uinterfacelangauge');
-        $lang = $this->session->userdata('ulangabbr');
+                
         $this->db->where('R_BoardCell.ID_RBoard', $id);
         $this->db->group_by('R_BoardCell.posInBoard');
         $this->db->order_by('R_BoardCell.posInBoard', 'asc');
@@ -106,9 +111,8 @@ class BoardInterface extends CI_Model {
     /*
      * Return one pictogram from the board with the given position in this board
      */
-    function getCell($pos, $idboard) {
+    function getCell($pos, $idboard, $idlang) {
         $output = array();
-        $idlang = $this->session->userdata('uinterfacelangauge');
         $this->db->where('R_BoardCell.ID_RBoard', $idboard);
         $this->db->where('R_BoardCell.posInBoard', $pos);
         $this->db->join('Cell', 'R_BoardCell.ID_RCell = Cell.ID_Cell');
@@ -348,8 +352,8 @@ class BoardInterface extends CI_Model {
     /*
      * Return all functions
      */
-    function getFunctions() {
-        $language = $this->session->userdata('ulangabbr');
+    function getFunctions($language) {
+
         $this->db->order_by('name', 'asc');
         $this->db->select('ID_Function, functName' . $language . ' AS name');
         $query = $this->db->get('Function');
@@ -388,15 +392,16 @@ class BoardInterface extends CI_Model {
     /*
      * Return primarygroupboard from a board group
      */
-    function getPrimaryGroupBoard() {
-        $idusu = $this->session->userdata('idusu');
+    function getPrimaryGroupBoard($idusu) {
+
         $this->db->where('primaryGroupBoard', '1');
         $this->db->where('ID_GBUser', $idusu);
         $query = $this->db->get('GroupBoards');
         if ($query->num_rows() > 0) {
             $output = $query->result();
-        } else
+        } else {
             $output = null;
+        }
         return $output;
     }
     function getInfoGroupBoard($idgroup) {
@@ -433,8 +438,7 @@ class BoardInterface extends CI_Model {
     /*
      * Return all user boards in the same group
      */
-    function getAllBoards() {
-        $idusu = $this->session->userdata('idusu');
+    function getAllBoards($idusu) {
         $this->db->where('ID_GBUser', $idusu);
         $this->db->join('GroupBoards', 'ID_GB = ID_GBBoard');
         $query = $this->db->get('Boards');
@@ -498,8 +502,7 @@ class BoardInterface extends CI_Model {
     /*
      * ADD MODIFIER TO A NOUN THAT WAS JUST ENTERED
      */
-    function afegirModifNom($modif) {
-        $idusu = $this->session->userdata('idusu');
+    function afegirModifNom($modif, $idusu) {
         $this->db->where('ID_RSTPUser', $idusu);
         $query = $this->db->get('R_S_TempPictograms');
         if ($query->num_rows() > 0) {
@@ -608,22 +611,30 @@ class BoardInterface extends CI_Model {
             $output = null;
         return $output;
     }
-    public function AddBoards(){
+    public function AddBoards($idusu, $idlang){
       // $this->LaunchClean();
-      $GBID=$this->createGroupBoard();
-      $this->InsertBoards($GBID);
-      $this->InsertCells();
+      $GBID=$this->createGroupBoard($idusu, $idlang);
+      $this->InsertBoards($GBID, false, $idlang);
+      $this->InsertCells(false, $idlang, $idusu);
       return $GBID;
     }
+    public function AddKBBoards($idusu, $idlang){
+      // $this->LaunchClean();
+      $GBID=$this->createKBGroupBoard($idusu, $idlang);
+      $this->InsertBoards($GBID, true, $idlang);
+      $this->InsertCells(true, $idlang, $idusu);
+      return $GBID;
+    }
+    
+    // NOT IN USE
     private function LaunchClean(){
       $this->cleanRBoardCell();
       $this->cleanCells();
       $this->cleanBoards();
       $this->cleanGroupBoards();
     }
-    private function createGroupBoard(){
-      $ID_User=$this->session->idusu;
-      $ID_Language=$this->session->uinterfacelangauge;
+    private function createGroupBoard($ID_User, $ID_Language){
+
       if($ID_Language==1){
         $GBname='Exemple';
       }else{
@@ -636,73 +647,89 @@ class BoardInterface extends CI_Model {
        $res=$query->result();
        return $res[0]->s2;
     }
-    private function cleanGroupBoards(){
-      $ID_User=$this->session->idusu;
-      $ID_Language=$this->session->uinterfacelangauge;
+    private function createKBGroupBoard($ID_User, $ID_Language){
+      
       if($ID_Language==1){
-        $GBname='nous Grups';
+        $GBname='Teclat';
       }else{
-        $GBname='Grupos nuevos';
+        $GBname='Teclado';
       }
-      $sql="DELETE GroupBoards FROM GroupBoards WHERE GBname=? AND ID_GBUser=?";
-      $this->db->query($sql,array($GBname,$ID_User));
+       $sql="INSERT INTO `GroupBoards` (`ID_GBUser`, `GBname`, `primaryGroupBoard`, `defWidth`, `defHeight`, `imgGB`)
+       VALUES (?,?,?,?,?,?)";
+       $a=$this->db->query($sql,array($ID_User,$GBname,0,10,5,NULL));
+       $query=$this->db->query("SELECT LAST_INSERT_ID() as s2");
+       $res=$query->result();
+       return $res[0]->s2;
     }
-    private function cleanRBoardCell(){
-      $ID_User=$this->session->idusu;
-      $boardkey=$this->getBoardkey();
-      for($i=0;$i<count($boardkey);$i++){
-        $sql="DELETE R_BoardCell FROM R_BoardCell INNER JOIN Cell ON
-        R_BoardCell.ID_RCell = Cell.ID_Cell AND R_BoardCell.ID_RBoard=?";
-        $this->db->query($sql,$boardkey[$i]);
-      }
-    }
-    private function cleanCells(){
-      $ID_User=$this->session->idusu;
-      $boardkey=$this->getBoardkey();
-      for($i=0;$i<count($boardkey);$i++){
-      $sql="DELETE Cell FROM Cell INNER JOIN R_BoardCell ON
-      R_BoardCell.ID_RCell = Cell.ID_Cell AND R_BoardCell.ID_RBoard=?";
-      $this->db->query($sql,$boardkey[$i]);
-     }
-    }
-    private function cleanBoards(){
-      $ID_User=$this->session->idusu;
-      $sql="DELETE Boards FROM Boards INNER JOIN GroupBoards ON GroupBoards.ID_GB = Boards.ID_GBBoard AND GroupBoards.ID_GBUser=?
-      AND Boards.Bname NOT LIKE '%T. V.%' AND Boards.Bname NOT LIKE '%T. F.%' AND
-      Boards.Bname NOT LIKE '%P. 1%' AND Boards.Bname NOT LIKE '%P. 2%'";
-      $this->db->query($sql,$ID_User);
-    }
+    
+//    private function cleanGroupBoards(){
+//      $ID_User=$this->session->idusu;
+//      $ID_Language=$this->session->uinterfacelangauge;
+//      if($ID_Language==1){
+//        $GBname='nous Grups';
+//      }else{
+//        $GBname='Grupos nuevos';
+//      }
+//      $sql="DELETE GroupBoards FROM GroupBoards WHERE GBname=? AND ID_GBUser=?";
+//      $this->db->query($sql,array($GBname,$ID_User));
+//    }
+//    private function cleanRBoardCell(){
+//      $ID_User=$this->session->idusu;
+//      $boardkey=$this->getBoardkey();
+//      for($i=0;$i<count($boardkey);$i++){
+//        $sql="DELETE R_BoardCell FROM R_BoardCell INNER JOIN Cell ON
+//        R_BoardCell.ID_RCell = Cell.ID_Cell AND R_BoardCell.ID_RBoard=?";
+//        $this->db->query($sql,$boardkey[$i]);
+//      }
+//    }
+//    private function cleanCells(){
+//      $ID_User=$this->session->idusu;
+//      $boardkey=$this->getBoardkey();
+//      for($i=0;$i<count($boardkey);$i++){
+//      $sql="DELETE Cell FROM Cell INNER JOIN R_BoardCell ON
+//      R_BoardCell.ID_RCell = Cell.ID_Cell AND R_BoardCell.ID_RBoard=?";
+//      $this->db->query($sql,$boardkey[$i]);
+//     }
+//    }
+//    private function cleanBoards(){
+//      $ID_User=$this->session->idusu;
+//      $sql="DELETE Boards FROM Boards INNER JOIN GroupBoards ON GroupBoards.ID_GB = Boards.ID_GBBoard AND GroupBoards.ID_GBUser=?
+//      AND Boards.Bname NOT LIKE '%T. V.%' AND Boards.Bname NOT LIKE '%T. F.%' AND
+//      Boards.Bname NOT LIKE '%P. 1%' AND Boards.Bname NOT LIKE '%P. 2%'";
+//      $this->db->query($sql,$ID_User);
+//    }
     //Inserta en la base de datos los registros correspondientes a boards
-private function InsertBoards($gbid){
- $ID_Language=$this->session->uinterfacelangauge;
+private function InsertBoards($gbid, $kb, $ID_Language){
+    
     if($ID_Language==1){
-      $filename='./boards/BoardsC.json';
+      if ($kb) $filename='./boards/KBBoardsC.json';
+      else $filename='./boards/BoardsC.json';
     }else{
-      $filename='./boards/Boards.json';
- }
+      if ($kb) $filename='./boards/KBBoards.json';
+      else $filename='./boards/Boards.json';
+    }
   
- $file = file_get_contents($filename);
- $boards=json_decode($file);
- $count=count($boards->ID_Board);
+    $file = file_get_contents($filename);
+    $boards=json_decode($file);
+    $count=count($boards->ID_Board);
   
- for($i=0;$i<$count;$i++){
-  $sql="INSERT INTO Boards(ID_GBBoard,primaryboard,Bname,width,height,autoReturn,autoReadSentence)
-   VALUES (?,?,?,?,?,?,?)";
-  $this->db->query($sql,array(
-    $gbid,
-    $boards->primaryboard[$i],
-    $boards->Bname[$i],
-    $boards->width[$i],
-    $boards->height[$i],
-    $boards->autoReturn[$i],
-    $boards->autoReadSentence[$i]
-  ));
+    for($i=0;$i<$count;$i++){
+        $sql="INSERT INTO Boards(ID_GBBoard,primaryboard,Bname,width,height,autoReturn,autoReadSentence)
+        VALUES (?,?,?,?,?,?,?)";
+        $this->db->query($sql,array(
+        $gbid,
+        $boards->primaryboard[$i],
+        $boards->Bname[$i],
+        $boards->width[$i],
+        $boards->height[$i],
+        $boards->autoReturn[$i],
+        $boards->autoReadSentence[$i]
+      ));
+    }
+    return $count;
 }
-return $count;
-}
-    private function getBoardkey(){
+    private function getBoardkey($ID_User){
       $keys=array();
-      $ID_User=$this->session->idusu;
       $sql="SELECT * FROM Boards,GroupBoards WHERE GroupBoards.ID_GBUser=? AND
       GroupBoards.ID_GB=Boards.ID_GBBoard AND Boards.Bname NOT LIKE '%T. V.%' AND Boards.Bname NOT LIKE '%T. F.%' AND
       Boards.Bname NOT LIKE '%P. 1%' AND Boards.Bname NOT LIKE '%P. 2%'";
@@ -714,29 +741,41 @@ return $count;
     }
     
     //Inserta en la base de datos los registros correspondientes a cells
-private function InsertCells(){
+private function InsertCells($kb, $ID_Language, $idusu){
  $ID_Cell=array();
- $boardkeys=$this->getBoardkey();
+ $boardkeys=$this->getBoardkey($idusu);
   
- $ID_Language=$this->session->uinterfacelangauge;
      if($ID_Language==1){
-       $filepath = file_get_contents("./boards/CellC.json");
-       $filebpath=file_get_contents("./boards/BoardsC.json");
+            if ($kb) {
+                 $filepath = file_get_contents("./boards/KBCellC.json");
+                 $filebpath=file_get_contents("./boards/KBBoardsC.json");
+            }
+            else {
+                 $filepath = file_get_contents("./boards/CellC.json");
+                 $filebpath=file_get_contents("./boards/BoardsC.json");
+            }
      }else{
-       $filepath = file_get_contents("./boards/Cell.json");
-       $filebpath=file_get_contents("./boards/Boards.json");
+            if ($kb) {
+                $filepath = file_get_contents("./boards/KBCell.json");
+                $filebpath=file_get_contents("./boards/KBBoards.json");
+            }
+            else {
+                $filepath = file_get_contents("./boards/Cell.json");
+                $filebpath=file_get_contents("./boards/Boards.json");
+            }
      }
 
  $cells=json_decode($filepath);
  
- print_r($cells);
+ // print_r($cells);
  $boards=json_decode($filebpath);
  
- $boardkeys=array_slice($boardkeys,-34);
+ if ($kb) $boardkeys=array_slice($boardkeys,-1);
+ else $boardkeys=array_slice($boardkeys,-34);
   
  $count=count($cells->ID_Cell);
  
- echo "NUM. CELLS: ".$count;
+ // echo "NUM. CELLS: ".$count;
  for($i=0;$i<$count;$i++){
    if(!(is_null($cells->boardLink[$i]))){
        $posc=array_search($cells->boardLink[$i],$boards->ID_Board);
@@ -766,28 +805,42 @@ private function InsertCells(){
     $res=$query->result();
     array_push($ID_Cell,$res[0]->s2);
 }
- $this->InsertRBoardCell($ID_Cell);
+ $this->InsertRBoardCell($ID_Cell, $kb, $ID_Language, $idusu);
  return $boardkeys;
 }
     
     //Inserta en la base de datos los registros correspondientes a R_BoardCell
-private function InsertRBoardCell($ID_Cell){
-   $boardkeys=$this->getBoardkey();
+private function InsertRBoardCell($ID_Cell, $kb, $ID_Language, $idusu){
+   $boardkeys=$this->getBoardkey($idusu);
    
-   $ID_Language=$this->session->uinterfacelangauge;
        if($ID_Language==1){
-         $filepath = file_get_contents("./boards/R_BoardCellC.json");
-         $filebpath=file_get_contents("./boards/BoardsC.json");
-       }else{
-         $filepath = file_get_contents("./boards/R_BoardCell.json");
-         $filebpath=file_get_contents("./boards/Boards.json");
-       }
+                if ($kb) {
+                     $filepath = file_get_contents("./boards/KBR_BoardCellC.json");
+                     $filebpath=file_get_contents("./boards/KBBoardsC.json");
+                }
+                else {
+                     $filepath = file_get_contents("./boards/R_BoardCellC.json");
+                     $filebpath=file_get_contents("./boards/BoardsC.json");
+                }
+        }else{
+                if ($kb) {
+                    $filepath = file_get_contents("./boards/KBR_BoardCell.json");
+                    $filebpath=file_get_contents("./boards/KBBoards.json");
+                }
+                else {
+                    $filepath = file_get_contents("./boards/R_BoardCell.json");
+                    $filebpath=file_get_contents("./boards/Boards.json");
+                }
+        }
    
    $rbcell=json_decode($filepath);
    $boards=json_decode($filebpath);
    
    $count=count($rbcell->ID_RBoard);
-   $boardkeys=array_slice($boardkeys, -34);
+   
+    if ($kb) $boardkeys=array_slice($boardkeys,-1);
+    else $boardkeys=array_slice($boardkeys,-34);
+ 
    for($i=0;$i<$count;$i++){
      if(!(is_null($rbcell->ID_RBoard[$i]))){
          $posc=array_search($rbcell->ID_RBoard[$i],$boards->ID_Board);
@@ -961,8 +1014,7 @@ private function InsertRBoardCell($ID_Cell){
     /*
      * Get the last img asociate to the picto
      */
-    function getImgCell($id) {
-        $idusu = $this->session->userdata('idusu');
+    function getImgCell($id, $idusu) {
         $this->db->where('P_StatsUserPicto.ID_PSUPUser', $idusu);
         $this->db->where('P_StatsUserPicto.pictoid', $id);
         $query = $this->db->get('P_StatsUserPicto');
@@ -986,30 +1038,27 @@ private function InsertRBoardCell($ID_Cell){
         } else
             return null;
     }
-    function getColors() {
-        $idLanguage = $this->session->userdata('uinterfacelangauge');
+    function getColors($idlang) {
         $this->db->select('tagString, content'); // Seleccionar les columnes
         $this->db->from('Content'); // Seleccionem la taula
         $this->db->where('section', 'color'); // filtrem per columnes
-        $this->db->where('ID_CLanguage', $idLanguage); // filtrem per columnes
+        $this->db->where('ID_CLanguage', $idlang); // filtrem per columnes
         $this->db->order_by('Content.content', 'asc');
         $query = $this->db->get(); // Fem la query i la guardem a la variable query
         return $query->result_array(); // retornem l'array query amb els resultats
     }
-    function get_errorText($errorID) {
-        $idLanguage = $this->session->userdata('uinterfacelangauge');
+    function get_errorText($errorID, $idlang) {
         $this->db->select('tagString, content'); // Seleccionar les columnes
         $this->db->from('Content'); // Seleccionem la taula
         $this->db->where('tagString', $errorID); // filtrem per columnes
-        $this->db->where('ID_CLanguage', $idLanguage); // filtrem per columnes
+        $this->db->where('ID_CLanguage', $idlang); // filtrem per columnes
         $query = $this->db->get(); // Fem la query i la guardem a la variable query
         return $query->result_array();
     }
 
-    function ErrorAudioToDB($errorCode) {
-        $idUser = $this->session->userdata('idusu');
+    function ErrorAudioToDB($errorCode, $idusu) {
         $this->db->set('errorTemp', $errorCode);
-        $this->db->where('ID_User', $idUser);
+        $this->db->where('ID_User', $idusu);
         $this->db->update('User');
     }
 

@@ -10,12 +10,9 @@ class BackupController extends REST_Controller {
         parent::__construct();
         $this->load->model("BackupInserts");
         $this->load->model("RecoverBackup");
-        $this->load->model("Main_model");
         $this->load->model("BackupClean");
-        $this->load->model('BoardInterface');
-        $this->load->library('session');
     }
-    //crea la carpeta para los backups
+    //crea la carpeta para los backups y todos sus contenidos
 public function index_get(){
   
   $data=$this->BackupInserts->createBackupFolder();
@@ -25,9 +22,29 @@ public function index_get(){
   $this->response($response, REST_Controller::HTTP_OK);
 }
 
+public function dobackup_post(){
+    
+    $postdata = file_get_contents("php://input");
+    $request = json_decode($postdata);
+    $idsu = $request->idsu;
+    $idusu = $request->idusu;
+    $langid = $request->langid;
+  
+  $data=$this->BackupInserts->createBackupFolder($idsu, $idusu, $langid);
+  $response = [
+      'data' => $data
+  ];
+  $this->response($response, REST_Controller::HTTP_OK);
+}
 
-public function getkeycounts_get(){
-  $data=$this->RecoverBackup->getKeyCounts();
+
+public function getkeycounts_post(){
+    
+    $postdata = file_get_contents("php://input");
+    $request = json_decode($postdata);
+    $idusu = $request->idusu;
+    
+  $data=$this->RecoverBackup->getKeyCounts($idusu);
   $response = [
       'data' => $data
   ];
@@ -37,9 +54,12 @@ public function getkeycounts_get(){
 public function recimages_post(){
   $overwrite=$this->post('overwrite');
   $Fname=$this->post("folder");
-  if($overwrite) $this->BackupClean->LaunchParcialClean_images();
+
+  $idusu = $this->post("idusu");
   
-  $data=$this->RecoverBackup->LaunchParcialRecover_images($Fname);
+  if($overwrite) $this->BackupClean->LaunchParcialClean_images($idusu);
+  
+  $data=$this->RecoverBackup->LaunchParcialRecover_images($Fname, $idusu);
   $response = [
       'data' => $data
   ];
@@ -48,9 +68,13 @@ public function recimages_post(){
 public function recpictos_post(){
   $overwrite=$this->post('overwrite');
   $Fname=$this->post("folder");
-  if($overwrite) $this->BackupClean->LaunchParcialClean_Pictograms();
+  $idusu = $this->post("idusu");
+  $langid = $this->post("langid");
+  $keycounts=$this->post("keycounts");
+    
+  if($overwrite) $this->BackupClean->LaunchParcialClean_Pictograms($idusu, $langid);
 
-  $data=$this->RecoverBackup->LaunchParcialRecover_Pictograms($Fname, $overwrite);
+  $data=$this->RecoverBackup->LaunchParcialRecover_Pictograms($Fname, $overwrite, $idusu, $langid, $keycounts["pcont"]);
   $response = [
       'data' => $data
   ];
@@ -58,10 +82,13 @@ public function recpictos_post(){
 }
 //recupera el vocabulario y las inserta en la nueva base de datos
 public function recvocabulary_post(){
-  $overwrite=$this->post('overwrite');
+  $overwrite=false;
   $Fname=$this->post("folder");
+  $idusu = $this->post("idusu");
+  $langid = $this->post("langid");
+  $keycounts=$this->post("keycounts");
   
-  $data=$this->RecoverBackup->LaunchParcialRecover_Pictograms($Fname, $overwrite);
+  $data=$this->RecoverBackup->LaunchParcialRecover_Pictograms($Fname, $overwrite, $idusu, $langid, $keycounts["pcont"]);
   $response = [
       'data' => $data
   ];
@@ -73,10 +100,11 @@ public function recfolder_post(){
   $overwrite=$this->post('overwrite');
   $Fname=$this->post("folder");
   $keycounts=$this->post("keycounts");
+  $idusu = $this->post("idusu");
   
-  if($overwrite) $this->BackupClean->LaunchParcialClean_Folder();
+  if($overwrite) $this->BackupClean->LaunchParcialClean_Folder($idusu);
   
-  $data=$this->RecoverBackup->LaunchParcialRecover_Folder($Fname,$keycounts["fcont"],$keycounts["scont"],$keycounts["hcont"], $overwrite);
+  $data=$this->RecoverBackup->LaunchParcialRecover_Folder($Fname,$keycounts["fcont"],$keycounts["scont"],$keycounts["hcont"], $overwrite, $idusu);
   $response = [
       'data' => $data
   ];
@@ -87,8 +115,10 @@ public function recfolder_post(){
 public function reccfg_post(){
   $overwrite=$this->post('overwrite');
   $Fname=$this->post("folder");
+  $idusu = $this->post("idusu");
+  $idsu = $this->post("idsu");
   
-  $this->RecoverBackup->LaunchParcialRecover_cfg($overwrite,$Fname);
+  $this->RecoverBackup->LaunchParcialRecover_cfg($overwrite,$Fname,$idsu,$idusu);
   $response = [
       'data' => $Fname
   ];
@@ -98,23 +128,34 @@ public function recpanels_post(){
   $overwrite=$this->post('overwrite');
   $Fname=$this->post("folder");
   $keycounts=$this->post("keycounts");
+  $idusu = $this->post("idusu");
+  
   if($overwrite){
     $mainGboard=true;
-    $this->BackupClean->LaunchParcialClean_panels();
+    $this->BackupClean->LaunchParcialClean_panels($idusu);
   }else{
     $mainGboard=false;
   }
   
-  $data=$this->RecoverBackup->LaunchParcialRecover_panels($mainGboard,$Fname, $keycounts["gbcont"], $keycounts["bcont"], $keycounts["scont"], $keycounts["fcont"], $keycounts["pcont"], $overwrite);
+  $data=$this->RecoverBackup->LaunchParcialRecover_panels($mainGboard,$Fname, $keycounts["gbcont"], $keycounts["bcont"], $keycounts["scont"], $keycounts["fcont"], $keycounts["pcont"], $overwrite, $idusu);
   $response = [
       'data' => $data
   ];
   $this->response($response, REST_Controller::HTTP_OK);
 }
-public function recbackup_get(){
-  $this->BackupClean->LaunchClean();
+
+// NOT IN USE
+public function recbackup_post(){
+    
+    $postdata = file_get_contents("php://input");
+    $request = json_decode($postdata);
+    $idsu = $request->idsu;
+    $idusu = $request->idusu;
+    $langid = $request->langid;
+    
+  $this->BackupClean->LaunchClean($idusu, $langid);
   
-  $data=$this->RecoverBackup->LaunchTotalRecover();
+  $data=$this->RecoverBackup->LaunchTotalRecover($idsu, $idusu, $langid);
   $response = [
       'data' => $data
   ];

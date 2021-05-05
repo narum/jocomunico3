@@ -18,8 +18,15 @@ class Historic extends REST_Controller {
     }
 
     public function getSFolder_post() {
-        $idusu = $this->session->userdata('idusu');
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        
         $sFolder = $this->HistoricInterface->getSFolders($idusu);
+        
+        if ($sFolder == NULL) {
+            $sFolder = array();
+        }
 
         $response = [
             'sFolder' => $sFolder
@@ -32,13 +39,14 @@ class Historic extends REST_Controller {
         $request = json_decode($postdata);
         $day = $request->day;
         $pagHistoric = $request->pagHistoric;
+        $idusu = $request->idusu;
 
         $historicArray = array();
-        $idusu = $this->session->userdata('idusu');
         $historic = $this->HistoricInterface->getHistoric($idusu, $day);
+        
         for ($i = $pagHistoric; $i < count($historic) && $i < $pagHistoric + 10; $i++){
             $arrayProv[0] = $historic[$i];
-            $arrayProv[1] = $this->HistoricInterface->getPictosHistoric($historic[$i]->ID_SHistoric);
+            $arrayProv[1] = $this->HistoricInterface->getPictosHistoric($historic[$i]->ID_SHistoric, $idusu);
             array_push($historicArray,$arrayProv);
         }
         $count = $this->HistoricInterface->getCountHistoric($idusu, $day);
@@ -55,14 +63,14 @@ class Historic extends REST_Controller {
         $request = json_decode($postdata);
         $idfolder = $request->folder;
         $pagHistoric = $request->pagHistoric;
+        $idusu = $request->idusu;
         
         $sentenceArray = array();
-        $idusu = $this->session->userdata('idusu');
         $sentenece = $this->HistoricInterface->getSentenceFolder($idusu, $idfolder);
 
         for ($i = $pagHistoric; $i < count($sentenece) && $i < $pagHistoric + 10; $i++){
             $arrayProv[0] = $sentenece[$i];
-            $arrayProv[1] = $this->HistoricInterface->getPictosFolder($sentenece[$i]->ID_SSentence);
+            $arrayProv[1] = $this->HistoricInterface->getPictosFolder($sentenece[$i]->ID_SSentence, $idusu);
             array_push($sentenceArray,$arrayProv);
         }
         $count = $this->HistoricInterface->getCountSentenceFolder($idusu, $idfolder);
@@ -76,7 +84,9 @@ class Historic extends REST_Controller {
 
     public function getHistorialState_post() {
         
-        $state = $this->HistoricInterface->getHistorialState();
+        $idusu = $this->post('idusu');
+        
+        $state = $this->HistoricInterface->getHistorialState($idusu);
         $response = [
             'state' => $state
         ];
@@ -85,16 +95,21 @@ class Historic extends REST_Controller {
 
     public function changeHistorialState_post() {
         $newstate = $this->post('newState');
-        $prevstate = $this->HistoricInterface->getHistorialState();
-        $this->HistoricInterface->changeHistorialState($newstate);
+        $idusu = $this->post('idusu');
+        $prevstate = $this->HistoricInterface->getHistorialState($idusu);
+        $this->HistoricInterface->changeHistorialState($newstate, $idusu);
         if ($newstate != $prevstate) {
-            $this->HistoricInterface->deleteHistoric();
+            $this->HistoricInterface->deleteHistoric($idusu);
         }
         $this->response(null, REST_Controller::HTTP_OK);
     }
     
+    /*
+     * NOT IN USE
+     */
     public function deleteHistoric_post(){
-        $this->HistoricInterface->deleteHistoric();
+        $idusu = $this->post('idusu');
+        $this->HistoricInterface->deleteHistoric($idusu);
     }
     
 }

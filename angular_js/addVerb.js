@@ -149,6 +149,7 @@ var app = angular.module('controllers');
             var uploadUrl = $scope.baseurl + "ImgUploader/upload";
             var fd = new FormData();
             fd.append('vocabulary', angular.toJson(true));
+            fd.append('idusu', $rootScope.userId);
             for (i = 0; i < $scope.myFile.length; i++) {
                 fd.append('file' + i, $scope.myFile[i]);
             }
@@ -188,7 +189,7 @@ var app = angular.module('controllers');
 
         $scope.getConjugations = function (){
             var URL = $scope.baseurl + "AddVerb/getConjugations";
-            var postdata = {verb : $scope.verb.name};
+            var postdata = {verb : $scope.verb.name, langabbr: $rootScope.languageAbbr, idusu: $rootScope.userId};
             console.log(postdata);
             $http.post(URL, postdata).success(function (response) {
                 console.log(response);
@@ -745,7 +746,7 @@ var app = angular.module('controllers');
            if ($scope.isEdit === true){
                $scope.imgHasBeenUploaded = true;
                var URL = $scope.baseurl + "AddVerb/getAllData";
-               var postdata = {verbID : $scope.verbID};
+               var postdata = {verbID : $scope.verbID, langabbr: $rootScope.languageAbbr};
                $http.post(URL, postdata).success(function (response) {
                    console.log(response);
                    $scope.conjugations = response.conjugations;
@@ -975,7 +976,7 @@ var app = angular.module('controllers');
         $scope.addVerb = function(){
                 if(!checkVerbErrors($scope.addVerbErrors) && !checkErrorsConjugations()){
                     var URL = $scope.baseurl + "AddVerb/verbExist";
-                    var postdata = {verb : $scope.verb.name};
+                    var postdata = {verb : $scope.verb.name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr};
                     $http.post(URL, postdata).success(function (response) {
                         if(response === true && $scope.isEdit !== true){
                             var textBD = $scope.content;
@@ -1000,7 +1001,7 @@ var app = angular.module('controllers');
                                                     formasNoPersonales: $scope.formasNoPersonales};
 
                                 var URL = $scope.baseurl + "AddVerb/insertData";
-                                var postdata = {isEdit: $scope.isEdit, verbID: $scope.verbID, img: $scope.imgPicto.value, folder: $scope.imgFolder.value, verb: $scope.verb.name, pronominal: $scope.pronominal.value, conjugations: conjugations, patterns: patterns};
+                                var postdata = {isEdit: $scope.isEdit, verbID: $scope.verbID, img: $scope.imgPicto.value, folder: $scope.imgFolder.value, verb: $scope.verb.name, pronominal: $scope.pronominal.value, conjugations: conjugations, patterns: patterns, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr};
                                 console.log(postdata);
                                 $http.post(URL, postdata).success(function (response){
                                     console.log(response);
@@ -1013,7 +1014,7 @@ var app = angular.module('controllers');
                 }
         };
         $scope.EditWordRemove = function () {
-            var postdata = {id: $scope.verbID, type: 'verb'};
+            var postdata = {id: $scope.verbID, type: 'verb', idusu: $rootScope.userId, langid: $rootScope.expanLanguageId};
             console.log(postdata);
             var URL = $scope.baseurl + "AddWord/EditWordRemove";
             $http.post(URL, postdata).success(function (response){
@@ -1040,7 +1041,7 @@ var app = angular.module('controllers');
              */
              $scope.searchStartImg = function (name) {
                 var url = $scope.baseurl + "ARASAAC/searchDelete";
-                var postdata = {name: name};
+                var postdata = {name: name, idusu: $rootScope.userId};
                 $http.post(url, postdata).
                 success(function (response)
                 {

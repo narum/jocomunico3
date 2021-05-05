@@ -46,10 +46,9 @@ class AddWordInterface extends CI_Model {
         return $voc;
     }
 
-    function EditWordNoms($id) {
+    function EditWordNoms($id, $idusu, $userlanguage) {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('nameid', $id);
         $this->db->join('Pictograms', 'Name' . $userlanguage . '.nameid = Pictograms.pictoid', 'left');
         $query = $this->db->get('Name' . $userlanguage);
@@ -61,10 +60,9 @@ class AddWordInterface extends CI_Model {
 
         return $output;
     }
-    function EditWordAdj($id) {
+    function EditWordAdj($id, $idusu, $userlanguage) {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('adjid', $id);
         $this->db->join('Pictograms', 'Adjective' . $userlanguage . '.adjid = Pictograms.pictoid', 'left');
         $query = $this->db->get('Adjective' . $userlanguage);
@@ -77,9 +75,8 @@ class AddWordInterface extends CI_Model {
         return $output;
     }
 
-    function getDBClassNames($id) {
+    function getDBClassNames($id, $userlanguage) {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
         $this->db->where('nameid', $id);
         $this->db->select('class');
         $query = $this->db->get('NameClass' . $userlanguage);
@@ -91,9 +88,8 @@ class AddWordInterface extends CI_Model {
 
         return $output;
     }
-    function getDBClassAdj($id) {
+    function getDBClassAdj($id, $userlanguage) {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
         $this->db->where('adjid', $id);
         $this->db->select('class');
         $query = $this->db->get('AdjClass' . $userlanguage);
@@ -107,12 +103,7 @@ class AddWordInterface extends CI_Model {
     }
 
     
-    function getDBVerbs(){
-        $user = $this->session->userdata('idusu');
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
+    function getDBVerbs($user, $languageExp, $languageInt){
 
         $output = array();
 
@@ -138,16 +129,12 @@ class AddWordInterface extends CI_Model {
      * Gets all names from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBNamesLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
+    function getDBNamesLike($startswith, $user, $languageExp, $languageInt) {
 
         $output = array();
         $this->db->limit(6); // limit up to 6
 
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt);
         //$this->db->or_where('Pictograms.ID_PUser', $user); //Get all default and own user pictos
@@ -169,16 +156,12 @@ class AddWordInterface extends CI_Model {
      * Gets all verbs from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBVerbsLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
+    function getDBVerbsLike($startswith, $user, $languageExp, $languageInt) {
 
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt); //Get all default and own user pictos
         $this->db->select('verbid as id, PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');
@@ -201,16 +184,12 @@ class AddWordInterface extends CI_Model {
      * Gets all adjectius from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBAdjLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
+    function getDBAdjLike($startswith, $user, $languageExp, $languageInt) {
 
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt); //Get all default and own user pictos
         $this->db->select('adjid as id,PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');
@@ -231,16 +210,12 @@ class AddWordInterface extends CI_Model {
      * Gets all expressions from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBExprsLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
-
+    function getDBExprsLike($startswith, $user, $languageExp, $languageInt) {
+        
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt); //Get all default and own user pictos
         $this->db->select('exprid as id, PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');
@@ -261,16 +236,12 @@ class AddWordInterface extends CI_Model {
      * Gets all adverbs from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBAdvsLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
+    function getDBAdvsLike($startswith, $user, $languageExp, $languageInt) {
 
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt); //Get all default and own user pictos
         $this->db->select('advid as id, PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');
@@ -292,16 +263,12 @@ class AddWordInterface extends CI_Model {
      * Gets all modifier from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBModifsLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
-
+    function getDBModifsLike($startswith, $user, $languageExp, $languageInt) {
+        
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt); //Get all default and own user pictos
         $this->db->select('modid as id, PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');
@@ -323,16 +290,12 @@ class AddWordInterface extends CI_Model {
      * Gets all QuestionPart from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBQuestionPartLike($startswith, $user) {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
-
+    function getDBQuestionPartLike($startswith, $user, $languageExp, $languageInt) {
+        
         $output = array();
 
         $this->db->limit(6);
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $user));
         $this->db->where('Pictograms.ID_PUser', $user);
         $this->db->where('PictogramsLanguage.languageid', $languageInt);  //Get all default and own user pictos
         $this->db->select('questid as id, PictogramsLanguage.pictotext as text, Pictograms.pictoType as type, imgPicto, imgFolder');

@@ -142,9 +142,7 @@ class Main_model extends CI_Model {
     // JORGE: Codigo para conseguir el usuario de la base de datos.
 
     function getUser($user, $pass) {
-        $languageExp = $this->session->userdata('ulanguage');
         $this->db->join('User', 'SuperUser.ID_SU = User.ID_USU', 'left');
-        $this->db->where('cfgExpansionLanguage', $languageExp);
         $this->db->where('SUname', $user);
         $this->db->where('pswd', md5($pass));
         $query = $this->db->get('SuperUser');
@@ -238,7 +236,7 @@ class Main_model extends CI_Model {
         $this->db->from('SuperUser');
         $this->db->join('User', 'SuperUser.cfgDefUser = User.ID_User');
         $this->db->join('Languages', 'SuperUser.cfgDefUser = User.ID_User AND User.ID_ULanguage = Languages.ID_Language', 'right');
-        $this->db->where('ID_USU', $ID_SU);
+        $this->db->where('ID_SU', $ID_SU);
         $query1 = $this->db->get()->result_array();
         $userConfig = $query1[0];
 
@@ -255,19 +253,25 @@ class Main_model extends CI_Model {
         $this->db->order_by('Languages.ID_Language', 'asc');
         $query3 = $this->db->get()->result_array();
 
-
-        // Guardamos los datos como objeto
-        $Array = [
-            'userConfig' => $userConfig,
-            'users' => $query2,
-            'languages' => $query3,
-        ];
+        $this->session->unset_userdata('idsu');
+        $this->session->unset_userdata('idusu');
+        $this->session->unset_userdata('uname');
+        $this->session->unset_userdata('ulanguage');
+        $this->session->unset_userdata('uinterfacelangauge');
+        $this->session->unset_userdata('uinterfacelangtype');
+        $this->session->unset_userdata('uinterfacelangnadjorder');
+        $this->session->unset_userdata('uinterfacelangncorder');
+        $this->session->unset_userdata('uinterfacelangabbr');
+        $this->session->unset_userdata('cfgAutoEraseSentenceBar');
+        $this->session->unset_userdata('isfem');
+        $this->session->unset_userdata('cfgExpansionOnOff');
+        $this->session->unset_userdata('cfgPredBarNumPred');
 
         // Save user config data in the COOKIES
+        $this->session->set_userdata('idsu', $userConfig["ID_SU"]);
         $this->session->set_userdata('idusu', $userConfig["ID_User"]);
         $this->session->set_userdata('uname', $userConfig["SUname"]);
         $this->session->set_userdata('ulanguage', $userConfig["cfgExpansionLanguage"]);
-        //MODIF: Cuando lo juntemos con jose dará fallo. Jose tiene que cambiar "uinterfacelangauge" por este
         $this->session->set_userdata('uinterfacelangauge', $userConfig["ID_ULanguage"]);
         $this->session->set_userdata('uinterfacelangtype', $userConfig["type"]);
         $this->session->set_userdata('uinterfacelangnadjorder', $userConfig["nounAdjOrder"]);
@@ -277,14 +281,25 @@ class Main_model extends CI_Model {
         $this->session->set_userdata('isfem', $userConfig["cfgIsFem"]);
         $this->session->set_userdata('cfgExpansionOnOff', $userConfig["cfgExpansionOnOff"]);
         $this->session->set_userdata('cfgPredBarNumPred', $userConfig["cfgPredBarNumPred"]);
+        
+        // Guardamos los datos como objeto
+        $Array = [
+            'userConfig' => $userConfig,
+            'users' => $query2,
+            'languages' => $query3,
+            'idsu' => $userConfig["ID_SU"],
+            'idusu' => $userConfig["ID_User"]
+        ];
 
         // Save Expansion language in the COOKIES
         $this->db->select('canExpand');
         $this->db->where('ID_Language', $userConfig["cfgExpansionLanguage"]);
-        $query3 = $this->db->get('Languages');
+        $query4 = $this->db->get('Languages');
+        
+        $this->session->unset_userdata('ulangabbr');
 
-        if ($query3->num_rows() > 0) {
-            $aux = $query3->result();
+        if ($query4->num_rows() > 0) {
+            $aux = $query4->result();
             $canExpand = $aux[0]->canExpand;
 
             if ($canExpand == '1'){
@@ -293,14 +308,14 @@ class Main_model extends CI_Model {
                 $this->session->set_userdata('ulangabbr', 'ES');
             }
         }
-
+        
         return $Array;
     }
     //Return last $day days from historic table
     function getHistoric($idusu, $day){
         $date = date('Y-m-d', strtotime("-".$day." day"));
         $this->db->from('S_Historic');
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('sentenceDate >', $date);
         $this->db->where('ID_SHUser', $idusu);
         $this->db->where('isDeleted', '0');
@@ -339,7 +354,7 @@ class Main_model extends CI_Model {
     //get historic sentences with pictos
     function getSentencesWithPictos($idusu, $ID_Folder){
         $this->db->from('S_Sentence');
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('ID_SFolder', $ID_Folder);
         $this->db->where('ID_SSUser', $idusu);
         $this->db->join('R_S_SentencePictograms', 'S_Sentence.ID_SSentence = R_S_SentencePictograms.ID_RSSPSentence');

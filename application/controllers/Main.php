@@ -9,7 +9,6 @@ class Main extends REST_Controller {
         parent::__construct('rest', TRUE);
         $this->load->model('main_model');
         $this->load->library('Myaudio');
-        $this->load->library('session');
     }
 
      public function getOS_get()
@@ -239,7 +238,7 @@ class Main extends REST_Controller {
     //get today,last week and last month historic
     public function getHistoric_get()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
 
         $this->main_model->deleteHistoric();//delete all historic after last 30 days
 
@@ -259,7 +258,7 @@ class Main extends REST_Controller {
     //get today,last week and last month historic
     public function getSentenceFolders_get()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
 
         $folders = $this->main_model->getData('S_Folder', 'ID_SFUser', $idusu);
         $response = [
@@ -271,7 +270,7 @@ class Main extends REST_Controller {
     //Up historic folder Order
     public function upHistoricFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $this->query('ID_Folder');
 
         $folderToUp = $this->main_model->getSingleData('S_Folder', 'ID_SFUser', $idusu, 'ID_Folder', $ID_Folder);
@@ -288,7 +287,7 @@ class Main extends REST_Controller {
     //Down historic folder Order
     public function downHistoricFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $this->query('ID_Folder');
 
         $folderToDown = $this->main_model->getSingleData('S_Folder', 'ID_SFUser', $idusu, 'ID_Folder', $ID_Folder);
@@ -305,7 +304,7 @@ class Main extends REST_Controller {
     //
     public function getSentencesOrHistoricFolder_post()
     {        
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $this->query('ID_Folder');
 
         if($ID_Folder<0){
@@ -334,7 +333,7 @@ class Main extends REST_Controller {
     //Copy sentence from historic or folder to other folder
     public function addSentenceOnFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $this->query('ID_Folder');
         $ID_Sentence = $this->query('ID_Sentence');
         $historicFolder = $this->query('historicFolder');
@@ -416,7 +415,7 @@ class Main extends REST_Controller {
     //Delete sentence from folder
     public function deleteSentenceFromFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_SSentence = $this->query('ID_SSentence');
 
         //Delete pictograms
@@ -429,7 +428,7 @@ class Main extends REST_Controller {
     //Create sentence folder
     public function createSentenceFolder_post()
       {
-          $idusu = $this->session->userdata('idusu');
+          $idusu = $this->query('idusu');
 
           $folders = $this->main_model->getHistoricFolders($idusu);
           $folderOrder = $folders[0][folderOrder]+1;
@@ -458,7 +457,7 @@ class Main extends REST_Controller {
     public function editSentenceFolder_post()
     {
         $data = json_decode($this->query("folder"), true); // convertimos el string json del post en array.
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $data['ID_Folder'];
 
         $this->main_model->changeHistFolder($idusu, $ID_Folder, $data);
@@ -473,7 +472,7 @@ class Main extends REST_Controller {
     public function deleteSentenceFolder_post()
     {
         $data = json_decode($this->query("folder"), true); // convertimos el string json del post en array.
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_Folder = $data['ID_Folder'];
 
         //Get sentences ID from folder to delete pictograms
@@ -499,7 +498,7 @@ class Main extends REST_Controller {
     public function addManualSentence_post()
       {
           $pictograms = json_decode($this->query("pictograms"), true); // convertimos el string json del post en array.
-          $idusu = $this->session->userdata('idusu');
+          $idusu = $this->query('idusu');
           $ID_Folder = $this->query('ID_SFolder');
 
           //Get sentences in folder to know de order number of the new sentence
@@ -533,7 +532,6 @@ class Main extends REST_Controller {
     public function editManualSentence_post()
   {
       $pictograms = json_decode($this->query("pictograms"), true); // convertimos el string json del post en array.
-      $idusu = $this->session->userdata('idusu');
       $ID_SSentence = $this->query('ID_SSentence');
       $sentence=[
           'generatorString'=>$this->query('sentence'),
@@ -555,7 +553,7 @@ class Main extends REST_Controller {
     //Up sentence position in folder
     public function upSentenceOrderOnFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_SSentence = $this->query('ID_SSentence');
         $ID_SFolder = $this->query('ID_SFolder');
 
@@ -578,7 +576,7 @@ class Main extends REST_Controller {
     //Down sentence position in folder
     public function downSentenceOrderOnFolder_post()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $ID_SSentence = $this->query('ID_SSentence');
         $ID_SFolder = $this->query('ID_SFolder');
 
@@ -602,7 +600,7 @@ class Main extends REST_Controller {
 
     public function errorVoicesSeen_get()
     {
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $this->query('idusu');
         $this->main_model->restartErrorVoices($idusu);
     }
 

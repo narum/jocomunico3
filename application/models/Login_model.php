@@ -59,11 +59,26 @@ class Login_model extends CI_Model {
         $userConfig = $query2[0];
 
         // Save user config data in the COOKIES
+        $this->session->unset_userdata('idsu');
+        $this->session->unset_userdata('idusu');
+        $this->session->unset_userdata('uname');
+        $this->session->unset_userdata('ulanguage');
+        $this->session->unset_userdata('uinterfacelangauge');
+        $this->session->unset_userdata('uinterfacelangtype');
+        $this->session->unset_userdata('uinterfacelangnadjorder');
+        $this->session->unset_userdata('uinterfacelangncorder');
+        $this->session->unset_userdata('uinterfacelangabbr');
+        $this->session->unset_userdata('cfgAutoEraseSentenceBar');
+        $this->session->unset_userdata('isfem');
+        $this->session->unset_userdata('cfgExpansionOnOff');
+        $this->session->unset_userdata('cfgPredBarNumPred');
+
+
+        // Save user config data in the COOKIES
         $this->session->set_userdata('idsu', $userConfig["ID_SU"]);
         $this->session->set_userdata('idusu', $userConfig["ID_User"]);
         $this->session->set_userdata('uname', $userConfig["SUname"]);
         $this->session->set_userdata('ulanguage', $userConfig["cfgExpansionLanguage"]);
-        //MODIF: Cuando lo juntemos con jose dará fallo. Jose tiene que cambiar "uinterfacelangauge" por este
         $this->session->set_userdata('uinterfacelangauge', $userConfig["ID_ULanguage"]);
         $this->session->set_userdata('uinterfacelangtype', $userConfig["type"]);
         $this->session->set_userdata('uinterfacelangnadjorder', $userConfig["nounAdjOrder"]);
@@ -82,6 +97,9 @@ class Login_model extends CI_Model {
         if ($query3->num_rows() > 0) {
             $aux = $query3->result();
             $canExpand = $aux[0]->canExpand;
+
+            $this->session->unset_userdata('ulangabbr');
+            $this->session->unset_userdata('explangcannotexpand');
 
             if ($canExpand == '1'){
                 $this->session->set_userdata('ulangabbr', $userConfig["languageabbr"]);

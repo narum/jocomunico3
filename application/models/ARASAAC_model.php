@@ -14,49 +14,67 @@ class ARASAAC_model extends CI_Model {
      * @return array $output a row for each returned voice with all the fields
      * from the database
      */
-    public function getServerImages($name, $type) 
+    public function getServerImages($name, $type, $userlanguage) 
     {
-        $lang = "CA";
-        $imagestype = "colorpictos";
-        $userlanguage = $this->session->uinterfacelangauge;
+        $lang = "ca";
         switch($userlanguage){
             case 1:
-                $lang="CA";
+                $lang="ca";
                 break;
             case 2:
-                $lang="ES";
+                $lang="es";
                 break;
         }
         
         $images = array();
         
-        switch($type){
-            case "color":
-                $imagestype="colorpictos";
-                break;
-            case "bw":
-                $imagestype="bwpictos";
-                break;
+        if ($name == "" || $name == " ") {
+            return $images;
         }
-    
-        $service_url = 'http://www.arasaac.org/api/index.php?callback=json&language='.$lang.'&word='.$name.'&catalog='.$imagestype.'&nresults=8&tipo_palabra=2&thumbnails=150&TXTlocate=1&KEY=t6tVmVhM8jKCBECmiIV4';
-        $curl = curl_init($service_url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $curl_response = curl_exec($curl);
-        curl_close($curl);
         
-        $decoded = json_decode($curl_response);
-        for($i=0; $i<count($decoded->symbols); $i++){
-            array_push($images, $decoded->symbols[$i]);
+        else {
+            $service_url = "https://api.arasaac.org/api/pictograms/".$lang."/search/".$name;
+            $curl = curl_init($service_url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $curl_response = curl_exec($curl);
+            curl_close($curl);
+
+            $decoded = json_decode($curl_response);
+
+            for($i=0; $i<count($decoded); $i++){
+
+                $id = $decoded[$i]->_id;
+                $text = $decoded[$i]->keywords[0]->keyword;
+                $path = "";
+
+                switch($type){
+                    case "color":
+                        $path = "https://static.arasaac.org/pictograms/".$id."/".$id."_500.png";
+                        break;
+                    case "bw":
+                        $path = "https://static.arasaac.org/pictograms/".$id."/".$id."_nocolor_500.png";
+                        break;
+                }
+
+                $aux = array(
+                    "imagePNGURL" => $path,
+                    "name" => $text
+                );
+
+                array_push($images, $aux);
+
+                //echo "ID: ".$id."; Name: ".$name."; Path: ".$path." - ";
+            }
+
+            return $images;
         }
-        return $images;
     }
     
-    public function downloadServerImage($idsu, $url, $name)
+    public function downloadServerImage($idusu, $url, $name)
     {
         $status = "error";
         
-        $imgname = substr($url,-9);
+        $imgname = substr($url,-13);
         $imgnameclean = str_replace('/','',$imgname);
         $path = "img/users/".$imgnameclean;
         
@@ -70,8 +88,8 @@ class ARASAAC_model extends CI_Model {
         if ($query->num_rows() > 0) {
             $aux = $query->result();
             // if it's not from the same user, we add it to the user without reuploading the image
-            if ($idsu != $aux[0]->ID_ISU) {
-                $this->addImageInTable($idsu, $name, $path);
+            if ($idusu != $aux[0]->ID_ISU) {
+                $this->addImageInTable($idusu, $name, $path);
             }
             $status = "ok";
         }
@@ -85,16 +103,16 @@ class ARASAAC_model extends CI_Model {
             curl_close($ch);
             $aux2 = fclose($fp);
             
-            $this->addImageInTable($idsu, $name, $path);
+            $this->addImageInTable($idusu, $name, $path);
             if ($aux && $aux2) $status = "ok";
         }
         
         return $status;
     }
     
-    private function addImageInTable($idsu, $name, $path) {
+    private function addImageInTable($idusu, $name, $path) {
         $data = array(
-            'ID_ISU' => $idsu,
+            'ID_ISU' => $idusu,
             'imgName' => $name,
             'imgPath' => $path,
             'isArasaac' => '1'
@@ -103,11 +121,11 @@ class ARASAAC_model extends CI_Model {
         $this->db->insert('Images', $data);
     }
     
-    public function getUserImages($idsu, $name) {
+    public function getUserImages($idusu, $name) {
         $output = array();
 
         $this->db->limit(8);
-        $this->db->where('ID_ISU', $idsu);
+        $this->db->where('ID_ISU', $idusu);
         $this->db->like('imgName', $name, 'after');
         $this->db->order_by('imgName', 'asc');
         $query = $this->db->get('Images');

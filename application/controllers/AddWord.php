@@ -18,13 +18,14 @@ class AddWord extends REST_Controller {
         $this->load->model('InsertVocabulari');
     }
 
+    // NOT IN USE ANYMORE
     public function index_get() {
         // CHECK COOKIES
         if (!$this->session->userdata('uname')) {
             redirect(base_url(), 'location');
         } else {
             if (!$this->session->userdata('cfguser')) {
-                $this->BoardInterface->loadCFG($this->session->userdata('uname'));
+                $this->BoardInterface->loadCFG();
                 $this->load->view('MainBoard', true);
             } else {
                 $this->load->view('MainBoard', true);
@@ -54,7 +55,10 @@ class AddWord extends REST_Controller {
         $request = json_decode($postdata);
         $idPicto = $request->id;
         $type = $request->type;
-        $this->InsertVocabulari->deletePictogram($idPicto, $type);
+        $user = $request->idusu;
+        $langid = $request->langid;
+        
+        $this->InsertVocabulari->deletePictogram($idPicto, $type, $user, $langid);
 
         $response = [];
 
@@ -77,12 +81,15 @@ class AddWord extends REST_Controller {
         $request = json_decode($postdata);
         $idPicto = $request->id;
         $type = $request->type;
+        $idusu = $request->idusu;
+        $langabbr = $request->langabbr;
+        
         switch($type){
             case('name'):
-                $data = $this->AddWordInterface->EditWordNoms($idPicto);
+                $data = $this->AddWordInterface->EditWordNoms($idPicto, $idusu, $langabbr);
                 break;
             case('adj'):
-                $data = $this->AddWordInterface->EditWordAdj($idPicto);
+                $data = $this->AddWordInterface->EditWordAdj($idPicto, $idusu, $langabbr);
                 break;
         }
         $response = [
@@ -95,12 +102,14 @@ class AddWord extends REST_Controller {
         $request = json_decode($postdata);
         $idPicto = $request->id;
         $type = $request->type;
+        $langabbr = $request->langabbr;
+        
         switch ($type) {
             case('name'):
-                $data = $this->AddWordInterface->getDBClassNames($idPicto);
+                $data = $this->AddWordInterface->getDBClassNames($idPicto, $langabbr);
                 break;
             case('adj'):
-                $data = $this->AddWordInterface->getDBClassAdj($idPicto);
+                $data = $this->AddWordInterface->getDBClassAdj($idPicto, $langabbr);
                 break;
         }
         usort($data, array('SearchWord', 'cmpclass'));
@@ -115,13 +124,21 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $objAdd = $request->objAdd;
-        $this->InsertVocabulari->insertPicto($objAdd);
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        
+        $this->InsertVocabulari->insertPicto($objAdd, $user, $language);
     }
 
     public function getAllVerbs_post(){
 
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
-        $Verbs = $this->AddWordInterface->getDBVerbs();
+        $Verbs = $this->AddWordInterface->getDBVerbs($user, $language, $idlang);
 
         $response = [
             "data" => $Verbs
@@ -135,18 +152,19 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
-        $user = $this->session->userdata('idusu');
 
         // Controller search all names from all picto table
-        $Names = $this->AddWordInterface->getDBNamesLike($startswith, $user);
-        $Verbs = $this->AddWordInterface->getDBVerbsLike($startswith, $user);
-        $Adj = $this->AddWordInterface->getDBAdjLike($startswith, $user);
-        $Exprs = $this->AddWordInterface->getDBExprsLike($startswith, $user);
-        $Advs = $this->AddWordInterface->getDBAdvsLike($startswith, $user);
-        $Modifs = $this->AddWordInterface->getDBModifsLike($startswith, $user);
-        $QuestionPart = $this->AddWordInterface->getDBQuestionPartLike($startswith, $user);
+        $Names = $this->AddWordInterface->getDBNamesLike($startswith, $user, $language, $idlang);
+        $Verbs = $this->AddWordInterface->getDBVerbsLike($startswith, $user, $language, $idlang);
+        $Adj = $this->AddWordInterface->getDBAdjLike($startswith, $user, $language, $idlang);
+        $Exprs = $this->AddWordInterface->getDBExprsLike($startswith, $user, $language, $idlang);
+        $Advs = $this->AddWordInterface->getDBAdvsLike($startswith, $user, $language, $idlang);
+        $Modifs = $this->AddWordInterface->getDBModifsLike($startswith, $user, $language, $idlang);
+        $QuestionPart = $this->AddWordInterface->getDBQuestionPartLike($startswith, $user, $language, $idlang);
 
         // Marge all arrays to one
         $DataArray = array_merge($Names, $Verbs, $Adj, $Exprs, $Advs, $Modifs, $QuestionPart);
@@ -164,10 +182,12 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
+        
         // Controller search all names from all picto table
-        $DataArray = $this->AddWordInterface->getDBNamesLike($startswith, $user);
+        $DataArray = $this->AddWordInterface->getDBNamesLike($startswith, $user, $language, $idlang);
         usort($DataArray, array('SearchWord', 'cmp'));
         $response = [
             "data" => $DataArray
@@ -180,12 +200,12 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
-
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
         // Controller search all names from all picto table
-        $DataArray = $this->AddWordInterface->getDBVerbsLike($startswith, $user);
+        $DataArray = $this->AddWordInterface->getDBVerbsLike($startswith, $user, $language, $idlang);
         usort($DataArray, array('SearchWord', 'cmp'));
         $response = [
             "data" => $DataArray
@@ -198,12 +218,12 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
-
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
         // Controller search all names from all picto table
-        $DataArray = $this->AddWordInterface->getDBAdjLike($startswith, $user);
+        $DataArray = $this->AddWordInterface->getDBAdjLike($startswith, $user, $language, $idlang);
         usort($DataArray, array('SearchWord', 'cmp'));
         $response = [
             "data" => $DataArray
@@ -216,12 +236,12 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
-
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
         // Controller search all names from all picto table
-        $DataArray = $this->AddWordInterface->getDBExprsLike($startswith, $user);
+        $DataArray = $this->AddWordInterface->getDBExprsLike($startswith, $user, $language, $idlang);
         usort($DataArray, array('SearchWord', 'cmp'));
         $response = [
             "data" => $DataArray
@@ -234,14 +254,14 @@ class AddWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
-
+        $user = $request->idusu;
+        $language = $request->langabbr; // Expansion Abbr
+        $idlang = $request->idlang; // Interface
 
         // Controller search all names from all picto table
-        $Advs = $this->AddWordInterface->getDBAdvsLike($startswith, $user);
-        $Modifs = $this->AddWordInterface->getDBModifsLike($startswith, $user);
-        $QuestionPart = $this->AddWordInterface->getDBQuestionPartLike($startswith, $user);
+        $Advs = $this->AddWordInterface->getDBAdvsLike($startswith, $user, $language, $idlang);
+        $Modifs = $this->AddWordInterface->getDBModifsLike($startswith, $user, $language, $idlang);
+        $QuestionPart = $this->AddWordInterface->getDBQuestionPartLike($startswith, $user, $language, $idlang);
 
         $DataArray = array_merge($Advs, $Modifs, $QuestionPart);
         usort($DataArray, array('SearchWord', 'cmp'));
@@ -289,6 +309,8 @@ class AddWord extends REST_Controller {
         ];
         $this->response($response, REST_Controller::HTTP_OK);
     }
+    
+    // NOT IN USE ANYMORE (USED IN JOCOMUNICO 1.0)
     public function copyUserVocabulary_post() {
 
         $postdata = file_get_contents("php://input");

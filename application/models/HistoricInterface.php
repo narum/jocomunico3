@@ -21,8 +21,9 @@ class HistoricInterface extends CI_Model {
     }
     public function getHistoric($idusu, $day){
 
-        if($this->getHistorialState() == '0')
+        if($this->getHistorialState($idusu) == '0') {
             return null;
+        }
         else{
             $date = date('Y-m-d', strtotime("-".$day." day"));
         
@@ -36,16 +37,17 @@ class HistoricInterface extends CI_Model {
 
             if ($query->num_rows() > 0) {
                 $output = $query->result();
-            } else
+            } else {
                 $output = null;
+            }
 
             return $output;
         }
 
     }
     
-    public function getPictosHistoric($IDHistoric){
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+    public function getPictosHistoric($IDHistoric, $idusu){
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('ID_SHistoric', $IDHistoric);
         $this->db->join('R_S_HistoricPictograms', 'S_Historic.ID_SHistoric = R_S_HistoricPictograms.ID_RSHPSentence', 'left');
         $this->db->join('Pictograms', 'R_S_HistoricPictograms.pictoid = Pictograms.pictoid', 'left');
@@ -91,8 +93,8 @@ class HistoricInterface extends CI_Model {
         return $query->num_rows();
     }
     
-    public function getPictosFolder($IDSentence){
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+    public function getPictosFolder($IDSentence, $idusu){
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('ID_SSentence', $IDSentence);
         $this->db->join('R_S_SentencePictograms', 'S_Sentence.ID_SSentence = R_S_SentencePictograms.ID_RSSPSentence', 'left');
         $this->db->join('Pictograms', 'R_S_SentencePictograms.pictoid = Pictograms.pictoid', 'left');
@@ -107,8 +109,7 @@ class HistoricInterface extends CI_Model {
     }
 
     //Get if Historial is enable or disable
-    public function getHistorialState(){
-        $idusu = $this->session->userdata('idusu');
+    public function getHistorialState($idusu){
         $this->db->where('ID_User', $idusu);
         $query = $this->db->get('User');
         
@@ -119,22 +120,22 @@ class HistoricInterface extends CI_Model {
     }
 
     //Execute update [cfgHistorialState] and new new latest date [cfgLatestHistrorialActivated]
-    public function changeHistorialState($newState) {
+    public function changeHistorialState($newState, $idusu) {
         //Change enable or disable
         $data = array(
             'cfgHistorialState' => $newState
         );
-        $this->db->where('ID_User', $this->session->userdata('idusu'));
+        $this->db->where('ID_User', $idusu);
         $this->db->update('User', $data);
     }
 
-    public function deleteHistoric(){
+    public function deleteHistoric($idusu){
         //Delete Historial
         //Change enable or disable
         $data = array(
             'isDeleted' => '1'
         );
-        $this->db->where('ID_SHUser', $this->session->userdata('idusu'));
+        $this->db->where('ID_SHUser', $idusu);
         $this->db->update('S_Historic', $data);
     }
 

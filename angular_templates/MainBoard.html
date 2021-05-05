@@ -108,6 +108,9 @@
                         <!-- put the scan color over the image.mousedown
                              Only if we are in Scan mode
                         MODIF: Añadir variable if inScan-->
+                        
+                        <div ng-if="picto.ID_CFunction === '80' && AccObPressed" class="backgroundCell" ng-style="{'background-color':'#505050'}"></div>
+                        <div ng-if="picto.ID_CFunction === '81' && AccTPressed" class="backgroundCell" ng-style="{'background-color':'#505050'}"></div>
 
                         <div ng-if="isScanned(picto);" class="scaneo" ng-style="{'border':'7px solid #{{cfgScanColor}}'}"></div>
 
@@ -129,7 +132,9 @@
                                   <img ng-if="picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}{{picto.imgFolder}}{{picto.imgPicto}}" class="imgResponsive"/>
                                   <img ng-if="picto.imgSFolder && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/') && !picto.imgFunct" ng-src="{{baseurl}}{{picto.imgSFolder}}" class="imgResponsive"/>
                                   <img ng-if="picto.sPreRecImg1 && !picto.imgSFolder && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/') && !picto.imgFunct" ng-src="{{baseurl}}{{picto.sPreRecImg1}}" class="imgResponsive"/>
-                                  <img ng-if="picto.imgFunct && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img{{picto.imgFunct}}" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction === '73' && shiftPressed && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img/pictosespeciales/shift_sel.png" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction === '73' && !shiftPressed && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img/pictosespeciales/shift.png" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction !== '73' && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img{{picto.imgFunct}}" class="imgResponsive"/>
                           <!--    </div>-->
                           </div>
 
@@ -138,7 +143,7 @@
 
                         <div ng-if="cfgTextInCell == 1">
 
-                          <div ng-if="isPictoActive(picto) && picto.textInCell !== null" class="textCell">{{picto.textInCell}}</div>
+                          <div ng-if="isPictoActive(picto) && picto.textInCell !== null && picto.functType !== 'key'" class="textCell">{{picto.textInCell}}</div>
                           <div ng-if="isPictoActive(picto) && picto.textInCell === null && picto.pictotext !== null" class="textCell">{{picto.pictotext}}</div>
                           <div ng-if="isPictoActive(picto) && picto.textInCell === null && picto.pictotext === null && picto.folderName !== null" class="textCell">{{picto.folderName}}</div>
                           <div ng-if="isPictoActive(picto) && picto.textInCell === null && picto.pictotext === null && picto.folderName === null && picto.sPreRecText !== null" class="textCell">{{picto.sPreRecText}}</div>
@@ -149,12 +154,14 @@
                           <img ng-if="isPictoActive(picto) && picto.ID_CFunction !== null" ng-src="{{baseurl}}img/srcWeb/Mainboard/functions.png" class="function"/>
 
                           <div ng-if="isPictoActive(picto)" class="contentCell">
-                              <div ng-style="cfgTextInCell == 1 ? {'height':'78%'}:{'height':'100%'}">
+                              <div ng-style="cfgTextInCell == 1 && picto.functType !== 'key' ? {'height':'78%'}:{'height':'100%'}">
                                   <img ng-if="picto.imgCell && picto.imgCell !== 'img/pictos/'" class="imgResponsive" ng-src="{{baseurl}}{{picto.imgCell}}"/>
                                   <img ng-if="picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}{{picto.imgFolder}}{{picto.imgPicto}}" class="imgResponsive"/>
                                   <img ng-if="picto.imgSFolder && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/') && !picto.imgFunct" ng-src="{{baseurl}}{{picto.imgSFolder}}" class="imgResponsive"/>
                                   <img ng-if="picto.sPreRecImg1 && !picto.imgSFolder && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/') && !picto.imgFunct" ng-src="{{baseurl}}{{picto.sPreRecImg1}}" class="imgResponsive"/>
-                                  <img ng-if="picto.imgFunct && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img{{picto.imgFunct}}" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction === '73' && shiftPressed && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img/pictosespeciales/shift_sel.png" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction === '73' && !shiftPressed && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img/pictosespeciales/shift.png" class="imgResponsive"/>
+                                  <img ng-if="picto.imgFunct && picto.ID_CFunction !== '73' && !picto.imgPicto && (!picto.imgCell || picto.imgCell === 'img/pictos/')" ng-src="{{baseurl}}img{{picto.imgFunct}}" class="imgResponsive"/>
                               </div>
                           </div>
 

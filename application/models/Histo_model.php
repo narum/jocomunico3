@@ -14,7 +14,7 @@ class Histo_model extends CI_Model {
         $userid = 1;               //modificar
         
         $data = array(
-        'userid' => $userid,
+        'userid' => $userid, 
         'pictoid' => $pictoid,
         'languageid' => $userlanguage
         );

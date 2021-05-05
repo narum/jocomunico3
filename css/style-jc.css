@@ -592,3 +592,26 @@ html *
 .selectedDeletePicto{
   background-color: #98AFC7;
 }
+
+#sentenceKeyboardTop {
+    display: block;
+    overflow: hidden;
+    height: 60%;
+    border-bottom: 2px solid #a0a0a0;
+    text-align: left;
+    margin-left: 1%;
+    margin-right: 3%;
+    padding: 1%;
+    padding-top: 0;
+    font-size: 2vw !important;
+}
+
+#sentenceKeyboardBottom {
+    display: block;
+    font-weight: bold;
+    margin-left: 1%;
+    margin-right: 3%;
+    padding-top: 2%;
+    height: 35%;
+    overflow: hidden;
+}

@@ -19,7 +19,9 @@ class ARASAAC extends REST_Controller {
         $request = json_decode($postdata);
         $imgName = $request->name;
         $searchType = $request->type;
-        $images = $this->ARASAAC_model->getServerImages($imgName, $searchType);
+        $langid = $request->langid;
+        
+        $images = $this->ARASAAC_model->getServerImages($imgName, $searchType, $langid);
 
         $response = [
             "data" => $images
@@ -29,13 +31,14 @@ class ARASAAC extends REST_Controller {
     }
     
     public function upload_post() {
-        $idsu = $this->session->userdata('idsu');
         
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $imgName = $request->name;
         $imgPath = $request->path;
-        $status = $this->ARASAAC_model->downloadServerImage($idsu, $imgPath, $imgName);
+        $idusu = $request->idusu;
+        
+        $status = $this->ARASAAC_model->downloadServerImage($idusu, $imgPath, $imgName);
 
         $response = [
             "status" => $status
@@ -45,12 +48,13 @@ class ARASAAC extends REST_Controller {
     }
     
     public function searchDelete_post() {
-        $idsu = $this->session->userdata('idsu');
         
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $imgName = $request->name;
-        $images = $this->ARASAAC_model->getUserImages($idsu, $imgName);
+        $idusu = $request->idusu;
+        
+        $images = $this->ARASAAC_model->getUserImages($idusu, $imgName);
 
         $response = [
             "data" => $images

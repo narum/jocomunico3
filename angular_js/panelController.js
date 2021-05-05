@@ -19,11 +19,20 @@ angular.module('controllers')
             });
             
             // Check if the user has already added the Example panels
+            // Check if the user has already added the Keyboard panel
+            
             $scope.alreadyExamplePanels = false;
-           if ($cookies.get('alreadyExamplePanels')) {
-                $scope.alreadyExamplePanels = true;
-            }              
-
+            $scope.alreadyKBPanels = false;
+            var URL = $scope.baseurl + "PanelGroup/alreadyExampleKBPanels";
+            var postdata = {idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+            //Request via post to controller search data from database
+            $http.post(URL, postdata).
+            success(function (response)
+            {
+                    $scope.alreadyExamplePanels = response.example;
+                    $scope.alreadyKBPanels = response.kb;
+            });
+            
             //Dropdown Menu Bar
             $rootScope.dropdownMenuBar = null;
             $rootScope.dropdownMenuBarButtonHide = false;
@@ -64,12 +73,12 @@ angular.module('controllers')
             */
             $http.get($scope.baseurl + 'Register/getLatestUpdateChecked').success(function(response){
                 $scope.version = response.latestUpdateChecked.version;
-                $scope.showUpdateFooter = (window.localStorage.getItem('updateAccepted') != 'true') && (response.latestUpdateChecked.showPopUp == 1);
+                $scope.showUpdateFooter = (window.localStorage.getItem('updateAccepted') != $scope.version) && (response.latestUpdateChecked.showPopUp == 1);
                 $scope.footerUpdateClass = ($scope.showUpdateFooter) ? "footer-updates" : "footer-cookies-fade";
             });
 
             $scope.okUpdates = function() {
-                window.localStorage.setItem('updateAccepted', true);
+                window.localStorage.setItem('updateAccepted', $scope.version);
                 $scope.footerUpdateClass = "footer-cookies-fade";
             };
 
@@ -106,7 +115,7 @@ angular.module('controllers')
 
             //User sentence folders
             var getFolders = function(){
-                Resources.main.get({'funct': "getSentenceFolders"}).$promise
+                Resources.main.get({'idusu': $rootScope.userId}, {'funct': "getSentenceFolders"}).$promise
                 .then(function (results) {
                     $scope.historicFolders=[];
                     $scope.historicFolders.push({'ID_Folder':'-1', 'ID_SFUser':$rootScope.userId, 'folderDescr':'', 'folderName':$scope.content.historyTodayFolder, 'imgSFolder':'img/pictos/hoy.png', 'folderColor':'dfdfdf', 'folderOrder':'0.1'});
@@ -122,14 +131,17 @@ angular.module('controllers')
                 });
             };
             //Delet historic sentences 30 days old
-            Resources.main.get({'funct': "getHistoric"});
+            // Resources.main.get({'funct': "getHistoric"});
+            Resources.main.get({'idusu': $rootScope.userId}, {'funct': "getHistoric"}).$promise
+                    .then(function (results) {
+                    });
 
             //Up folder order
             $scope.upFolder = function (order, folderId) {
                 order = parseInt(order, 10); //string to integer
                 if (order > 1) {
                     $scope.showUpDownButtons=false;
-                    Resources.main.save({'ID_Folder': folderId}, {'funct': "upHistoricFolder"}).$promise
+                    Resources.main.save({'ID_Folder': folderId, 'idusu': $rootScope.userId}, {'funct': "upHistoricFolder"}).$promise
                     .then(function (results) {
                         getFolders();
                     });
@@ -138,9 +150,9 @@ angular.module('controllers')
             //Down folder order
             $scope.downFolder = function (order, folderId) {
                 order = parseInt(order, 10); //string to integer
-                if (order < $scope.historicFolders[$scope.historicFolders.length-1].folderOrder) {
+                if (order < $scope.historicFolders.length-3) {
                     $scope.showUpDownButtons=false;
-                    Resources.main.save({'ID_Folder': folderId}, {'funct': "downHistoricFolder"}).$promise
+                    Resources.main.save({'ID_Folder': folderId, 'idusu': $rootScope.userId}, {'funct': "downHistoricFolder"}).$promise
                     .then(function (results) {
                         getFolders();
                     });
@@ -177,7 +189,7 @@ angular.module('controllers')
             if ($scope.newFolder.folderColor == null){
                 $scope.newFolder.folderColor='FFFFFF';
             }
-            Resources.main.save({'folderName':$scope.newFolder.folderName,'imgSFolder':$scope.newFolder.imgSFolder,'folderColor':$scope.newFolder.folderColor},{'funct': "createSentenceFolder"}).$promise
+            Resources.main.save({'folderName':$scope.newFolder.folderName,'imgSFolder':$scope.newFolder.imgSFolder,'folderColor':$scope.newFolder.folderColor,'idusu':$rootScope.userId},{'funct': "createSentenceFolder"}).$promise
             .then(function (results) {
                 $scope.newFolder={};
                 getFolders();
@@ -225,7 +237,7 @@ angular.module('controllers')
          */
          $scope.searchStartImgArasaac = function (name, type) {
             var url = $scope.baseurl + "ARASAAC/search";
-            var postdata = {name: name, type: type};
+            var postdata = {name: name, type: type, langid: $rootScope.interfaceLanguageId};
             $http.post(url, postdata).
             success(function (response)
             {
@@ -237,7 +249,7 @@ angular.module('controllers')
          $scope.uploadARASAACImage = function (path, name) {
             $scope.uploadedOK = "waiting";
             var url = $scope.baseurl + "ARASAAC/upload";
-            var postdata = {path: path, name: name};
+            var postdata = {path: path, name: name, idusu: $rootScope.userId};
             $http.post(url, postdata).
             success(function (response)
             {
@@ -268,7 +280,7 @@ angular.module('controllers')
          */
          $scope.searchStartImgDelete = function (name) {
             var url = $scope.baseurl + "ARASAAC/searchDelete";
-            var postdata = {name: name};
+            var postdata = {name: name, idusu: $rootScope.userId};
             $http.post(url, postdata).
             success(function (response)
             {
@@ -304,7 +316,7 @@ angular.module('controllers')
             $http.post(URL, postdata).
                 success(function (response)
                 {
-                    $scope.CreateBoardData = {CreateBoardName: '', height: response.defHeight.toString(), width: response.defWidth.toString(), idGroupBoard: response.ID_GB};
+                    $scope.CreateBoardData = {CreateBoardName: '', height: response.defHeight.toString(), width: response.defWidth.toString(), idGroupBoard: response.ID_GB, idusu: $rootScope.userId};
                     $scope.CreateBoardData.height = $scope.range(10)[response.defHeight - 1].valueOf();
                     $scope.CreateBoardData.width = $scope.range(10)[response.defWidth - 1].valueOf();
 
@@ -333,7 +345,7 @@ angular.module('controllers')
                URL = $scope.baseurl + "ImgUploader/getImagesUploads";
                break;
        }
-       var postdata = {name: name};
+       var postdata = {name: name, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
        $http.post(URL, postdata).
            success(function (response)
            {
@@ -345,7 +357,7 @@ angular.module('controllers')
         $scope.searchFoto = function (name)
         {
             var URL = $scope.baseurl + "SearchWord/getDBAll";
-            var postdata = {id: name};
+            var postdata = {id: name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, langid: $rootScope.interfaceLanguageId};
             //Request via post to controller search data from database
             $http.post(URL, postdata).
                 success(function (response)
@@ -361,6 +373,7 @@ angular.module('controllers')
             var uploadUrl = $scope.baseurl + "ImgUploader/upload";
             var fd = new FormData();
             fd.append('vocabulary', angular.toJson(false));
+            fd.append('idusu', $rootScope.userId);
             for (i = 0; i < $scope.myFile.length; i++) {
                 fd.append('file' + i, $scope.myFile[i]);
             }
@@ -392,9 +405,11 @@ angular.module('controllers')
             };
 
             $scope.initPanelGroup = function () {
+                
+                var postdata = {idusu: $rootScope.userId};
                 var URL = $scope.baseurl + "PanelGroup/getUserPanelGroups";
 
-                $http.post(URL).
+                $http.post(URL, postdata).
                         success(function (response)
                         {
                             $scope.panels = response.panels;
@@ -476,7 +491,7 @@ angular.module('controllers')
                 });
             };
             $scope.newPanellGroup = function () {
-                $scope.CreateBoardData = {GBName: '', defH: 5, defW: 5, imgGB: ""};
+                $scope.CreateBoardData = {GBName: '', defH: 5, defW: 5, imgGB: "", idusu: $rootScope.userId};
                 $('#ConfirmCreateGroupBoard').modal({backdrop: 'static'});
             };
 
@@ -512,7 +527,7 @@ angular.module('controllers')
             };
 
             $scope.setPrimary = function (idGB) {
-                var postdata = {ID_GB: idGB};
+                var postdata = {ID_GB: idGB, idusu: $rootScope.userId};
                 var URL = $scope.baseurl + "PanelGroup/setPrimaryGroupBoard";
 
                 $http.post(URL, postdata).
@@ -524,7 +539,7 @@ angular.module('controllers')
 
             $scope.changeGroupBoardName = function (nameboard, idgb)
             {
-                var postdata = {Name: nameboard, ID: idgb};
+                var postdata = {Name: nameboard, ID: idgb, idusu: $rootScope.userId};
                 var URL = $scope.baseurl + "PanelGroup/modifyGroupBoardName";
                 $http.post(URL, postdata).
                         success(function (response)
@@ -590,7 +605,7 @@ angular.module('controllers')
             {
 
                 var URL = "";
-                var postdata = {id: name};
+                var postdata = {id: name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, idlang: $rootScope.interfaceLanguageId};
                 //Radio button function parameter, to set search type
                 switch (Searchtype)
                 {
@@ -643,6 +658,7 @@ angular.module('controllers')
             /* Browser detection
             * @rjlopezdev
             */
+            // NOT IN USE SINCE JOCOMUNICO 3.0
             $scope.isNotChrome = function () {
               //If cookie is not saved, show modal
               if($cookies.get('browserAdvice') != 'true'){
@@ -663,7 +679,7 @@ angular.module('controllers')
 
             $scope.getHistorialState = function () {
                 var URL = $scope.baseurl + "Historic/getHistorialState";
-                $http.post(URL).success(function (response) {
+                $http.post(URL, {idusu: $rootScope.userId}).success(function (response) {
                     $scope.HistoricState = (response.state === '1') ? true : false;
                     console.log(response.state);
                 });
@@ -680,6 +696,7 @@ angular.module('controllers')
                 var URL = $scope.baseurl + "Historic/changeHistorialState";
                 $http.post(URL
                     , {
+                        idusu: $rootScope.userId,
                         newState: ($scope.HistoricState) ? 0 : 1
                     })
                     .success(function (response) {
@@ -713,13 +730,13 @@ angular.module('controllers')
                       }
 
                       $scope.recparcialBackupCall_OW=function(BackupRoute,foldername,keycounts){
-                        var postdata = {overwrite: true, folder:foldername, keycounts:keycounts};
+                        var postdata = {overwrite: true, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
                         $http.post("BackupController/"+BackupRoute,postdata).success(function (results) {
                           console.log(results.data);
                         });
                       }
                       $scope.recparcialBackupCall_NOW=function(BackupRoute,foldername, keycounts){
-                        var postdata = {overwrite: false,folder: foldername, keycounts:keycounts};
+                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
                         $http.post("BackupController/"+BackupRoute,postdata).success(function (results) {
                           console.log(results.data);
                         });
@@ -732,50 +749,92 @@ angular.module('controllers')
                           $scope.toggleInfoModal("Information", "There was an error.");
                         }else{
 							$scope.viewActived=false;
-                            $http.get("BackupController/getkeycounts").success(function (results) {
+                            var postdata = {idusu: $rootScope.userId};
+                            $http.post("BackupController/getkeycounts", postdata).success(function (results) {
                                 var keycounts = results.data;
                                 if(panelb){
-                                  image=true;
-                                  voc=true;
-                                  folder=true;
-                                  $scope.recparcialBackupCall_OW('recpictos',foldername, keycounts);
-                                  $scope.recparcialBackupCall_OW('recimages',foldername, keycounts);
-                                  if(cfg)$scope.recparcialBackupCall_OW('reccfg',foldername, keycounts);
+                                    
+                                    image=true;
+                                    voc=true;
+                                    folder=true;
                                   
-                                  $timeout(function () {
-                                      var postdata = {overwrite: true, folder:foldername, keycounts:keycounts};
-                                      $http.post("BackupController/recfolder",postdata).success(function (results) {
-                                          $http.post("BackupController/recpanels",postdata).success(function (results) {
-                                          
-                                            $route.reload();
-                                          
+                                    if(cfg)$scope.recparcialBackupCall_OW('reccfg',foldername, keycounts);
+                                  
+                                    var postdata = {overwrite: true, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+
+                                      $http.post("BackupController/recpictos",postdata).success(function (results) {
+                                          $http.post("BackupController/recimages",postdata).success(function (results) {
+                                              $http.post("BackupController/recfolder",postdata).success(function (results) {
+                                                  $http.post("BackupController/recpanels",postdata).success(function (results) {
+
+                                                    if (cfg) {
+                                                        $location.path('/userConfig');
+                                                    }
+                                                    else {
+                                                        $route.reload();
+                                                    }
+
+                                                  });
+                                              });
                                           });
                                       });
-                                  }, 3000);
                                   
                                 }else{
+                                    
                                     if(cfg) $scope.recparcialBackupCall_OW('reccfg',foldername, keycounts);
+                                    
                                     if (folder) {
-                                        $scope.recparcialBackupCall_OW('recvocabulary',foldername, keycounts);
-                                        $scope.recparcialBackupCall_OW('recimages',foldername, keycounts);
-                                        
-                                        $timeout(function () {
-                                            var postdata = {overwrite: true, folder:foldername, keycounts:keycounts};
-                                            $http.post("BackupController/recfolder",postdata).success(function (results) {
-                                          
-                                                $scope.viewActived=false;
-                                                $route.reload();
-                                          
+                                            
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recvocabulary",postdata).success(function (results) {    
+                                            $http.post("BackupController/recimages",postdata).success(function (results) {
+                                                $http.post("BackupController/recfolder",postdata).success(function (results) {
+
+                                                    $scope.viewActived=false;
+                                                    if (cfg) {
+                                                        $location.path('/userConfig');
+                                                    }
+                                                    else {
+                                                        $route.reload();
+                                                    }
+
+                                                });
                                             });
-                                        }, 3000);
+                                        });
+                                            
                                     }
                                     else if(voc && !folder) { 
-                                        $scope.recparcialBackupCall_OW('recvocabulary',foldername, keycounts);
-                                        $scope.recparcialBackupCall_OW('recimages',foldername, keycounts);
+                                        
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recvocabulary",postdata).success(function (results) {    
+                                            $http.post("BackupController/recimages",postdata).success(function (results) {
+
+                                                if (cfg) {
+                                                    $location.path('/userConfig');
+                                                }
+                                                else {
+                                                    $route.reload();
+                                                }
+
+                                            });
+                                        });
                                     }
-                                    else if(image && !voc && !folder)$scope.recparcialBackupCall_OW('recimages',foldername, keycounts);
+                                    else if(image && !voc && !folder) {
+                                        
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recimages",postdata).success(function (results) {
+
+                                            if (cfg) {
+                                                $location.path('/userConfig');
+                                            }
+                                            else {
+                                                $route.reload();
+                                            }
+
+                                        });
+                                    }
                                   
-                                    setTimeout(function(){ $route.reload(); }, 3000);
+                                    if(cfg && !folder && !voc && !image) setTimeout(function(){ $location.path('/userConfig'); }, 3000);
                                 }
                             }
                           );
@@ -787,55 +846,98 @@ angular.module('controllers')
                           $scope.toggleInfoModal("Information", "There was an error.");
                         }else{
 							$scope.viewActived=false;
-                            $http.get("BackupController/getkeycounts").success(function (results) {
+                            var postdata = {idusu: $rootScope.userId};
+                            $http.post("BackupController/getkeycounts", postdata).success(function (results) {
                                 var keycounts = results.data;
                                 if(panelb){
-                                  image=true;
-                                  voc=true;
-                                  folder=true;
-                                  $scope.recparcialBackupCall_NOW('recpictos',foldername, keycounts);
-                                  $scope.recparcialBackupCall_NOW('recimages',foldername, keycounts);
-                                  if(cfg)$scope.recparcialBackupCall_NOW('reccfg',foldername, keycounts);
+                                    
+                                    image=true;
+                                    voc=true;
+                                    folder=true;
                                   
-                                  $timeout(function () {
-                                      var postdata = {overwrite: false, folder:foldername, keycounts:keycounts};
-                                      $http.post("BackupController/recfolder",postdata).success(function (results) {
-                                          $http.post("BackupController/recpanels",postdata).success(function (results) {
-                                          
-											$route.reload();
-                                          
+                                    if(cfg) $scope.recparcialBackupCall_OW('reccfg',foldername, keycounts);
+                                  
+                                    var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+
+                                      $http.post("BackupController/recpictos",postdata).success(function (results) {
+                                          $http.post("BackupController/recimages",postdata).success(function (results) {
+                                              $http.post("BackupController/recfolder",postdata).success(function (results) {
+                                                  $http.post("BackupController/recpanels",postdata).success(function (results) {
+
+                                                    if (cfg) {
+                                                        $location.path('/userConfig');
+                                                    }
+                                                    else {
+                                                        $route.reload();
+                                                    }
+
+                                                  });
+                                              });
                                           });
                                       });
-                                  }, 3000);
                                   
                                 }else{
-                                    if(cfg) $scope.recparcialBackupCall_NOW('reccfg',foldername, keycounts);
+                                    
+                                    if(cfg) $scope.recparcialBackupCall_OW('reccfg',foldername, keycounts);
+                                    
                                     if (folder) {
-                                        $scope.recparcialBackupCall_NOW('recvocabulary',foldername, keycounts);
-                                        $scope.recparcialBackupCall_NOW('recimages',foldername, keycounts);
-                                        
-                                        $timeout(function () {
-                                            var postdata = {overwrite: false, folder:foldername, keycounts:keycounts};
-                                            $http.post("BackupController/recfolder",postdata).success(function (results) {
-                                          
-                                                $scope.viewActived=false;
-                                                $route.reload();
-                                          
+                                            
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recvocabulary",postdata).success(function (results) {    
+                                            $http.post("BackupController/recimages",postdata).success(function (results) {
+                                                $http.post("BackupController/recfolder",postdata).success(function (results) {
+
+                                                    $scope.viewActived=false;
+                                                    
+                                                    if (cfg) {
+                                                        $location.path('/userConfig');
+                                                    }
+                                                    else {
+                                                        $route.reload();
+                                                    }
+
+                                                });
                                             });
-                                        }, 3000);
+                                        });
+                                            
                                     }
                                     else if(voc && !folder) { 
-                                        $scope.recparcialBackupCall_NOW('recvocabulary',foldername, keycounts);
-                                        $scope.recparcialBackupCall_NOW('recimages',foldername, keycounts);
+                                        
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recvocabulary",postdata).success(function (results) {    
+                                            $http.post("BackupController/recimages",postdata).success(function (results) {
+
+                                                if (cfg) {
+                                                    $location.path('/userConfig');
+                                                }
+                                                else {
+                                                    $route.reload();
+                                                }
+
+                                            });
+                                        });
                                     }
-                                    else if(image && !voc && !folder)$scope.recparcialBackupCall_NOW('recimages',foldername, keycounts);
+                                    else if(image && !voc && !folder) {
+                                        
+                                        var postdata = {overwrite: false, folder:foldername, keycounts:keycounts, idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                                        $http.post("BackupController/recimages",postdata).success(function (results) {
+
+                                            if (cfg) {
+                                                $location.path('/userConfig');
+                                            }
+                                            else {
+                                                $route.reload();
+                                            }
+
+                                        });
+                                    }
                                   
-                                    setTimeout(function(){ $route.reload(); }, 3000);
+                                    if(cfg && !folder && !voc && !image) setTimeout(function(){ $location.path('/userConfig'); }, 3000);
                                 }
                             }
                           );
-                            }
-                        }
+                      }
+                    }
                       $scope.checkboxparcial=function(){
                         $("#limgrec").attr("checked",true)
                         $("#lvoc").attr("checked",true)
@@ -843,7 +945,8 @@ angular.module('controllers')
                       }
                       //funcion que llama al backend para hacer un backup total
                       $scope.totalBackup=function(){
-                        var promise = $http.get('BackupController');
+                        var postdata = {idsu: $rootScope.sUserId, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
+                        var promise = $http.post('BackupController/dobackup', postdata);
                         promise.then(function(results) {
                           $scope.backup=results.data.data;
                           console.log(results);
@@ -876,6 +979,7 @@ angular.module('controllers')
                            console.log(uploadUrl);
                           var fd = new FormData();
                           fd.append('vocabulary', angular.toJson(false));
+                          fd.append('idusu', $rootScope.userId);
                           for (i = 0; i < $scope.myFile.length; i++) {
                               fd.append('file' + i, $scope.myFile[i]);
                           }
@@ -907,7 +1011,7 @@ angular.module('controllers')
                         var postdata = {id: idboard};
                         var URL = $scope.baseurl + "Board/getPrimaryBoardP";
                         $http.post(URL, postdata).success(function (response){
-                          var post = {id: response.idboard};
+                          var post = {id: response.idboard, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr};
                           console.log(postdata)
                           var URL1 = $scope.baseurl + "Board/removeBoard";
                           $http.post(URL1, post).success(function (res){
@@ -935,14 +1039,35 @@ angular.module('controllers')
                       $scope.ShowAddGroupsInfo=function(){
                         $('#AddGroupsInfo').modal('toggle');
                       }
+                      
+                      $scope.ShowAddKBGroupsInfo=function(){
+                        $('#AddKBGroupsInfo').modal('toggle');
+                      }
+                      
                       $scope.AddBoards=function(){
                           
-                        $scope.viewActived=false;
-                          
-                        $http.get("Board/AddBoards").success(function (results) {
+                        $scope.viewActived=false; 
+
+                        var url = $scope.baseurl + "Board/AddBoards";
+                        var postdata = {idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId};
+                                                    
+                        $http.post(url, postdata).success(function (results) {
                                 console.log(results.data);
-                                $cookies.put('alreadyExamplePanels', true);
                                 $scope.alreadyExamplePanels = true;
+                                $route.reload();
+                            });
+                      }
+                      
+                      $scope.AddKBBoards=function(){
+                          
+                        $scope.viewActived=false;
+                        
+                        var url = $scope.baseurl + "Board/AddKBBoards";
+                        var postdata = {idusu: $rootScope.userId, idlang: $rootScope.interfaceLanguageId};
+                          
+                        $http.post(url, postdata).success(function (results) {
+                                console.log(results.data);
+                                $scope.alreadyKBPanels = true;
                                 $route.reload();
                             });
                       }

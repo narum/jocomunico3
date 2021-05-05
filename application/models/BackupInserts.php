@@ -4,13 +4,14 @@ El codigo es un 95% parsear los datos de backupselects en json
 la ultima funcion es la que coge las imagenes y las guarda en una carpeta.
 */
 
+// It calls BackupSelects Model to get all data from all database tables
+
 class BackupInserts extends CI_Model{
     
     var $isWin = false;
     
   function __construct(){
       parent::__construct();
-      $this->load->library('session');
       $this->load->library('zip');
       $this->load->model("BackupSelects");
       $this->load->helper('url');
@@ -20,7 +21,7 @@ class BackupInserts extends CI_Model{
   /*Este es el metodo principal, aqui se llama a todos los metodos privados
   pero antes claro crea una carpeta con la fecha y el id de usuario precision segundos
   */
-  public function createBackupFolder(){
+  public function createBackupFolder($idsu, $idusu, $langid){
   $F = date("d_m_Y_H_i_s");
   $Fname = "";
     
@@ -33,34 +34,35 @@ class BackupInserts extends CI_Model{
   
   mkdir($Fname, 0777);
   
-  $this->generateAdjectivesClassJson($Fname);
-  $this->generateAdjectivesJson($Fname);
-  $this->generateBoardsJson($Fname);
-  $this->generateCellJson($Fname);
-  $this->generateGroupBoardsJson($Fname);
-  $this->generateImagesJson($Fname);
-  $this->generateNameJson($Fname);
-  $this->generateNameClassJson($Fname);
-  $this->generateVerbJson($Fname);
-  $this->generateVerbConjugationJson($Fname);
-  $this->generatePatternJson($Fname);
-  $this->generatePictogramsJson($Fname);
-  $this->generatePictogramsLanguageJson($Fname);
-  $this->generateRBoardCellJson($Fname);
-  $this->generateRSHistoricPictogramsJson($Fname);
-  $this->generateRSSentencePictogramsJson($Fname);
-  $this->generateSuperUserJson($Fname);
-  $this->generateSHistoricJson($Fname);
-  $this->generateSFolderJson($Fname);
-  $this->generateSSentenceJson($Fname);
-  $this->generateUserJson($Fname);
-  $this->setImagesOnBackup($Fname);
+  $this->generateAdjectivesClassJson($Fname, $idusu, $langid);
+  $this->generateAdjectivesJson($Fname, $idusu, $langid);
+  $this->generateBoardsJson($Fname, $idusu);
+  $this->generateCellJson($Fname, $idusu);
+  $this->generateGroupBoardsJson($Fname, $idusu);
+  $this->generateImagesJson($Fname, $idusu);
+  $this->generateNameJson($Fname, $idusu, $langid);
+  $this->generateNameClassJson($Fname, $idusu, $langid);
+  $this->generateVerbJson($Fname, $idusu, $langid);
+  $this->generateVerbConjugationJson($Fname, $idusu, $langid);
+  $this->generatePatternJson($Fname, $idusu, $langid);
+  $this->generatePictogramsJson($Fname, $idusu);
+  $this->generatePictogramsLanguageJson($Fname, $idusu);
+  $this->generateRBoardCellJson($Fname, $idusu);
+  $this->generateRSHistoricPictogramsJson($Fname, $idusu);
+  $this->generateRSSentencePictogramsJson($Fname, $idusu);
+  $this->generateSuperUserJson($Fname, $idsu);
+  $this->generateSHistoricJson($Fname, $idusu);
+  $this->generateSFolderJson($Fname, $idusu);
+  $this->generateSSentenceJson($Fname, $idusu);
+  $this->generateUserJson($Fname, $idsu);
+  $this->setImagesOnBackup($Fname, $idusu);
+  $this->generateVersion($Fname);
   return $F;
 }
 //Genera json de la tabla AdjectiveClass
-  private function generateAdjectivesClassJson($Fname){
-    $data=$this->BackupSelects->getAdjectives();
-    $ID_Language=$this->session->uinterfacelangauge;
+  private function generateAdjectivesClassJson($Fname, $idusu, $ID_Language){
+    $data=$this->BackupSelects->getAdjectives($idusu, $ID_Language);
+
     switch($ID_Language){
       case 1:
       $table="AdjClassCA";
@@ -78,9 +80,8 @@ class BackupInserts extends CI_Model{
   fclose($fp);
   }
   //Genera json de la tabla Adjectives
-  private function generateAdjectivesJson($Fname){
-    $data=$this->BackupSelects->getAdjectives();
-    $ID_Language=$this->session->uinterfacelangauge;
+  private function generateAdjectivesJson($Fname, $idusu, $ID_Language){
+    $data=$this->BackupSelects->getAdjectives($idusu, $ID_Language);
     switch($ID_Language){
       case 1:
       $table="AdjectiveCA";
@@ -104,38 +105,37 @@ class BackupInserts extends CI_Model{
   fclose($fp);
   }
   //Genera json de la tabla Boards
-  private function generateBoardsJson($Fname){
-    $data=$this->BackupSelects->getBoards();
+  private function generateBoardsJson($Fname, $idusu){
+    $data=$this->BackupSelects->getBoards($idusu);
     $fp = fopen($Fname.'/Boards.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   return $data;
   }
   //Genera json de la tabla cell
-  private function generateCellJson($Fname){
-    $data=$this->BackupSelects->getCell();
+  private function generateCellJson($Fname, $idusu){
+    $data=$this->BackupSelects->getCell($idusu);
     $fp = fopen($Fname.'/Cell.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla GroupBoards
-  private function generateGroupBoardsJson($Fname){
-    $data=$this->BackupSelects->getGroupBoards();
+  private function generateGroupBoardsJson($Fname, $idusu){
+    $data=$this->BackupSelects->getGroupBoards($idusu);
       $fp = fopen($Fname.'/GroupBoards.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla Images
-  private function generateImagesJson($Fname){
-    $data=$this->BackupSelects->getImages();
+  private function generateImagesJson($Fname, $idusu){
+    $data=$this->BackupSelects->getImages($idusu);
       $fp = fopen($Fname.'/Images.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla Names
-  private function generateNameJson($Fname){
-    $data=$this->BackupSelects->getNames();
-    $ID_Language=$this->session->uinterfacelangauge;
+  private function generateNameJson($Fname, $idusu, $ID_Language){
+    $data=$this->BackupSelects->getNames($idusu, $ID_Language);
     switch($ID_Language){
       case 1:
       $table="NameCA";
@@ -162,9 +162,8 @@ class BackupInserts extends CI_Model{
   fclose($fp);
   }
   //Genera json de la tabla Verb
-  private function generateVerbJson($Fname){
-        $data=$this->BackupSelects->getVerbs();
-        $ID_Language=$this->session->uinterfacelangauge;
+  private function generateVerbJson($Fname, $idusu, $ID_Language){
+        $data=$this->BackupSelects->getVerbs($idusu, $ID_Language);
         switch($ID_Language){
             case 1:
             $table="VerbCA";
@@ -183,9 +182,8 @@ class BackupInserts extends CI_Model{
         fclose($fp);
   }
   //Genera json de la tabla VerbConjugation
-  private function generateVerbConjugationJson($Fname){
-        $data=$this->BackupSelects->getVerbs();
-        $ID_Language=$this->session->uinterfacelangauge;
+  private function generateVerbConjugationJson($Fname, $idusu, $ID_Language){
+        $data=$this->BackupSelects->getVerbs($idusu, $ID_Language);
         switch($ID_Language){
             case 1:
             $table="VerbConjugationCA";
@@ -206,9 +204,8 @@ class BackupInserts extends CI_Model{
         fclose($fp);
   }
   //Genera json de la tabla Pattern
-  private function generatePatternJson($Fname){
-        $data=$this->BackupSelects->getVerbs();
-        $ID_Language=$this->session->uinterfacelangauge;
+  private function generatePatternJson($Fname, $idusu, $ID_Language){
+        $data=$this->BackupSelects->getVerbs($idusu, $ID_Language);
         switch($ID_Language){
             case 1:
             $table="PatternCA";
@@ -270,16 +267,15 @@ class BackupInserts extends CI_Model{
         fclose($fp);
   }
   //Genera json de la tabla S_Historic
-  private function generateSHistoricJson($Fname){
-    $data=$this->BackupSelects->getHistoric();
+  private function generateSHistoricJson($Fname, $idusu){
+    $data=$this->BackupSelects->getHistoric($idusu);
       $fp = fopen($Fname.'/S_Historic.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla NameClass
-  private function generateNameClassJson($Fname){
-    $data=$this->BackupSelects->getNames();
-    $ID_Language=$this->session->uinterfacelangauge;
+  private function generateNameClassJson($Fname, $idusu, $ID_Language){
+    $data=$this->BackupSelects->getNames($idusu, $ID_Language);
     switch($ID_Language){
       case 1:
       $table="NameClassCA";
@@ -297,78 +293,87 @@ class BackupInserts extends CI_Model{
   fclose($fp);
   }
   //Genera json de la tabla Pictograms
-  private function generatePictogramsJson($Fname){
-    $data=$this->BackupSelects->getPictograms();
+  private function generatePictogramsJson($Fname, $idusu){
+    $data=$this->BackupSelects->getPictograms($idusu);
       $fp = fopen($Fname.'/Pictograms.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla PictogramsLanguage
-  private function generatePictogramsLanguageJson($Fname){
-    $data=$this->BackupSelects->getPictogramsLanguage();
+  private function generatePictogramsLanguageJson($Fname, $idusu){
+    $data=$this->BackupSelects->getPictogramsLanguage($idusu);
       $fp = fopen($Fname.'/PictogramsLanguage.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla R_BoardCell
-  private function generateRBoardCellJson($Fname){
-    $data=$this->BackupSelects->getRBoardCell();
+  private function generateRBoardCellJson($Fname, $idusu){
+    $data=$this->BackupSelects->getRBoardCell($idusu);
       $fp = fopen($Fname.'/R_BoardCell.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla R_S_HistoricPictograms
-  private function generateRSHistoricPictogramsJson($Fname){
-    $data=$this->BackupSelects->getRSHistoricPictograms();
+  private function generateRSHistoricPictogramsJson($Fname, $idusu){
+    $data=$this->BackupSelects->getRSHistoricPictograms($idusu);
       $fp = fopen($Fname.'/R_S_HistoricPictograms.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla R_S_SentencePictograms
-  private function generateRSSentencePictogramsJson($Fname){
-    $data=$this->BackupSelects->getRSSentecePictograms();
+  private function generateRSSentencePictogramsJson($Fname, $idusu){
+    $data=$this->BackupSelects->getRSSentecePictograms($idusu);
       $fp = fopen($Fname.'/R_S_SentencePictograms.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla SuperUser
-  private function generateSuperUserJson($Fname){
-    $data=$this->BackupSelects->getSuperUser();
+  private function generateSuperUserJson($Fname, $idsu){
+    $data=$this->BackupSelects->getSuperUser($idsu);
     $fp = fopen($Fname.'/SuperUser.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla S_Folder
-  private function generateSFolderJson($Fname){
-    $data=$this->BackupSelects->getSFolder();
+  private function generateSFolderJson($Fname, $idusu){
+    $data=$this->BackupSelects->getSFolder($idusu);
       $fp = fopen($Fname.'/S_Folder.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla S_Sentence
-  private function generateSSentenceJson($Fname){
-    $data=$this->BackupSelects->getSSentence();
+  private function generateSSentenceJson($Fname, $idusu){
+    $data=$this->BackupSelects->getSSentence($idusu);
       $fp = fopen($Fname.'/S_Sentence.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   }
   //Genera json de la tabla User
-  private function generateUserJson($Fname){
-    $data=$this->BackupSelects->getUser();
+  private function generateUserJson($Fname, $idsu){
+    $data=$this->BackupSelects->getUser($idsu);
       $fp = fopen($Fname.'/User.json', 'w');
   fwrite($fp, json_encode($data));
   fclose($fp);
   return $fp;
   }
   //Hace el backup de las imagenes moviendo el contenido de una carpeta a la de backup
-  private function setImagesOnBackup($Fname){
+  private function setImagesOnBackup($Fname, $idusu){
     mkdir("$Fname/images");
-  $data=$this->BackupSelects->getImages();
+  $data=$this->BackupSelects->getImages($idusu);
   $imgName=$data['imgName'];
   $imgPath=$data['imgPath'];
   for($i=0;$i<count($imgPath);$i++){
       copy($imgPath[$i],$Fname.'/'.'images/'.$imgName[$i]);
 }
 }
+
+  //Genera json de la tabla AdjectiveClass
+  private function generateVersion($Fname){
+
+    $fp = fopen($Fname.'/Version.txt', 'w');
+  fwrite($fp, "Jocomunico 3.0");
+  fclose($fp);
+  }
+
   }
   ?>

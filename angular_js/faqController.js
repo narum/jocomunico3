@@ -1,13 +1,14 @@
 angular.module('controllers')
-    .controller('faqCtrl', function ($http, $scope, $rootScope, Resources, AuthService, txtContent, $location, $timeout, dropdownMenuBarInit) {
+    .controller('faqCtrl', function ($scope, $rootScope, Resources, $location, dropdownMenuBarInit) {
 
         //Dropdown Menu Bar
+            var languageId = 1;
             $rootScope.dropdownMenuBar = null;
             if($rootScope.isLogged){
-                var languageId = $rootScope.interfaceLanguageId;
+                languageId = $rootScope.interfaceLanguageId;
                 $rootScope.dropdownMenuBarChangeLanguage = false;//Languages button available
             } else {
-                var languageId = $rootScope.contentLanguageUserNonLoged;
+                languageId = $rootScope.contentLanguageUserNonLoged;
                 $rootScope.dropdownMenuBarChangeLanguage = true;//Languages button available
             }
             dropdownMenuBarInit(languageId)
@@ -83,9 +84,15 @@ angular.module('controllers')
 
         // Language
         $rootScope.langabbr = $rootScope.contentLanguageUserNonLogedAbbr;
-
+        
+        var idioma = $rootScope.contentLanguageUserNonLoged;
+        if (window.localStorage.getItem('contentLanguageUserNonLoged')) {
+            idioma = window.localStorage.getItem('contentLanguageUserNonLoged')
+            $rootScope.langabbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
+        }
+        
         // Get content for the home view from ddbb
-        Resources.register.get({'section': 'faq', 'idLanguage': $rootScope.contentLanguageUserNonLoged}, {'funct': "content"}).$promise
+        Resources.register.get({'section': 'faq', 'idLanguage': idioma}, {'funct': "content"}).$promise
         .then(function (results) {
             $scope.text = results.data;
             $scope.viewActived = true;

@@ -11,6 +11,13 @@ class Mypattern {
                            // defaultverb o els verbless patterns
     var $impersonal = false;
     
+    var $lang;
+    var $langType;
+    var $adjOrder;
+    var $ncOrder;
+    var $explangcannotexpand = '0';
+    var $preguntapattern;
+    
     var $tipusfrase;
     var $defaulttense = null;
     var $verbpeticio;
@@ -488,7 +495,7 @@ class Mypattern {
                 $fittype = 0; // 1, si fit slot, 0 si no
                 
                 // passem el key de l'slot per si de cas hi ha subverb i els slots són de l'estil "Theme 1|2"
-                $fittype = $slot->nounFitsSlot($word, $keyslot);
+                $fittype = $slot->nounFitsSlot($word, $keyslot, $this->ncOrder, $this->langType, $this->preguntapattern);
                 
                 if ($fittype == 0) $unusedNouns[] = $word; // si no ha pogut anar a cap slot, no el fem servir
                 else $usedNouns[] = $word;
@@ -537,9 +544,9 @@ class Mypattern {
         // $this->disambiguateSlots($opts, "NC");
         
         $CI = &get_instance();
-        $langnouncorder = $CI->session->userdata('uinterfacelangncorder');
+        $langnouncorder = $this->ncOrder;
         
-        $langtype = $CI->session->userdata('uinterfacelangtype');
+        $langtype = $this->langType;
         $svo = true;
         if ($langtype != 'svo') $svo = false;
                 
@@ -677,7 +684,7 @@ class Mypattern {
                     $fittype = 0; // 1, si fit slot, 0 si no
 
                     // passem el key de l'slot per si de cas hi ha subverb i els slots són de l'estil "Theme 1|2"
-                    $fittype = $slot->adverbFitsSlot($word, $keyslot);
+                    $fittype = $slot->adverbFitsSlot($word, $keyslot, $this->langType, $this->preguntapattern);
 
                     if ($fittype == 0) $unusedAdverbs[] = $word; // si no ha pogut anar a cap slot, no el fem servir
                     else $usedAdverbs[] = $word;
@@ -806,7 +813,7 @@ class Mypattern {
                 $fittype = 0; // 1, si fit slot, 0 si no
                                 
                 // passem el key de l'slot per si de cas hi ha subverb i els slots són de l'estil "Theme 1|2"
-                $fittype = $slot->adjFitsSlot($word, $keyslot);
+                $fittype = $slot->adjFitsSlot($word, $keyslot, $this->adjOrder, $this->langType, $this->preguntapattern);
                 
                 if ($fittype == 0) $unusedAdjs[] = $word; // si no ha pogut anar a cap slot, no el fem servir
                 else $usedAdjs[] = $word;
@@ -997,7 +1004,7 @@ class Mypattern {
                     $fittype = 0; // 1, si fit slot, 0 si no
 
                     // passem el key de l'slot per si de cas hi ha subverb i els slots són de l'estil "Theme 1|2"
-                    $fittype = $slot->modifFitsSlot($word, $keyslot);
+                    $fittype = $slot->modifFitsSlot($word, $keyslot, $this->langType, $this->preguntapattern);
 
                     if ($fittype == 0) $unusedModifs[] = $word; // si no ha pogut anar a cap slot, no el fem servir
                     else $usedModifs[] = $word;
@@ -1363,7 +1370,7 @@ class Mypattern {
         // agafem el tipus d'idioma, ja que per desambiguar si l'idioma és svo
         // les paraules que vagin abans del verb tindran punts extra per fer de subjecte
         // i les que vagin darrere per fer dels altres slots
-        $langtype = $CI->session->userdata('uinterfacelangtype');
+        $langtype = $this->langType;
         
         $svo = true;
         if ($langtype != 'svo') $svo = false;
@@ -1703,7 +1710,7 @@ class Mypattern {
      */
     
     // Ordena els slots de la frase: ÉS EL PRIMER PAS DEL GENERADOR
-    public function ordenarSlotsFrase($propietatsfrase)
+    public function ordenarSlotsFrase($propietatsfrase, $isfem)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
@@ -1712,7 +1719,7 @@ class Mypattern {
         $matching = new Mymatching();
         
         //agafem si l'usuari parla en masculí o en femení pel generador
-        if ($CI->session->userdata('isfem') == '1') $this->isfem = true;
+        if ($isfem == '1') $this->isfem = true;
         
         // agafem si la frase és negativa
         $this->frasenegativa = $propietatsfrase['negativa'];
@@ -2108,7 +2115,7 @@ class Mypattern {
     }
     
     // Ordena els slots de la frase: ÉS EL PRIMER PAS DEL GENERADOR
-    public function ordenarSlotsFraseES($propietatsfrase)
+    public function ordenarSlotsFraseES($propietatsfrase, $isfem)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
@@ -2120,7 +2127,7 @@ class Mypattern {
         $this->frasenegativa = $propietatsfrase['negativa'];
         
         //agafem si l'usuari parla en masculí o en femení pel generador
-        if ($CI->session->userdata('isfem') == '1') $this->isfem = true;
+        if ($isfem == '1') $this->isfem = true;
                 
         // ADVS TEMPS
 
@@ -3295,7 +3302,7 @@ class Mypattern {
             
             // Els modificadors de tipuis de frase de permís o desig són per fer frases
             // en 1a persona "Vull que vagis a comprar" o "Puc menjar un gelat?".
-            $verbconjugat = $CI->Lexicon->conjugar($verbid, $tense, 1, "sing", false);
+            $verbconjugat = $CI->Lexicon->conjugar($verbid, $tense, 1, "sing", false, $this->lang);
             
             $auxtupla[0] = $verbconjugat."@VERBUM";
             $auxtupla[1] = null;
@@ -3321,7 +3328,7 @@ class Mypattern {
             // si la frase era de permís (verb poder), tant el mainverb com el secondary verb van en infinitiu
             if ($permis) {
 
-                $verbconjugat = $CI->Lexicon->conjugar($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal);
+                $verbconjugat = $CI->Lexicon->conjugar($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal, $this->lang);
 
                 $auxtupla[0] = $verbconjugat."@VERBUM";
                 $auxtupla[1] = $mainverbslot->paraulafinal;
@@ -3330,7 +3337,7 @@ class Mypattern {
                 $mainverbslot->isInfinitive = true;
                 
                 if ($secondaryverbslot != null) {
-                    $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                    $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
 
                     // posem la preposició que va davant del verb secundari, si n'hi havia
                     if ($secondaryverbslot->prep != null) {
@@ -3354,11 +3361,11 @@ class Mypattern {
             else if ($desig) {
                 
                 if ($persona == 1 && $numero == "sing") {
-                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal);
+                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal, $this->lang);
                     $mainverbslot->isInfinitive = true;
                 }
                 else {
-                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'prsubj', $persona, $numero, $this->pronominal);
+                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'prsubj', $persona, $numero, $this->pronominal, $this->lang);
                     
                     // afegim la partícula QUE després del "Vull"
                     $auxtupla[0] = "que";
@@ -3377,7 +3384,7 @@ class Mypattern {
                     
                     // si els subjectes eren iguals, també va en infinitiu
                     if ($this->subjsiguals) {
-                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         $secondaryverbslot->isInfinitive = true;
                         
@@ -3392,7 +3399,7 @@ class Mypattern {
                     // si no, aleshores va en subjuntiu (si fos en passat hauria d'anar en passat
                     // de subjuntiu, però el sistema encara no ho té
                     else {
-                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         // posem la preposició que va darrer del verb principal, si n'hi havia
                         if ($secondaryverbslot->prep != null) {
@@ -3417,7 +3424,7 @@ class Mypattern {
             
             // si no, CONJUGACIÓ NORMAL
             else {
-                $verbconjugat = $CI->Lexicon->conjugar($mainverbslot->paraulafinal->id, $tense, $persona, $numero, $this->pronominal);
+                $verbconjugat = $CI->Lexicon->conjugar($mainverbslot->paraulafinal->id, $tense, $persona, $numero, $this->pronominal, $this->lang);
 
                 $auxtupla[0] = $verbconjugat."@VERBUM";
                 $auxtupla[1] = $mainverbslot->paraulafinal;
@@ -3431,7 +3438,7 @@ class Mypattern {
                     
                     // si els subjectes eren iguals, també va en infinitiu
                     if ($this->subjsiguals) {
-                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         $secondaryverbslot->isInfinitive = true;
                         
@@ -3446,7 +3453,7 @@ class Mypattern {
                     // si no, aleshores va en subjuntiu (si fos en passat hauria d'anar en passat
                     // de subjuntiu, però el sistema encara no ho té
                     else {
-                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugar($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         // posem la preposició que va darrer del verb principal, si n'hi havia
                         if ($secondaryverbslot->prep != null) {
@@ -3560,7 +3567,7 @@ class Mypattern {
             
             // Els modificadors de tipuis de frase de permís o desig són per fer frases
             // en 1a persona "Vull que vagis a comprar" o "Puc menjar un gelat?".
-            $verbconjugat = $CI->Lexicon->conjugarES($verbid, $tense, 1, "sing", false);
+            $verbconjugat = $CI->Lexicon->conjugarES($verbid, $tense, 1, "sing", false, $this->lang);
             
             $auxtupla[0] = $verbconjugat."@VERBUM";
             $auxtupla[1] = null;
@@ -3586,7 +3593,7 @@ class Mypattern {
             // si la frase era de permís (verb poder), tant el mainverb com el secondary verb van en infinitiu
             if ($permis) {
 
-                $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal);
+                $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal, $this->lang);
 
                 $auxtupla[0] = $verbconjugat."@VERBUM";
                 $auxtupla[1] = $mainverbslot->paraulafinal;
@@ -3595,7 +3602,7 @@ class Mypattern {
                 $mainverbslot->isInfinitive = true;
                 
                 if ($secondaryverbslot != null) {
-                    $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                    $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
 
                     // posem la preposició que va davant del verb secundari, si n'hi havia
                     if ($secondaryverbslot->prep != null) {
@@ -3619,11 +3626,11 @@ class Mypattern {
             else if ($desig) {
                 
                 if ($persona == 1 && $numero == "sing") {
-                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal);
+                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'infinitiu', $persona, $numero, $this->pronominal, $this->lang);
                     $mainverbslot->isInfinitive = true;
                 }
                 else {
-                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'prsubj', $persona, $numero, $this->pronominal);
+                    $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, 'prsubj', $persona, $numero, $this->pronominal, $this->lang);
                     
                     // afegim la partícula QUE després del "Quiero"
                     $auxtupla[0] = "que";
@@ -3642,7 +3649,7 @@ class Mypattern {
                     
                     // si els subjectes eren iguals, va en infinitiu
                     if ($this->subjsiguals) {
-                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         $secondaryverbslot->isInfinitive = true;
                         
@@ -3657,7 +3664,7 @@ class Mypattern {
                     // si no, aleshores va en subjuntiu (si fos en passat hauria d'anar en passat
                     // de subjuntiu, però el sistema encara no ho té
                     else {
-                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         // posem la preposició que darrere del verb principal, si n'hi havia
                         if ($secondaryverbslot->prep != null) {
@@ -3682,7 +3689,7 @@ class Mypattern {
             
             // si no, CONJUGACIÓ NORMAL
             else {
-                $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, $tense, $persona, $numero, $this->pronominal);
+                $verbconjugat = $CI->Lexicon->conjugarES($mainverbslot->paraulafinal->id, $tense, $persona, $numero, $this->pronominal, $this->lang);
 
                 $auxtupla[0] = $verbconjugat."@VERBUM";
                 $auxtupla[1] = $mainverbslot->paraulafinal;
@@ -3696,7 +3703,7 @@ class Mypattern {
                     
                     // si els subjectes eren iguals, també va en infinitiu
                     if ($this->subjsiguals) {
-                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'infinitiu', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         $secondaryverbslot->isInfinitive = true;
                         
@@ -3711,7 +3718,7 @@ class Mypattern {
                     // si no, aleshores va en subjuntiu (si fos en passat hauria d'anar en passat
                     // de subjuntiu, però el sistema encara no ho té
                     else {
-                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2);
+                        $verbconjugat = $CI->Lexicon->conjugarES($secondaryverbslot->paraulafinal->id, 'prsubj', $persona2, $numero2, $this->pronominal2, $this->lang);
                         
                         // posem la preposició que darrere del verb principal, si n'hi havia
                         if ($secondaryverbslot->prep != null) {
@@ -4524,7 +4531,7 @@ class Mypattern {
                 // que no elimini els subjectes perquè així per la posterior traducció hi haurà menys
                 // ambigüitats (només pel primer nivell i si les frases no són ordres)
                 if ($slotaux->defvalueused) {
-                    if ($CI->session->userdata('explangcannotexpand') == '1' && $slotaux->level != 2
+                    if ($this->explangcannotexpand == '1' && $slotaux->level != 2
                             && $tipusfrase != "ordre") {
                         switch ($slotaux->defvalue) {
                             case '1':
@@ -4561,7 +4568,7 @@ class Mypattern {
                 }
                 // si no s'ha fet servir el subjecte per defecte o era del segon nivell o era una ordre
                 else {
-                    if ($CI->session->userdata('explangcannotexpand') != '1' || $slotaux->level == 2
+                    if ($this->explangcannotexpand != '1' || $slotaux->level == 2
                             || $tipusfrase == "ordre") {
                         // esborrem el tú o el yo, si no tenen elements coordinats
                         if (($slotaux->paraulafinal->text == "yo" || $slotaux->paraulafinal->text == "tú")

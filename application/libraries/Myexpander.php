@@ -22,10 +22,12 @@ class Myexpander {
     var $preguntaposada = array();
     var $paraulescopia = array();
     var $info = array();
+    
+    var $preguntapattern = false;
         
     function __construct() {}
     
-    public function expand()
+    public function expand($idusu, $lang, $expansion, $isfem, $langType, $adjOrder, $ncOrder)
     {
         // the character encoding of the words from the database is utf-8
         // so we set the php system to utf-8
@@ -42,11 +44,10 @@ class Myexpander {
         
         // agafem si el sistema d'expansió està o no activat
         $expansionOff = false;
-        if ($CI->session->userdata('cfgExpansionOnOff') == '0') $expansionOff = true;
+        if ($expansion == '0') $expansionOff = true;
         
         // GET SENTENCE
-        $idusu = $CI->session->userdata('idusu');
-        $this->paraulescopia = $CI->Lexicon->getLastSentence($idusu); // array amb les paraules
+        $this->paraulescopia = $CI->Lexicon->getLastSentence($idusu, $lang); // array amb les paraules
         $propietatsfrase = $CI->Lexicon->getLastSentenceProperties($idusu);
                 
         // variables per mostrar els resultats per pantalla
@@ -132,7 +133,7 @@ class Myexpander {
 
         // GET PATTERNS
 
-        $this->initialiseVerbPatterns($arrayVerbs, $propietatsfrase, $thereisadj, $adjdefverb, $adjdefsubj, $countnouns, $noundefverb, $othertypes);
+        $this->initialiseVerbPatterns($arrayVerbs, $propietatsfrase, $thereisadj, $adjdefverb, $adjdefsubj, $countnouns, $noundefverb, $othertypes, $lang, $idusu, $langType, $adjOrder, $ncOrder);
         // $verbPatterns = new Mypatterngroup();            
         // $verbPatterns.initialise($arrayVerbs);
 
@@ -189,7 +190,7 @@ class Myexpander {
                }
 
                // si la frase era de pregunta, ho guardem a les cookies
-               if ($propietatsfrase['tipusfrase'] == "pregunta") $CI->session->set_userdata('preguntapattern', true);
+               if ($propietatsfrase['tipusfrase'] == "pregunta") $this->preguntapattern = true;
                
                // Si hi ha una partícula de pregunta
                $numpreguntes = count($partPregunta);
@@ -221,7 +222,7 @@ class Myexpander {
                    else {
                        // només que hi hagi un patró on encaixi la partícula de pregunta, ja va bé
                        $preguntabona = true;
-                       $CI->session->set_userdata('preguntapattern', true);
+                       $this->preguntapattern = true;
                        $this->errormessagetemp = null;
                        $this->errorcodetemp = null;
                        $this->errortemp = false;
@@ -284,7 +285,7 @@ class Myexpander {
                $this->errorcodetemp = null;
                $this->errortemp = false;
                
-               $CI->session->set_userdata('preguntapattern', false);
+               $this->preguntapattern = false;
                // DEBUG
                // echo $auxpattern->printPattern();
 
@@ -316,13 +317,13 @@ class Myexpander {
             // CRIDEM EL GENERADOR AMB EL MILLOR PATTERN, LES PROPIETATS DE LA FRASE SELECCIONADA
             // I SI HI HA UNA PARTÍCULA DE PREGUNTA
 
-            $userlanguage = $CI->session->userdata('ulangabbr');
+            $userlanguage = $lang;
             $frasefinal = "";
 
             if ($userlanguage == "CA") {
-                $frasefinal = $this->generateSentence($bestpattern, $propietatsfrase, $this->preguntaposada[$bestpatternindex]);
+                $frasefinal = $this->generateSentence($bestpattern, $propietatsfrase, $this->preguntaposada[$bestpatternindex], $userlanguage, $isfem, $langType, $adjOrder, $ncOrder);
             } else if ($userlanguage == "ES") {
-                $frasefinal = $this->generateSentenceES($bestpattern, $propietatsfrase, $this->preguntaposada[$bestpatternindex]);
+                $frasefinal = $this->generateSentenceES($bestpattern, $propietatsfrase, $this->preguntaposada[$bestpatternindex], $userlanguage, $isfem, $langType, $adjOrder, $ncOrder);
             }
 
             // si el millor patró té un codi d'error 7 (paraula no utilitzada), aleshores llegim sense expansió
@@ -363,7 +364,7 @@ class Myexpander {
 
 
     // INICIALITZA TOTS ELS PATTERNS POSSIBLES I ELS POSA A L'ARRAY ALLPATTERNS
-    function initialiseVerbPatterns($arrayVerbs, $propietatsfrase, $thereisadj, $adjdefverb, $adjdefsubj, $countnouns, $noundefverb, $othertypes)
+    function initialiseVerbPatterns($arrayVerbs, $propietatsfrase, $thereisadj, $adjdefverb, $adjdefsubj, $countnouns, $noundefverb, $othertypes, $lang, $idusu, $langType, $adjOrder, $ncOrder)
     {   
         $CI = &get_instance();
         $CI->load->model('Lexicon');
@@ -372,6 +373,11 @@ class Myexpander {
 
         $auxword = new Myword();
         $auxpattern = new Mypattern();
+        $auxpattern->lang = $lang;
+        $auxpattern->langType = $langType;
+        $auxpattern->adjOrder = $adjOrder;
+        $auxpattern->ncOrder = $ncOrder;
+        $auxpattern->preguntapattern = $this->preguntapattern;
 
         if ($numverbs > 2) {
             $this->allpatterns = null;
@@ -391,26 +397,26 @@ class Myexpander {
                 // si hi ha un adjectiu i no hi ha noms, ni altres paraules excepte modificadors
                 // agafem el verb per defecte del primer adjectiu introduït
                 if ($thereisadj && $countnouns == 0 && !$othertypes) {
-                    $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($adjdefverb, ($adjdefverb != 0)); 
+                    $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($adjdefverb, ($adjdefverb != 0), $lang, $idusu); 
                 }
                 // si hi ha algun nom i no hi ha altres paraules excepte modificadors i/o adjectius
                 // agafem el verb per defecte del primer nom introduït
                 // si el nom no tenia verb per defecte i hi havia un adjectiu, agafem el verb per
                 // defecte de l'adjectiu
                 else if ($countnouns > 0 && !$othertypes) {
-                    if ($noundefverb != 0) $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($noundefverb, false);
-                    else if ($thereisadj) $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($adjdefverb, ($adjdefverb != 0));
-                    else $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false); // Verbless
+                    if ($noundefverb != 0) $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($noundefverb, false, $lang, $idusu);
+                    else if ($thereisadj) $arrayVerbs[] = $CI->Lexicon->getPatternsVerb($adjdefverb, ($adjdefverb != 0), $lang, $idusu);
+                    else $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false, $lang, $idusu); // Verbless
                 }
                 else {
                     // Agafem els verbless patterns
-                    $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false); // Verbless
+                    $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false, $lang, $idusu); // Verbless
                 }
                 
             }
             else {
                 // Agafem els verbless patterns
-                $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false); // Verbless
+                $arrayVerbs[] = $CI->Lexicon->getPatternsVerb(0, false, $lang, $idusu); // Verbless
             }
 
             // Per cada paraula
@@ -422,6 +428,11 @@ class Myexpander {
                 foreach ($auxword->patterns as $pattern) {
 
                     $auxpattern = new Mypattern();
+                    $auxpattern->lang = $lang;
+                    $auxpattern->langType = $langType;
+                    $auxpattern->adjOrder = $adjOrder;
+                    $auxpattern->ncOrder = $ncOrder;
+                    $auxpattern->preguntapattern = $this->preguntapattern;
                     // inicialitzem el pattern, li diem que és verbless i li passem el subjecte per defecte
                     // de l'adjectiu (si era un nom el valor serà false)
                     $auxpattern->initialise($pattern, true, $adjdefsubj); 
@@ -444,6 +455,11 @@ class Myexpander {
                 // menys els que eren de subverb
                 if ($pattern->subverb == '0') {
                     $auxpattern = new Mypattern();
+                    $auxpattern->lang = $lang;
+                    $auxpattern->langType = $langType;
+                    $auxpattern->adjOrder = $adjOrder;
+                    $auxpattern->ncOrder = $ncOrder;
+                    $auxpattern->preguntapattern = $this->preguntapattern;
                     $auxpattern->initialise($pattern, false, false);
 
                     $auxpattern->forceFillSlot("Main Verb", $auxword, 0, 0);
@@ -468,6 +484,11 @@ class Myexpander {
                 if ($pattern->subverb == '1') { // Si el pattern accepta subverb
 
                     $auxpattern = new Mypattern();
+                    $auxpattern->lang = $lang;
+                    $auxpattern->langType = $langType;
+                    $auxpattern->adjOrder = $adjOrder;
+                    $auxpattern->ncOrder = $ncOrder;
+                    $auxpattern->preguntapattern = $this->preguntapattern;
                     $auxpattern->initialise($pattern, false, false);
 
                     // Posar a dins els patterns del segon verb que no accepten subverb
@@ -478,6 +499,11 @@ class Myexpander {
                             $subverbfound = true;
 
                             $auxpattern2 = new Mypattern();
+                            $auxpattern2->lang = $lang;
+                            $auxpattern2->langType = $langType;
+                            $auxpattern2->adjOrder = $adjOrder;
+                            $auxpattern2->ncOrder = $ncOrder;
+                            $auxpattern2->preguntapattern = $this->preguntapattern;
                             $auxpattern2->initialise($pattern2, false, false);
 
                             $auxpatternfusion = new Mypattern();
@@ -504,6 +530,11 @@ class Myexpander {
                     if ($pattern2->subverb == '1') { // Si el pattern accepta subverb
 
                         $auxpattern2 = new Mypattern();
+                        $auxpattern2->lang = $lang;
+                        $auxpattern2->langType = $langType;
+                        $auxpattern2->adjOrder = $adjOrder;
+                        $auxpattern2->ncOrder = $ncOrder;
+                        $auxpattern2->preguntapattern = $this->preguntapattern;
                         $auxpattern2->initialise($pattern2, false, false);
 
                         // Posar a dins els patterns del segon verb que no accepten subverb
@@ -514,6 +545,11 @@ class Myexpander {
                                 $subverbfound = true;
 
                                 $auxpattern = new Mypattern();
+                                $auxpattern->lang = $lang;
+                                $auxpattern->langType = $langType;
+                                $auxpattern->adjOrder = $adjOrder;
+                                $auxpattern->ncOrder = $ncOrder;
+                                $auxpattern->preguntapattern = $this->preguntapattern;
                                 $auxpattern->initialise($pattern, false, false);
 
                                 $auxpatternfusion = new Mypattern();
@@ -539,10 +575,15 @@ class Myexpander {
     }
 
 
-    function generateSentence($patternfinal, $propietatsfrase, $partpreguntaposada)
+    function generateSentence($patternfinal, $propietatsfrase, $partpreguntaposada, $lang, $isfem, $langType, $adjOrder, $ncOrder)
     {
         $pattern = new Mypattern();
         $pattern = $patternfinal;
+        $pattern->lang = $lang;
+        $pattern->langType = $langType;
+        $pattern->adjOrder = $adjOrder;
+        $pattern->ncOrder = $ncOrder;
+        $pattern->preguntapattern = $this->preguntapattern;
         
         if ($partpreguntaposada) $propietatsfrase['tipusfrase'] = "pregunta";
         // si el temps per defecte és l'imperatiu, però hi ha modificadors de frase o de tense
@@ -575,7 +616,7 @@ class Myexpander {
 //        if ($propietatsfrase['tipusfrase'] == "defecte") $propietatsfrase['tipusfrase'] = $pattern->tipusfrase;
 
         // 1. Ordenem els slots segons el tipus de frase
-        $pattern->ordenarSlotsFrase($propietatsfrase);
+        $pattern->ordenarSlotsFrase($propietatsfrase, $isfem);
 
         // 2 i 3. 2: Ordenar paraules de dins dels slots, ja posant les preposicions.
         // 3: Controlar que les paraules concordin en gènere i número (els adjs amb els noms 
@@ -602,10 +643,15 @@ class Myexpander {
         return $pattern->printFraseFinal();
     }
 
-    function generateSentenceES($patternfinal, $propietatsfrase, $partpreguntaposada)
+    function generateSentenceES($patternfinal, $propietatsfrase, $partpreguntaposada, $lang, $isfem, $langType, $adjOrder, $ncOrder)
     {
         $pattern = new Mypattern();
         $pattern = $patternfinal;
+        $pattern->lang = $lang;
+        $pattern->langType = $langType;
+        $pattern->adjOrder = $adjOrder;
+        $pattern->ncOrder = $ncOrder;
+        $pattern->preguntapattern = $this->preguntapattern;
 
         if ($partpreguntaposada) $propietatsfrase['tipusfrase'] = "pregunta";
         // si el temps per defecte és l'imperatiu, però hi ha modificadors de frase o de tense
@@ -638,7 +684,7 @@ class Myexpander {
 //        if ($propietatsfrase['tipusfrase'] == "defecte") $propietatsfrase['tipusfrase'] = $pattern->tipusfrase;
 
         // 1. Ordenem els slots segons el tipus de frase
-        $pattern->ordenarSlotsFraseES($propietatsfrase);
+        $pattern->ordenarSlotsFraseES($propietatsfrase, $isfem);
 
         // 2 i 3. 2: Ordenar paraules de dins dels slots, ja posant les preposicions.
         // 3: Controlar que les paraules concordin en gènere i número (els adjs amb els noms 

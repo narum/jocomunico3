@@ -44,7 +44,7 @@
     margin-top: 0px;
     margin-left: 0px;
     left: 0px;
-    height: 15vh;
+    height: 25vh;
     width: 100vw;
     border-radius: 0px;
     opacity: 0.95;
@@ -54,7 +54,7 @@
     margin-top: 0px;
     margin-left: 0px;
     left: 6vh;
-    height: 15vh;
+    height: 25vh;
     width: 100vw;
     border-radius: 0px;
     opacity: 0.95;
@@ -87,7 +87,7 @@
     transition: left 0.25s ease;
 }
 .fontSizeForced *{
-    font-size: 1.4vh;
+    font-size: 1.8vh;
 }
 .buttonsMenuBar{
     z-index:0;
@@ -97,8 +97,10 @@
     top: -12vh;
     margin-top: 5vh;
     padding-left: 12vh;
+    padding-right: 10px;
     /*font-size: 1.2vh;*/
     text-align: center;
+    -webkit-user-select: none;
 }
 .buttonsMenuBarOpened{
     z-index:41 !important;
@@ -114,7 +116,7 @@
     opacity: 1;
 }
 .icondropdownMenuBar{
-    height: 2vh;
+    height: 2.5vh;
     width: auto;
     margin-bottom: 0.6vh;
 }
@@ -123,6 +125,7 @@
 }
 .marginButtonMenuBar label{
     font-weight: normal;
+    padding-bottom: 10px;
 }
 input.statesButtonMenuBar[type=radio]:empty + label,
 input.statesButtonMenuBar[type=checkbox]:empty + label{

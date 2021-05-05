@@ -7,7 +7,7 @@ class Login extends REST_Controller {
 
     public function __construct()
     {
-        parent::__construct('rest', TRUE);
+        parent::__construct('rest', TRUE); 
         $this->load->model('login_model');
     }
 

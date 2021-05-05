@@ -7,9 +7,10 @@ class DeleteTemp extends CI_Controller {
       $this->load->helper('file');
   }
 
+  // Deletes all temporary files
   public function index(){
     delete_files('Temp', TRUE);
-    delete_files('backups', TRUE);
+    delete_files('backups', TRUE); 
   }
-
+  
 }

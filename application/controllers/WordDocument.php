@@ -9,7 +9,7 @@ class WordDocument extends REST_Controller {
 
   public function __construct(){
     parent::__construct('rest', TRUE);
-    $this->load->model('WordDocument_Model');
+    $this->load->model('WordDocument_Model'); 
   }
 
   public function index_post(){

@@ -10,7 +10,6 @@ class AddVerb extends REST_Controller {
     public function __construct() {
         parent::__construct();
 
-        $this->load->library('session');
         $this->load->model('AddVerbModel');
         $this->load->model('PanelInterface');
         $this->load->model('Lexicon');
@@ -22,7 +21,10 @@ class AddVerb extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $verb = $request->verb;
-        $result = $this->AddVerbModel->conjugateVerb($verb);
+        $language = $request->langabbr;
+        $user = $request->idusu;
+        
+        $result = $this->AddVerbModel->conjugateVerb($verb, $language, $user);
         $this->response($result, REST_Controller::HTTP_OK);
     }
 
@@ -30,7 +32,10 @@ class AddVerb extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $verb = $request->verb;
-        $result = $this->AddVerbModel->verbExist($verb);
+        $language = $request->langabbr;
+        $user = $request->idusu;
+        
+        $result = $this->AddVerbModel->verbExist($verb, $language, $user);
         $this->response($result, REST_Controller::HTTP_OK);
     }
 
@@ -45,7 +50,9 @@ class AddVerb extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $verbID = $request->verbID;
-        $result = $this->AddVerbModel->getAllData($verbID);
+        $language = $request->langabbr;
+        
+        $result = $this->AddVerbModel->getAllData($verbID, $language);
         $this->response($result, REST_Controller::HTTP_OK);
     }
 

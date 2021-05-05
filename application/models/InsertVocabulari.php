@@ -8,26 +8,28 @@ class InsertVocabulari extends CI_Model {
         parent::__construct();
     }        
 
-    private function insertAdjClass($new, $adjid, $class) {
-        if ($new) $this->insertIntoAdjClass($adjid, $class);
+    private function insertAdjClass($new, $adjid, $class, $langabbr) {
+        if ($new) {
+            $this->insertIntoAdjClass($adjid, $class, $langabbr);
+        }
         else {
             $this->db->where('adjid', $adjid);
-            $this->db->delete('AdjClass'.$this->session->userdata('ulangabbr'));
-            $this->insertIntoAdjClass($adjid, $class);
+            $this->db->delete('AdjClass'.$langabbr);
+            $this->insertIntoAdjClass($adjid, $class, $langabbr);
         }
     }
     
-    private function insertIntoAdjClass($adjid, $class) {
+    private function insertIntoAdjClass($adjid, $class, $langabbr) {
         for ($i = 0; $i < sizeof($class); $i++) {
             $data = array(
                 'adjid' => $adjid,
                 'class' => $class[$i]->classType
             );
-            $this->db->insert('AdjClass'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->insert('AdjClass'.$langabbr, $data);
         }
     }        
     
-    private function insertAdjective($new, $adjid, $fem, $masc, $mascpl, $fempl, $defaultverb, $subjdef) {
+    private function insertAdjective($new, $adjid, $fem, $masc, $mascpl, $fempl, $defaultverb, $subjdef, $langabbr) {
         $data = array(
             'adjid' => $adjid,
             'fem' => $fem,
@@ -37,38 +39,41 @@ class InsertVocabulari extends CI_Model {
             'defaultverb' => $defaultverb,
             'subjdef' => $subjdef
         );
-        if ($new) $this->db->insert('Adjective'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Adjective'.$langabbr, $data);
         else {
             $this->db->where('adjid', $adjid);
-            $this->db->update('Adjective'.$this->session->userdata('ulangabbr'), $data); 
+            $this->db->update('Adjective'.$langabbr, $data); 
         }
     }
     
-    private function insertAdverb($new, $advid, $advtext) {
+    // NOT IN USE
+    private function insertAdverb($new, $advid, $advtext, $langabbr) {
         $data = array(
             'advid' => $advid,
             'class' => $advtext
         );
-        if ($new) $this->db->insert('Adverb'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Adverb'.$langabbr, $data);
         else {
             $this->db->where('advid', $advid);
-            $this->db->update('Adverb'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('Adverb'.$langabbr, $data);
         }
     }
     
-    private function insertAdvType($new, $advid, $type) {
+    // NOT IN USE
+    private function insertAdvType($new, $advid, $type, $langabbr) {
         $data = array(
             'advid' => $advid,
             'type' => $type
         );
-        if ($new) $this->db->insert('AdvType'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('AdvType'.$langabbr, $data);
         else {
             $this->db->where('advid', $advid);
-            $this->db->update('AdvType'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('AdvType'.$langabbr, $data);
         }
     }
     
-    private function insertModifier($new, $modid, $masc, $fem, $mascpl, $fempl, $negatiu, $type, $scope) {
+    // NOT IN USE
+    private function insertModifier($new, $modid, $masc, $fem, $mascpl, $fempl, $negatiu, $type, $scope, $langabbr) {
         $data = array(
             'modid' => $modid,
             'masc' => $masc,
@@ -79,14 +84,14 @@ class InsertVocabulari extends CI_Model {
             'type' => $type,
             'scope' => $scope
         );
-        if ($new) $this->db->insert('Modifier'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Modifier'.$langabbr, $data);
         else {
             $this->db->where('modid', $modid);
-            $this->db->update('Modifier'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('Modifier'.$langabbr, $data);
         }
     }
     
-    private function insertName($new, $nameid, $nomtext, $mf, $singpl, $contabincontab, $determinat, $ispropernoun, $defaultverb, $plural, $femeni, $fempl) {
+    private function insertName($new, $nameid, $nomtext, $mf, $singpl, $contabincontab, $determinat, $ispropernoun, $defaultverb, $plural, $femeni, $fempl, $langabbr) {
         $data = array(
             'nameid' => $nameid,
             'nomtext' => $nomtext,
@@ -100,58 +105,63 @@ class InsertVocabulari extends CI_Model {
             'femeni' => $femeni,
             'fempl' => $fempl
         );
-        if ($new) $this->db->insert('Name'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Name'.$langabbr, $data);
         else {
             $this->db->where('nameid', $nameid);
-            $this->db->update('Name'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('Name'.$langabbr, $data);
         }
     }
     
-    private function insertNameClass($new, $nameid, $class) {
-        if ($new) $this->insertIntoNameClass($nameid, $class);
+    private function insertNameClass($new, $nameid, $class, $langabbr) {
+        if ($new) {
+            $this->insertIntoNameClass($nameid, $class, $langabbr);
+        }
         else {
             $this->db->where('nameid', $nameid);
-            $this->db->delete('NameClass'.$this->session->userdata('ulangabbr'));
-            $this->insertIntoNameClass($nameid, $class);
+            $this->db->delete('NameClass'.$langabbr);
+            $this->insertIntoNameClass($nameid, $class, $langabbr);
         }
     }
     
-    private function insertIntoNameClass($nameid, $class) {
+    private function insertIntoNameClass($nameid, $class, $langabbr) {
         for ($i = 0; $i < sizeof($class); $i++) {
             $data = array(
                 'nameid' => $nameid,
                 'class' => $class[$i]->classType
             );
-            $this->db->insert('NameClass'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->insert('NameClass'.$langabbr, $data);
         }
     }
     
-    private function insertPattern($new, $patternid, $verbid) { // falta param pattern
+    // NOT IN USE
+    private function insertPattern($new, $patternid, $verbid, $langabbr) { // falta param pattern
         $data = array(
             'patternid' => $patternid,
             'verbid' => $verbid
         );
-        if ($new) $this->db->insert('Pattern'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Pattern'.$langabbr, $data);
         else {
             $this->db->where('patternid', $patternid);
-            $this->db->update('Pattern'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('Pattern'.$langabbr, $data);
         }
     }
     
-    private function insertVerb($new, $verbid, $verbtext, $actiu) {
+    // NOT IN USE
+    private function insertVerb($new, $verbid, $verbtext, $actiu, $langabbr) {
         $data = array(
             'verbid' => $verbid,
             'verbtext' => $verbtext,
             'actiu' => $actiu
         );
-        if ($new) $this->db->insert('Verb'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('Verb'.$langabbr, $data);
         else {
             $this->db->where('verbid', $verbid);
-            $this->db->update('Verb'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('Verb'.$langabbr, $data);
         }
     }
     
-    private function insertVerbConjugation($new, $verbid, $tense, $pers, $singpl, $verbconj) {
+    // NOT IN USE
+    private function insertVerbConjugation($new, $verbid, $tense, $pers, $singpl, $verbconj, $langabbr) {
         $data = array(
             'verbid' => $verbid,
             'tense' => $tense,
@@ -159,22 +169,23 @@ class InsertVocabulari extends CI_Model {
             'singpl' => $singpl,
             'verbconj' => $verbconj
         );
-        if ($new) $this->db->insert('VerbConjugation'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('VerbConjugation'.$langabbr, $data);
         else {
             $this->db->where('verbid', $verbid);
-            $this->db->update('VerbConjugation'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('VerbConjugation'.$langabbr, $data);
         }
     }
     
-    private function insertVerbPattern($new, $verbid, $patternid) {
+    // NOT IN USE
+    private function insertVerbPattern($new, $verbid, $patternid, $langabbr) {
         $data = array(
             'verbid' => $verbid,
             'patternid' => $patternid
         );
-        if ($new) $this->db->insert('VerbPattern'.$this->session->userdata('ulangabbr'), $data);
+        if ($new) $this->db->insert('VerbPattern'.$langabbr, $data);
         else {
             $this->db->where('verbid', $verbid);
-            $this->db->update('VerbPattern'.$this->session->userdata('ulangabbr'), $data);
+            $this->db->update('VerbPattern'.$langabbr, $data);
         }
     }
 
@@ -236,42 +247,41 @@ class InsertVocabulari extends CI_Model {
         }
     }
 
-    public function insertPicto($objAdd) {
-        $ID_PUSer = $this->session->userdata('idusu');
-        $ID_PSUPUser = $this->session->userdata('idusu');
-        $languageid = ($this->session->userdata('ulangabbr') == 'CA' ? 1:  2);
+    public function insertPicto($objAdd, $ID_PUSer, $langabbr) {
+        
+        $languageid = ($langabbr == 'CA' ? 1:  2);
         $pictoid = $this->insertPictograms($objAdd->new, $objAdd->pictoid, $ID_PUSer, $objAdd->type, $objAdd->supExp, $objAdd->imgPicto, $objAdd->imgFolder);
         var_dump($pictoid);        
          //pictofreq a modificar
         
         if ($objAdd->type == 'name') {
             $this->insertPictogramsLanguage($objAdd->new, $pictoid, $languageid, $objAdd->nomtext, $pictofreq = 10.000);
-            $this->insertName($objAdd->new, $pictoid, $objAdd->nomtext, $objAdd->mf, $objAdd->singpl, $objAdd->contabincontab, $objAdd->determinat, $objAdd->ispropernoun, $objAdd->defaultverb, $objAdd->plural, $objAdd->femeni, $objAdd->fempl);
-            $this->insertNameClass($objAdd->new, $pictoid, $objAdd->class);            
+            $this->insertName($objAdd->new, $pictoid, $objAdd->nomtext, $objAdd->mf, $objAdd->singpl, $objAdd->contabincontab, $objAdd->determinat, $objAdd->ispropernoun, $objAdd->defaultverb, $objAdd->plural, $objAdd->femeni, $objAdd->fempl, $langabbr);
+            $this->insertNameClass($objAdd->new, $pictoid, $objAdd->class, $langabbr);            
         }
         else if ($objAdd->type == 'adj') {
             $this->insertPictogramsLanguage($objAdd->new, $pictoid, $languageid, $objAdd->masc, $pictofreq = 10.000);
-            $this->insertAdjective($objAdd->new, $pictoid, $objAdd->fem, $objAdd->masc, $objAdd->mascpl, $objAdd->fempl, $objAdd->defaultverb, $objAdd->subjdef);
-            $this->insertAdjClass($objAdd->new, $pictoid, $objAdd->class);
+            $this->insertAdjective($objAdd->new, $pictoid, $objAdd->fem, $objAdd->masc, $objAdd->mascpl, $objAdd->fempl, $objAdd->defaultverb, $objAdd->subjdef, $langabbr);
+            $this->insertAdjClass($objAdd->new, $pictoid, $objAdd->class, $langabbr);
         }
     }
 
-    public function deletePictogram($pictoid, $type) {
+    public function deletePictogram($pictoid, $type, $idusu, $langid) {
         switch ($type) {
             case "adj":
-                $this->deleteAdj($pictoid);
+                $this->deleteAdj($pictoid, $langid);
                 break;
             case "name":
-                $this->deleteName($pictoid);
+                $this->deleteName($pictoid, $langid);
                 break;
             case "verb":
-                $this->deleteVerb($pictoid);
+                $this->deleteVerb($pictoid, $langid);
                 break;
             default:
                 break;
         }
         
-        $this->db->where('ID_PUser', $this->session->userdata('idusu'));                             
+        $this->db->where('ID_PUser', $idusu);                             
         $this->db->where('pictoid', $pictoid);                             
         $this->db->delete('Pictograms');
         
@@ -279,9 +289,11 @@ class InsertVocabulari extends CI_Model {
         $this->db->delete('PictogramsLanguage');
     }
     
-    private function deleteAdj($pictoid) 
+    private function deleteAdj($pictoid, $ID_Language) 
     {
-        $ID_Language=$this->session->uinterfacelangauge;
+        $maintable="AdjectiveCA";
+        $classtable="AdjClassCA";
+        
         switch($ID_Language){
           case 1:
           $maintable="AdjectiveCA";
@@ -298,10 +310,11 @@ class InsertVocabulari extends CI_Model {
         $this->db->query($sql, $pictoid);
     }
     
-    private function deleteName($pictoid) 
+    private function deleteName($pictoid, $ID_Language) 
     {
-        
-        $ID_Language=$this->session->uinterfacelangauge;
+        $maintable="NameCA";
+        $classtable="NameClassCA";
+          
         switch($ID_Language){
           case 1:
           $maintable="NameCA";
@@ -318,9 +331,12 @@ class InsertVocabulari extends CI_Model {
         $this->db->query($sql, $pictoid);
     }
     
-    private function deleteVerb($pictoid) 
+    private function deleteVerb($pictoid, $ID_Language) 
     {
-        $ID_Language=$this->session->uinterfacelangauge;
+        $maintable = "VerbCA";
+        $conjtable = "VerbConjugationCA";
+        $patterntable = "PatternCA";
+              
         switch($ID_Language){
           case 1:
               $maintable = "VerbCA";

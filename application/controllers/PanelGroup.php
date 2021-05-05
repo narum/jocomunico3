@@ -17,13 +17,14 @@ class PanelGroup extends REST_Controller {
         $this->load->model('AddWordInterface');
     }
 
+    // NOT IN USE
     public function index_get() {
         // CHECK COOKIES
         if (!$this->session->userdata('uname')) {
             redirect(base_url(), 'location');
         } else {
             if (!$this->session->userdata('cfguser')) {
-                $this->BoardInterface->loadCFG($this->session->userdata('uname'));
+                $this->BoardInterface->loadCFG();
                 $this->load->view('MainBoard', true);
             } else {
                 $this->load->view('MainBoard', true);
@@ -50,7 +51,10 @@ class PanelGroup extends REST_Controller {
     }
 
     public function getUserPanelGroups_post() {
-        $idusu = $this->session->userdata('idusu');
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        
         $panels = $this->PanelInterface->getUserPanels($idusu);
 
         $response = [
@@ -80,8 +84,8 @@ class PanelGroup extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $ID_GBoard = $request->ID_GB;
-        $idusu = $this->session->userdata('idusu');
-
+        $idusu = $request->idusu;
+        
         $this->PanelInterface->setPrimaryGroupBoard($ID_GBoard, $idusu);
 
         $response = [
@@ -98,7 +102,8 @@ class PanelGroup extends REST_Controller {
         $defW = $request->defW;
         $defH = $request->defH;
         $imgGB = $request->imgGB;
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $request->idusu;
+        
         $this->BoardInterface->initTrans();
         $id = $this->PanelInterface->newGroupPanel($GBName, $idusu, $defW, $defH, $imgGB);
 
@@ -146,7 +151,7 @@ class PanelGroup extends REST_Controller {
         $request = json_decode($postdata);
         $ID_GB = $request->ID;
         $name = $request->Name;
-        $idusu = $this->session->userdata('idusu');
+        $idusu = $request->idusu;
 
         $this->PanelInterface->changeGroupName($ID_GB, $name, $idusu);
 
@@ -158,10 +163,13 @@ class PanelGroup extends REST_Controller {
     }
 
     public function copyDefaultGroupBoard_post() {
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+
         //MODIF: 2 es el panel default
         $this->BoardInterface->initTrans();
-        $idusu = $this->session->userdata('idusu');
-        $board = $this->BoardInterface->getPrimaryGroupBoard();
+        $board = $this->BoardInterface->getPrimaryGroupBoard($idusu);
         if ($board == null) {
 
             $changedLinks = array();
@@ -244,7 +252,7 @@ class PanelGroup extends REST_Controller {
                 $boardtables = $this->BoardInterface->copyBoardTables($idDst, $sameGroupBoard, $row);
                 $idusuorigen = $this->session->userdata('idusu');
                 if ($row->ID_CPicto != null) {
-                    $this->Lexicon->addWordStatsX1($row->ID_CPicto, $idusu, true);
+                    $this->Lexicon->addWordStatsX1($row->ID_CPicto, $idusu, true, NULL);
                     if ($row->imgCell != null) {
                         $this->Lexicon->addImgTempStatsX1($row->ID_CPicto, $idusu, $row->imgCell);
                     }
@@ -279,6 +287,31 @@ class PanelGroup extends REST_Controller {
             'userName' => $user,
             'userID' => $userObj[0]->ID_User
         ];
+        $this->response($response, REST_Controller::HTTP_OK);
+    }
+    
+    public function alreadyExampleKBPanels_post() {
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $idusu = $request->idusu;
+        $langid = $request->langid;
+        
+        $textex = "Exemple";
+        $textkb = "Teclat";
+        
+        if ($langid == 2) {
+            $textex = "Ejemplo";
+            $textkb = "Teclado";
+        }
+        
+        $example = $this->PanelInterface->alreadyKBExample($idusu, $textex);
+        $kb = $this->PanelInterface->alreadyKBExample($idusu, $textkb);
+
+        $response = [
+            'example' => $example,
+            'kb' => $kb
+        ];
+
         $this->response($response, REST_Controller::HTTP_OK);
     }
 

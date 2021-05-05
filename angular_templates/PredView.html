@@ -6,13 +6,18 @@
 
             <!--         If there is an custom image this line mades it draggable and dropable.
                          Only if we are in edit mode-->
-            <div class="contentPredCell" ng-mousedown="isClickEnable()?addToSentence(picto.pictoid, picto.imgtemp, picto.pictotext):null;" ng-mouseenter="cfgTimeOverOnOff?TimeoutOverClick(1,picto):null" ng-mouseleave="cfgTimeOverOnOff?CancelTimeoutOverClick():null">
+            <div ng-if='keyboardWord == ""' class="contentPredCell" ng-mousedown="isClickEnable()?addToSentence(picto.pictoid, picto.imgtemp, picto.pictotext):null;" ng-mouseenter="cfgTimeOverOnOff?TimeoutOverClick(4,picto):null" ng-mouseleave="cfgTimeOverOnOff?CancelTimeoutOverClick():null">
                 <div ng-if="inScan && isScanning == 'predictionCell' && picto.pictoid == arrayScannedCells[indexScannedCells].pictoid && isScanningCancel === false" class="scaneo" ng-style="{'border':'7px solid #{{cfgScanColor}}'}"></div> 
-                <div ng-if="cfgTextInCell && picto.pictotext" class="textCell" ng-style="{'height':'30 % '}">{{picto.pictotext}}</div>
+                <div ng-if="cfgTextInCell == '1' && picto.pictotext" class="textCell" ng-style="{'height':'30 % '}">{{picto.pictotext}}</div>
                 <div ng-style="cfgTextInCell ? {'height':'70%'}:{'height':'100%'}">
-                    <img ng-if="!picto.imgtemp" ng-src="{{baseurl}}{{picto.imgFolder}}{{picto.imgPicto}}" class="imgResponsive"/>
-                    <img ng-if="picto.imgtemp" ng-src="{{baseurl}}{{picto.imgtemp}}" class="imgResponsive"/>
+                    <img ng-if="!picto.imgtemp && cfgTextInCell != '2'" ng-src="{{baseurl}}{{picto.imgFolder}}{{picto.imgPicto}}" class="imgResponsive"/>
+                    <img ng-if="picto.imgtemp && cfgTextInCell != '2'" ng-src="{{baseurl}}{{picto.imgtemp}}" class="imgResponsive"/>
+                    <div ng-if="cfgTextInCell == '2' && picto.pictotext" class="textCell2">{{picto.pictotext}}</div>
                 </div>
+            </div>
+            
+            <div ng-if='keyboardWord != ""' class="contentPredCell" ng-mousedown="isClickEnable()?addToSentence(1900, picto.imgtemp, picto.paraulatext):null;" ng-mouseenter="cfgTimeOverOnOff?TimeoutOverClick(4,picto):null" ng-mouseleave="cfgTimeOverOnOff?CancelTimeoutOverClick():null">
+                <div ng-if="picto.paraulatext" class="textCell2">{{picto.paraulatext}}</div>
             </div>
         </div>
     </div>

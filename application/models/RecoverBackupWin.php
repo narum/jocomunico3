@@ -3,6 +3,9 @@
 tambien varias funciones auxiliares al final del fichero las cuales cogen las claves recien insertadas para
 evitar colisiones entre claves, en la funcion LaunchTotalRecover es muy importante el orden en el que se ejecutan las
 funciones*/
+
+// NOT IN USE ANYMORE
+
 class RecoverBackupWin extends CI_Model {
     public function __construct(){
         parent::__construct();

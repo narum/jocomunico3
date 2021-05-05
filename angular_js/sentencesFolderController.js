@@ -115,7 +115,7 @@ angular.module('controllers')
         }
         //Get sentences folder or Historic folder
         var getSentences = function(){
-            Resources.main.save({'ID_Folder': $routeParams.folderId},{'funct': "getSentencesOrHistoricFolder"}).$promise
+            Resources.main.save({'ID_Folder': $routeParams.folderId, 'idusu': $rootScope.userId},{'funct': "getSentencesOrHistoricFolder"}).$promise
             .then(function (results) {
                 console.log(results.sentences);
                 $scope.sentences = results.sentences;
@@ -169,7 +169,7 @@ angular.module('controllers')
             }else{
                 $scope.sentenceToCopy = ID_SSentence;
             }
-            Resources.main.get({'funct': "getSentenceFolders"}).$promise
+            Resources.main.get({'idusu': $rootScope.userId}, {'funct': "getSentenceFolders"}).$promise
             .then(function (results) {
                 $scope.folders = results.folders;
                 $('#copySentenceModal').modal('toggle');//Show modal
@@ -177,7 +177,7 @@ angular.module('controllers')
         };
         $scope.copyOnFolder = function(ID_Folder){
             $('#copySentenceModal').modal('hide');//Hide modal
-            Resources.main.save({'ID_Folder':ID_Folder, 'ID_Sentence':$scope.sentenceToCopy,'historicFolder':$scope.historicFolder},{'funct': "addSentenceOnFolder"}).$promise
+            Resources.main.save({'ID_Folder':ID_Folder, 'ID_Sentence':$scope.sentenceToCopy,'historicFolder':$scope.historicFolder, 'idusu': $rootScope.userId},{'funct': "addSentenceOnFolder"}).$promise
             .then(function (results) {
                 console.log(results);
                 getSentences();
@@ -190,7 +190,7 @@ angular.module('controllers')
         };
         $scope.confirmDeleteSentence = function(){
             $('#deleteSentenceModal').modal('hide'); //Close modal
-            Resources.main.save({'ID_SSentence':idSentenceToDelete},{'funct': "deleteSentenceFromFolder"}).$promise
+            Resources.main.save({'ID_SSentence':idSentenceToDelete, 'idusu': $rootScope.userId},{'funct': "deleteSentenceFromFolder"}).$promise
             .then(function (results) {
                 console.log(results);
                 getSentences();
@@ -204,14 +204,14 @@ angular.module('controllers')
             $('#deleteFolderModal').modal('toggle');//Show modal
         };
         $scope.saveFolder = function(){
-            Resources.main.save({'folder':$scope.newFolder},{'funct': "editSentenceFolder"}).$promise
+            Resources.main.save({'folder':$scope.newFolder,'idusu':$rootScope.userId},{'funct': "editSentenceFolder"}).$promise
             .then(function (results) {
                 $scope.folderSelected = JSON.parse(JSON.stringify($scope.newFolder)); //copy JavaScript object to new variable NOT by reference
             });
         };
         $scope.deleteFolder = function(){
             $scope.viewActived = false;
-            Resources.main.save({'folder':$scope.newFolder},{'funct': "deleteSentenceFolder"}).$promise
+            Resources.main.save({'folder':$scope.newFolder,'idusu':$rootScope.userId},{'funct': "deleteSentenceFolder"}).$promise
             $timeout(function () {
                 $location.path('/panelGroups');
             }, 500);
@@ -254,7 +254,7 @@ angular.module('controllers')
             }else{
                 $('#createSentenceModal').modal('hide'); //Close modal
                 var pictograms = JSON.stringify($scope.newSentenceImage) //array to json format
-                Resources.main.save({'sentence':$scope.newSentence,'pictograms':pictograms,'ID_SFolder':$routeParams.folderId},{'funct': "addManualSentence"}).$promise
+                Resources.main.save({'sentence':$scope.newSentence,'pictograms':pictograms,'ID_SFolder':$routeParams.folderId,'idusu':$rootScope.userId},{'funct': "addManualSentence"}).$promise
                 .then(function (results) {
                     console.log(results);
                     $scope.newSentence=null;
@@ -286,14 +286,14 @@ angular.module('controllers')
         //Change sentence order in folder
         $scope.upSentenceOrder = function(idSentence){
             $scope.showUpDownButtons=false;
-            Resources.main.save({'ID_SSentence': idSentence,'ID_SFolder':$routeParams.folderId}, {'funct': "upSentenceOrderOnFolder"}).$promise
+            Resources.main.save({'ID_SSentence': idSentence,'ID_SFolder':$routeParams.folderId,'idusu':$rootScope.userId}, {'funct': "upSentenceOrderOnFolder"}).$promise
                 .then(function (results){
                     getSentences();
                 });
         }
         $scope.downSentenceOrder = function(idSentence){
             $scope.showUpDownButtons=false;
-            Resources.main.save({'ID_SSentence': idSentence,'ID_SFolder':$routeParams.folderId}, {'funct': "downSentenceOrderOnFolder"}).$promise
+            Resources.main.save({'ID_SSentence': idSentence,'ID_SFolder':$routeParams.folderId,'idusu':$rootScope.userId}, {'funct': "downSentenceOrderOnFolder"}).$promise
                 .then(function (results){
                     getSentences();
                 });
@@ -313,7 +313,7 @@ angular.module('controllers')
                  URL = $scope.baseurl + "ImgUploader/getImagesUploads";
                  break;
          }
-         var postdata = {name: name};
+         var postdata = {name: name, idusu: $rootScope.userId, langid: $rootScope.interfaceLanguageId};
          $http.post(URL, postdata).
              success(function (response)
              {
@@ -325,7 +325,7 @@ angular.module('controllers')
         $scope.searchFoto = function (name)
         {
             var URL = $scope.baseurl + "SearchWord/getDBAll";
-            var postdata = {id: name};
+            var postdata = {id: name, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, langid: $rootScope.interfaceLanguageId};
             //Request via post to controller search data from database
             $http.post(URL, postdata).
                 success(function (response)
@@ -341,6 +341,7 @@ angular.module('controllers')
             var uploadUrl = $scope.baseurl + "ImgUploader/upload";
             var fd = new FormData();
             fd.append('vocabulary', angular.toJson(false));
+            fd.append('idusu', $rootScope.userId);
             for (i = 0; i < $scope.myFile.length; i++) {
                 fd.append('file' + i, $scope.myFile[i]);
             }

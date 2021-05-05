@@ -1,4 +1,4 @@
-Jocomunico version 2.2.
+Jocomunico version 3.0.
 
 Jocomunico by Joan Pahisa is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
 
@@ -19,7 +19,9 @@ KNOWN BUGS
 
 - Uploading a backup made on version 2.0 to a version 2.1 (or higher) Jocomunico. To fix, please update your Jocomunico to version 2.1 (and follow later updates if available), redo the backup and upload it again.
 
-- Trying to update from Jocomunico 2.0 directly to 2.2. Updates need to be done in sequence: from 2.0 to 2.1 and then from 2.1 to 2.2.
+- Uploading a backup made on version 3.0 to a lower version. Only backups from 2.2 onward are compatible with higher versions, but none are compatible with lower versions. To fix, please update the lower version of Jocomunico to the latest version. Updates need to be done sequentially (i.e. from 1.0 to 2.0, 2.0 to 2.1, 2.1 to 2.2 and 2.2 to 3.0).
+
+- Trying to update from Jocomunico 2.0 directly to 3.0. Updates need to be done in sequence: from 2.0 to 2.1, from 2.1 to 2.2 and finally from 2.2 to 3.0.
 
 -----------------------
 README FOR INSTALLATION
@@ -36,7 +38,7 @@ General steps:
 
 1. Install an Apache server with MySQL, such as, XAMPP. PHP and MySQL version requirements are detailed in the B section of this README file.
 
-2. Extract all the contents of the master branch on GitHub (https://github.com/narum/jocomunico2/) to your desired folder.
+2. Extract all the contents of the master branch on GitHub (https://github.com/narum/jocomunico3/) to your desired folder.
 
 3. Install the database found in /ddbb/jocomunicoapp-database.sql. 
 
@@ -52,7 +54,7 @@ Adjustments in the code:
 
 4. (Optional) File: index.php - Switch the ENVIRONMENT variable into 'development' for easier debugging. Once you want to deploy your project, change it back to 'production'.
 
-5. File: /application/libraries/MyAudio.php - This file controls the online voice synthetizers (on the online version of the application) and/or the system's voice synthetizer (on the local version). There is only code to access Windows and MacOSX system voices, so, for Linux, functions to call the voices installed in the chosen synthetizer and to save its output as files in the /mp3 folder need to be coded. Finally, another function in order to list the available system voices also need to be coded.
+5. File: /application/libraries/MyAudio.php - This file controls the online voice synthetizers (on the online version of the application) and/or the system's voice synthetizer (on the local version). There is only code to access Windows and MacOSX system voices, so, for Linux, functions to call the voices installed in the chosen synthetizer and to save its output as files in the /mp3 folder need to be coded. Finally, another function in order to list the available system voices also needs to be coded.
 
 	a. The function to call the synthetizer and generate the audio files needs to be added as an option inside the 'switch' that begins on line 540 of the function 'sytnhesizeAudio'.
 	
@@ -68,7 +70,8 @@ B.1. PHP VERSION
 Tested from PHP 5.6 up to 7.3.
 
 *Depending on the server settings, on PHP 7.x+ there may be an issue with 
-CodeIgniter's Session Library. To see if this problem exists, run the application,
+CodeIgniter's Session Library (as of version 3.0 cookies are only used during login). 
+To see if this problem exists, run the application,
 create a user, log in to it, go to 'Mis paneles' on the menu and try to switch
 On and Off the toggle next to 'Historial'. If Folders 'Hoy', 'Semana pasada' and
 'Mes pasado' don't appear and disappear, the problem is there.

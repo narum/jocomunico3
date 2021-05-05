@@ -20,11 +20,12 @@ angular.module('services', [])
 	
 	return {
 		"init": function() {
+                        console.log("Entering INIT");
                         //DropDown Menu Bar
                         $rootScope.contentLanguageUserNonLoged = window.localStorage.getItem('contentLanguageUserNonLoged');
                         $rootScope.contentLanguageUserNonLogedAbbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
                         $rootScope.dropdownMenuBar = [];
-                        if(!$rootScope.contentLanguageUserNonLoged||!$rootScope.contentLanguageUserNonLogedAbbr){
+                        if(!$rootScope.contentLanguageUserNonLoged || !$rootScope.contentLanguageUserNonLogedAbbr){
                             $rootScope.contentLanguageUserNonLoged = 1; // idioma por defecto al iniciar (catalan)
                             $rootScope.contentLanguageUserNonLogedAbbr = 'CA';
                             window.localStorage.setItem('contentLanguageUserNonLoged', $rootScope.contentLanguageUserNonLoged);
@@ -38,24 +39,55 @@ angular.module('services', [])
 				this.login(token, userConfig);
 		},
 		"login": function(token, userConfig) {
+                        console.log("Entering LOGIN");
 			window.localStorage.setItem('token', token); // guardem el token al localStorage
                         window.localStorage.setItem('userData', JSON.stringify(userConfig));
 			$http.defaults.headers.common['Authorization'] = 'Bearer '+token; // posem el token al header per a totes les peticions
 			$http.defaults.headers.common['X-Authorization'] = 'Bearer '+token; // posem el token al header per a totes les peticions
-			$rootScope.isLogged = true;
+			window.localStorage.setItem('contentLanguageUserNonLoged', userConfig.ID_ULanguage);
+                        window.localStorage.setItem('contentLanguageUserNonLogedAbbr', userConfig.languageabbr);
+                        $rootScope.isLogged = true;
 			$rootScope.interfaceLanguageId = userConfig.ID_ULanguage;
 			$rootScope.expanLanguageId = userConfig.cfgExpansionLanguage;
+                        $rootScope.languageAbbr = userConfig.languageabbr;
                         $rootScope.sUserId = userConfig.ID_SU;
                         $rootScope.userId = userConfig.ID_User;
+                        $rootScope.autoEraseSB = userConfig.cfgAutoEraseSentenceBar;
+                        $rootScope.expansionOnOff = userConfig.cfgExpansionOnOff;
+                        $rootScope.isFem = userConfig.cfgIsFem;
+                        $rootScope.langType = userConfig.type;
+                        $rootScope.AdjOrder = userConfig.nounAdjOrder;
+                        $rootScope.NCOrder = userConfig.nounComplementOrder;
+                        $rootScope.predBarNum = userConfig.cfgPredBarNumPred;
 		},
 		"logout": function() {
+                        
+                        console.log("Entering LOGOUT");
+                        $http.get("Board/DestroySession").success(function (results) {
+                            console.log(results.data);
+                        });
+                        
 			window.localStorage.removeItem('token');
                         window.localStorage.removeItem('userData');
 			delete $http.defaults.headers.common['Authorization'];
-			delete $http.defaults.headers.common['X-Authorization'];
+			delete $http.defaults.headers.common['X-Authorization'];                        
 			$rootScope.isLogged = false;
                         $location.path('/login');
                         $rootScope.dropdownMenuBarValue = '/';
+                        $rootScope.sUserId = null;
+                        $rootScope.userId = null;
+                        $rootScope.interfaceLanguageId = window.localStorage.getItem('contentLanguageUserNonLoged');
+			$rootScope.expanLanguageId = null;
+                        $rootScope.languageAbbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
+                        $rootScope.autoEraseSB = null;
+                        $rootScope.expansionOnOff = null;
+                        $rootScope.isFem = null;
+                        $rootScope.langType = null;
+                        $rootScope.AdjOrder = null;
+                        $rootScope.NCOrder = null;
+                        $rootScope.predBarNum = null;
+                        $rootScope.contentLanguageUserNonLoged = window.localStorage.getItem('contentLanguageUserNonLoged');
+                        $rootScope.contentLanguageUserNonLogedAbbr = window.localStorage.getItem('contentLanguageUserNonLogedAbbr');
 		}
 	}
 })
@@ -73,7 +105,7 @@ angular.module('services', [])
     return function(Language){
         //Get menu bar content
         var content = function(){
-            if($rootScope.isLogged){
+            if(window.localStorage.getItem('token')){
                 return txtContent("menuBar").then(function (results) {
                     $rootScope.dropdownMenuBarChangeLanguage = false; //Show language button
                     $rootScope.dropdownMenuBarLanguage = false; // Show the langauges available

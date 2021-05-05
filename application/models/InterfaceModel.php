@@ -14,7 +14,7 @@ class InterfaceModel extends CI_Model{
           $sql = "SELECT ID_ULanguage FROM user WHERE ID_User=3";
           $query= $this->db->query($sql);
           foreach ($query->result() as $row){
-              return $row->ID_ULanguage;
+              return $row->ID_ULanguage; 
           }
 
           /* Query Builder*/

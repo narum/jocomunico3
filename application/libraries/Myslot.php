@@ -64,15 +64,13 @@ class Myslot {
         return $this->full;
     }
         
-    public function nounFitsSlot($word, $keyslot)
+    public function nounFitsSlot($word, $keyslot, $langnouncorder, $langtype, $preguntapattern)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
         
         $matching = new Mymatching();
-        
-        $langnouncorder = $CI->session->userdata('uinterfacelangncorder');
-        
+                
         $numclasses = count($word->classes);
         
         $matchscore = 1000;
@@ -164,13 +162,13 @@ class Myslot {
         // si podia entrar-hi i l'slot no està ple
         if ($matchscore != 1000 && !$this->full) {
             // POSEM LA PARAULA AL LLISTAT DE FILL TEMPORAL
-            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot);
+            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot, $langtype, $preguntapattern);
             $output = 1;
         }
         return $output;
     }
     
-    public function adverbFitsSlot($word, $keyslot)
+    public function adverbFitsSlot($word, $keyslot, $langtype, $preguntapattern)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
@@ -204,7 +202,7 @@ class Myslot {
         // Fins aquí hem vist si la paraula podia anar a un slot
         // Si podia anar a un slot, l'slot està buit i l'slot no és de lloc fem un fill temporal normal
         if (($matchscore != 1000) && (!$this->full) && ($this->type != "lloc")) {
-            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot);
+            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot, $langtype, $preguntapattern);
             $output = 1;
         }
         // Pels tots els slots plens amb noms, mirem com de bé fa de CAdv l'adverbi de lloc
@@ -245,13 +243,12 @@ class Myslot {
         return $output;
     }
     
-    public function adjFitsSlot($word, $keyslot)
+    public function adjFitsSlot($word, $keyslot, $langnounadjorder, $langtype, $preguntapattern)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
         
         // we get the usual order of adjectives that complement nouns for the given user interface language
-        $langnounadjorder = $CI->session->userdata('uinterfacelangnadjorder');
         
         $matching = new Mymatching();
         
@@ -341,14 +338,14 @@ class Myslot {
         // si havia fet fit d'un slot (no de complement)
         if ($matchscore != 1000) {
             // POSEM LA PARAULA AL LLISTAT DE FILL TEMPORAL
-            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot);
+            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot, $langtype, $preguntapattern);
             $output = 1;
         }
         return $output;
     }
     
     
-    public function modifFitsSlot($word, $keyslot)
+    public function modifFitsSlot($word, $keyslot, $langtype, $preguntapattern)
     {
         $CI = &get_instance();
         $CI->load->library('Mymatching');
@@ -450,18 +447,18 @@ class Myslot {
         // si havia fet fit d'un slot (no de complement)
         if ($matchscore != 1000) {
             // POSEM LA PARAULA AL LLISTAT DE FILL TEMPORAL
-            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot);
+            $this->fillSlotTemp($word, $matchscore, $matchindexclass, $keyslot, $langtype, $preguntapattern);
             $output = 1;
         }
         return $output;
     }
     
     
-    public function fillSlotTemp($word, $penalty, $classindexword, $keyslot) 
+    public function fillSlotTemp($word, $penalty, $classindexword, $keyslot, $langtype, $preguntapattern) 
     {        
         $word->slotstemps[] = $keyslot;
         
-        $punts = $this->slotPuntuation($word, $penalty);
+        $punts = $this->slotPuntuation($word, $penalty, $langtype, $preguntapattern);
                         
         $aux = array();
         $aux[0] = $word;
@@ -475,7 +472,7 @@ class Myslot {
         $this->paraulestemp[] = $aux;       
     }
     
-    public function slotPuntuation ($word, $penalty)
+    public function slotPuntuation ($word, $penalty, $langtype, $preguntapattern)
     {
         
         $CI = &get_instance();
@@ -483,7 +480,6 @@ class Myslot {
         // agafem el tipus d'idioma, ja que per desambiguar si l'idioma és svo
         // les paraules que vagin abans del verb tindran punts extra per fer de subjecte
         // i les que vagin darrere per fer dels altres slots
-        $langtype = $CI->session->userdata('uinterfacelangtype');
         
         $svo = true;
         if ($langtype != 'svo') $svo = false;
@@ -498,10 +494,10 @@ class Myslot {
                 // igualar als altres camps obligatoris en l'ordre de prioritat
                 // pel subjecte principal
                 if ($this->level == 1 && $word->beforeverb && $penalty < 5 && !$this->verbless) $punts = $punts - 18 + $penalty*4;
-                else if ($this->level == 1 && !$word->beforeverb && !$this->verbless && !$CI->session->userdata('preguntapattern')) $punts += 1;
+                else if ($this->level == 1 && !$word->beforeverb && !$this->verbless && !$preguntapattern) $punts += 1;
                 // pel secundari si n'hi ha
                 if ($this->level == 2 && $word->beforeverb2 && $penalty < 5 && !$this->verbless) $punts = $punts - 18 + $penalty*4;
-                else if ($this->level == 2 && !$word->beforeverb2 && !$this->verbless && !$CI->session->userdata('preguntapattern')) $punts += 1;
+                else if ($this->level == 2 && !$word->beforeverb2 && !$this->verbless && !$preguntapattern) $punts += 1;
             }
             else {
                 // igualem el grade del subjecte a slot obligatori si no era un fit terrible i no era verbless

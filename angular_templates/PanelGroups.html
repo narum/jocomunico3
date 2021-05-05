@@ -1,7 +1,7 @@
-<link rel="stylesheet" type="text/css" href="{{baseurl}}css/panelGroup.css">
-<link rel="stylesheet" type="text/css" href="{{baseurl}}css/generico.css">
-<link rel="stylesheet" type="text/css" href="{{baseurl}}css/editHistorialFolder.css">
-<link rel="stylesheet" type="text/css" href="{{baseurl}}/libraries/scrollbarPanel.css">
+<link rel="stylesheet" type="text/css" href="css/panelGroup.css">
+<link rel="stylesheet" type="text/css" href="css/generico.css">
+<link rel="stylesheet" type="text/css" href="css/editHistorialFolder.css">
+<link rel="stylesheet" type="text/css" href="libraries/scrollbarPanel.css">
 <link rel="stylesheet" type="text/css" href="css/home.css">
 
 <div ng-include="'/angular_templates/RecoverBackupModal.html'"></div>
@@ -16,6 +16,7 @@
 <div ng-include="'/angular_templates/logoutModal.html'"></div>
 <div ng-include="'/angular_templates/DownloadBackup.html'"></div>
 <div ng-include="'/angular_templates/AddGroupsInfo.html'"></div>
+<div ng-include="'/angular_templates/AddKBGroupsInfo.html'"></div>
 <div ng-include="'/angular_templates/arasaacImgsSearchModal.html'"></div>
 <div ng-include="'/angular_templates/imgsDeleteModal.html'"></div>
 
@@ -31,7 +32,7 @@
 <div class="row folderContainer" ng-if="viewActived">
 
     <div class="row">
-        <div ng-init="isNotChrome()"></div>
+        <!--<div ng-init="isNotChrome()"></div>-->
         <!--Panel Groups box-->
         <div class="col-xs-6 rightPadding">
             <div class="panelGroupContainer" id="boxUserConfig" style="background-image: url({{img.Patterns1_08}})">
@@ -47,6 +48,9 @@
                             <div class="col-xs-12 buttonAddFolder" ng-click="newPanellGroup()">+</div>
                             <div ng-if="!alreadyExamplePanels" class="col-xs-12 addGroups" ng-click="ShowAddGroupsInfo()">
                             {{content.addgroups}}
+                            </div>
+                            <div ng-if="!alreadyKBPanels" class="col-xs-12 addGroups" ng-click="ShowAddKBGroupsInfo()">
+                            {{content.addkbgroups}}
                             </div>
                             <div class="col-xs-12 panelContainer" ng-repeat="panel in panels" on-Finish-Loop="scrollbarPanel">
                                 <div class="col-xs-1"></div>

@@ -14,6 +14,7 @@ class ImgUploader extends REST_Controller {
 
     }
 
+    // NOT IN USE
     //MODIF: mirar que hacer aqui...
     public function index_get() {
         // CHECK COOKIES
@@ -21,7 +22,7 @@ class ImgUploader extends REST_Controller {
             redirect(base_url(), 'location');
         } else {
             if (!$this->session->userdata('cfguser')) {
-                $this->BoardInterface->loadCFG($this->session->userdata('uname'));
+                $this->BoardInterface->loadCFG();
                 $this->load->view('MainBoard', true);
             } else {
                 $this->load->view('MainBoard', true);
@@ -29,27 +30,31 @@ class ImgUploader extends REST_Controller {
         }
     }
     function getImagesArasaac_post() {
-$postdata = file_get_contents("php://input");
-$request = json_decode($postdata);
-$name = $request->name;
-$idusu = $this->session->userdata('idusu');
-$languageInt = $this->session->userdata('uinterfacelangauge');
-$data = $this->ImgUploader_model->getImagesArasaac($idusu, $name, $languageInt);
-for ($i = 0; $i < count($data); $i++) {
-    $data[$i]["imgPath"] = "img/pictos/" . $data[$i]["imgPath"];
+        $postdata = file_get_contents("php://input");
+        $request = json_decode($postdata);
+        $name = $request->name;
+        $idusu = $request->idusu;
+        $languageInt = $request->langid;
+
+        $data = $this->ImgUploader_model->getImagesArasaac($idusu, $name, $languageInt);
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i]["imgPath"] = "img/pictos/" . $data[$i]["imgPath"];
+        }
+        $response = [
+            'data' => $data
+        ];
+        $this->response($response, REST_Controller::HTTP_OK);
 }
-$response = [
-    'data' => $data
-];
-$this->response($response, REST_Controller::HTTP_OK);
-}
+    
+    // NOT IN USE
     public function uploadBackupWin_post(){
       $errorText = array();
-      $ID_User=$this->session->idusu;
       $target_dir="/xampp/htdocs/Temp/";
       $error = false;
+      $idusu = filter_input(INPUT_POST, 'idusu');
+      
       for ($i = 0; $i < count($_FILES); $i++) {
-          $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']));
+          $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']), $idusu);
           if (!(strpos($_FILES['file' . $i]['type'], 'zip'))) {
               $errorProv = ["errorImg1", $_FILES['file' . $i]['name']];
               array_push($errorText,$_FILES['file' . $i]['type']);
@@ -88,11 +93,12 @@ $this->response($response, REST_Controller::HTTP_OK);
 
     public function uploadBackup_post() {
         $errorText = array();
-        $ID_User=$this->session->idusu;
         $target_dir="./Temp/";
         $error = false;
+        $idusu = filter_input(INPUT_POST, 'idusu');
+        
         for ($i = 0; $i < count($_FILES); $i++) {
-            $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']));
+            $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']), $idusu);
             if (!(strpos($_FILES['file' . $i]['type'], 'zip')
             || $_FILES['file' . $i]['type'] == "application/octet-stream")) {
                 $errorProv = ["errorImg1", $_FILES['file' . $i]['name']];
@@ -138,6 +144,9 @@ $this->response($response, REST_Controller::HTTP_OK);
     }
 
     public function upload_post() {
+        
+        $idusu = filter_input(INPUT_POST, 'idusu');
+        
         //"vocabulary" is a string.....
         if (filter_input(INPUT_POST, 'vocabulary') == "true") {
             $target_dir = "img/pictos/";
@@ -147,7 +156,7 @@ $this->response($response, REST_Controller::HTTP_OK);
         $errorText = array();
         $error = false;
         for ($i = 0; $i < count($_FILES); $i++) {
-            $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']));
+            $md5Name = $this->Rename_Img(basename($_FILES['file' . $i]['name']), $idusu);
             if (!($_FILES['file' . $i]['type'] == "image/gif" || $_FILES['file' . $i]['type'] == "image/jpeg" || $_FILES['file' . $i]['type'] == "image/png")) {
                 $errorProv = ["errorImg1", $_FILES['file' . $i]['name']];
                 array_push($errorText, $errorProv);
@@ -170,7 +179,6 @@ $this->response($response, REST_Controller::HTTP_OK);
                 $success = move_uploaded_file($_FILES['file' . $i]['tmp_name'], $target_dir . $md5Name);
             }
             if ($success) {
-                $idusu = $this->session->userdata('idsu');
                 $this->ImgUploader_model->insertImg($idusu, basename($_FILES['file' . $i]['name']), $md5Name, $target_dir);
             } else {
                 $errorProv = ["errorImg2", $_FILES['file' . $i]['name']];
@@ -197,9 +205,8 @@ $this->response($response, REST_Controller::HTTP_OK);
         $this->response($response, REST_Controller::HTTP_OK);
     }
 
-    function Rename_Img($string) {
+    function Rename_Img($string, $idusu) {
 
-        $idusu = $this->session->userdata('idsu');
         $fecha = microtime();
         //MODIF: Pasar superuser no user
         $stringlen = strlen($string);
@@ -309,8 +316,8 @@ $this->response($response, REST_Controller::HTTP_OK);
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $name = $request->name;
+        $idusu = $request->idusu;
 
-        $idusu = $this->session->userdata('idsu');
         $data = $this->ImgUploader_model->getImages($idusu, $name);
 
         $response = [

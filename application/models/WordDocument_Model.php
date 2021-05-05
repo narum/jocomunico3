@@ -25,7 +25,7 @@ class WordDocument_Model extends CI_Model {
   var $tableStyle;
 
   function __construct(){
-      parent::__construct();
+      parent::__construct(); 
       $this->load->database();
       $this->phpWord = new \PhpOffice\PhpWord\PhpWord();
   }

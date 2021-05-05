@@ -45,7 +45,7 @@ class Audio_model extends CI_Model {
             $output = $aux[0];
         }
         
-        return $output;
+        return $output; 
     }
     
     /**

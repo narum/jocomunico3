@@ -35,10 +35,25 @@ class Lexicon extends CI_Model {
             $userConfig = $query2[0];
             
             // Save user config data in the COOKIES
+            $this->session->unset_userdata('idsu');
+            $this->session->unset_userdata('idusu');
+            $this->session->unset_userdata('uname');
+            $this->session->unset_userdata('ulanguage');
+            $this->session->unset_userdata('uinterfacelangauge');
+            $this->session->unset_userdata('uinterfacelangtype');
+            $this->session->unset_userdata('uinterfacelangnadjorder');
+            $this->session->unset_userdata('uinterfacelangncorder');
+            $this->session->unset_userdata('uinterfacelangabbr');
+            $this->session->unset_userdata('cfgAutoEraseSentenceBar');
+            $this->session->unset_userdata('isfem');
+            $this->session->unset_userdata('cfgExpansionOnOff');
+            $this->session->unset_userdata('cfgPredBarNumPred');
+            
+            // Save user config data in the COOKIES
+            $this->session->set_userdata('idsu', $userConfig["ID_SU"]);
             $this->session->set_userdata('idusu', $userConfig["ID_User"]);
             $this->session->set_userdata('uname', $userConfig["SUname"]);
             $this->session->set_userdata('ulanguage', $userConfig["cfgExpansionLanguage"]);
-            //MODIF: Cuando lo juntemos con jose dará fallo. Jose tiene que cambiar "uinterfacelangauge" por este
             $this->session->set_userdata('uinterfacelangauge', $userConfig["ID_ULanguage"]);
             $this->session->set_userdata('uinterfacelangtype', $userConfig["type"]);
             $this->session->set_userdata('uinterfacelangnadjorder', $userConfig["nounAdjOrder"]);
@@ -257,7 +272,7 @@ class Lexicon extends CI_Model {
                 
                     $taula = $infoparaula->pictoType;
                     // afegim la paraula a la frase de l'usuari
-                    $this->afegirParaula($idusu, $pictoid, $taula);
+                    $this->afegirParaula($idusu, $pictoid, $taula, "");
                     $paraulesbones++;
                     if ($taula == "name" || $taula == "adj") {
                         // si hi havia modificadors en espera que s'havien introduït abans del nom o adj
@@ -533,7 +548,7 @@ class Lexicon extends CI_Model {
                             }
                             $pictoid = $infoparaula->pictoid;
                             $taula = $infoparaula->pictoType;
-                            $this->afegirParaula($idusu, $pictoid, $taula);
+                            $this->afegirParaula($idusu, $pictoid, $taula, "");
                             $paraulesbones++;
                             if ($taula == "name" || $taula == "adj") {
                                 // si hi havia modificadors en espera que s'havien introduït abans del nom o adj
@@ -565,7 +580,7 @@ class Lexicon extends CI_Model {
         
         // si s'han introduït paraules, aleshores afegim la frase a la BBDD per expandir-la
         if ($paraulesbones > 0) {
-            $this->passarFraseABBDD($idusu, $tipusfrase, $tempsverbal, $negativa);
+            $this->passarFraseABBDD($idusu, $tipusfrase, $tempsverbal, $negativa, $lang);
         }
     }
     
@@ -575,12 +590,20 @@ class Lexicon extends CI_Model {
      * @param type $idparaula
      * @param type $imgtemp Es fa servir amb la nova interfície, per si l'usuari ha modificat 
      * la img per defecte del pictograma es guarda aquesta imatge.
+     * @param type $texttemp Es fa servir a partir de Jocomunico 3.0 per guardar el text de les 
+     * paraules introduïdes per teclat (pictotype = keyboard).
      */
-    function afegirParaula($idusu, $idparaula, $imgtemp)
+    function afegirParaula($idusu, $idparaula, $imgtemp, $texttemp)
     {
         $paraula = array();
         $pictoid = -1;
         $coord = '0';
+        
+        // texttemp is only for keyboard entered words (mapped to pictogram 1900)
+        $auxtext = null;
+        if ($idparaula == 1900) {
+            $auxtext = $texttemp;
+        }
         
         // gets the last inserted pictogram
         $this->db->where('ID_RSTPUser', $idusu);
@@ -594,11 +617,12 @@ class Lexicon extends CI_Model {
         }
         
         // if it's not equal to the last inserted pictogram
-        if (($idparaula != $pictoid) || $coord != '0') {
+        if ($idparaula == 1900 || ($idparaula != $pictoid) || $coord != '0') {
             $data = array(
                 'pictoid' => $idparaula,
                 'ID_RSTPUser' => $idusu,
                 'imgtemp' => $imgtemp,
+                'texttemp' => $auxtext,
             );
             $this->db->insert('R_S_TempPictograms', $data);
         }
@@ -606,13 +630,12 @@ class Lexicon extends CI_Model {
     /*
      * GET THE WORDS ALREADY ENTERED IN THE USER INTERFACE
      */
-    function recuperarFrase($idusu) // Per la interfície d'introduir la frase
+    function recuperarFrase($idusu, $userlanguage) // Per la interfície d'introduir la frase
     {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
         
         $paraules = array();
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('ID_RSTPUser', $idusu);
         $this->db->join('Pictograms', 'Pictograms.pictoid = R_S_TempPictograms.pictoid', 'left');
         $this->db->order_by('ID_RSTPSentencePicto', 'asc');
@@ -719,6 +742,13 @@ class Lexicon extends CI_Model {
                         }
                         else $output[$i] = null;
                         break;
+                        
+                    case 'keyboard':
+                        $word = new Myword();
+                        $word->initialise($paraules[$i], null, $i, $beforeverb, $beforeverb2, true);
+                        $output[$i] = $word;
+                        break;
+                    
                     default:
                         $output[$i] = null;
                         break;
@@ -769,7 +799,7 @@ class Lexicon extends CI_Model {
     /*
      * SEND WORDS ENTERED BY THE USER TO THE DATABASE
      */
-    function insertarFrase($idusu, $tipusfrase, $tense, $negativa)
+    function insertarFrase($idusu, $tipusfrase, $tense, $negativa, $lang, $autoerase, $langid)
     {
         $datestring = "%Y/%m/%d";
         $time = time();
@@ -779,11 +809,11 @@ class Lexicon extends CI_Model {
         
         // calculem l'string d'inputwords: és el llistat de paraules com apareixien
         // a Elements Seleccionats, just abans de prémer Generar
-        $paraulesFrase = $this->recuperarFrase($idusu);
+        $paraulesFrase = $this->recuperarFrase($idusu, $lang);
         
         // guardem les estadístiques de la frase
-        $this->addStatsX1($paraulesFrase, $idusu);
-        $this->addStatsX2($paraulesFrase, $idusu);
+        $this->addStatsX1($paraulesFrase, $idusu, $langid);
+        $this->addStatsX2($paraulesFrase, $idusu, $langid);
         $this->addStatsX3($paraulesFrase, $idusu);
         
         $inputwords = "";
@@ -873,13 +903,14 @@ class Lexicon extends CI_Model {
                     'isfem' => $row->isfem,
                     'coordinated' => $row->coordinated,
                     'imgtemp' => $row->imgtemp,
+                    'texttemp' => $row->texttemp,
 		    'ID_RSHPUser' => $idusu,
                 );
                 $this->db->insert('R_S_HistoricPictograms', $data2);
             }
         }
         // Eliminar les paraules de la taula provisional
-        if ($this->session->userdata('cfgAutoEraseSentenceBar') == '1') {
+        if ($autoerase == '1') {
             $this->db->where('ID_RSTPUser', $idusu);
             $this->db->delete('R_S_TempPictograms');
         }
@@ -888,7 +919,7 @@ class Lexicon extends CI_Model {
     /*
      * SEND WORDS ENTERED FROM FILE BY THE USER TO THE DATABASE
      */
-    function passarFraseABBDD($idusu, $tipusfrase, $tempsverbal, $negativa)
+    function passarFraseABBDD($idusu, $tipusfrase, $tempsverbal, $negativa, $lang)
     {
         $datestring = "%Y/%m/%d";
         $time = time();
@@ -898,7 +929,7 @@ class Lexicon extends CI_Model {
         
         // calculem l'string d'inputwords: és el llistat de paraules com apareixien
         // a Elements Seleccionats, just abans de prémer Generar
-        $paraulesFrase = $this->recuperarFrase($idusu);
+        $paraulesFrase = $this->recuperarFrase($idusu, $lang);
         $inputwords = "";
         $inputids = "";
         for ($i=0; $i<count($paraulesFrase); $i++) {
@@ -956,6 +987,7 @@ class Lexicon extends CI_Model {
                     'isfem' => $row->isfem,
                     'coordinated' => $row->coordinated,
                     'imgtemp' => $row->imgtemp,
+                    'texttemp' => $row->texttemp,
                 );
                 $this->db->insert('R_S_HistoricPictograms', $data2);
             }
@@ -971,10 +1003,9 @@ class Lexicon extends CI_Model {
     /*
      * GETS THE WORDS ENTERED BY THE USER IN THE LAST INPUT
      */
-    function getLastSentence($idusu)
+    function getLastSentence($idusu, $userlanguage)
     {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
         
         $paraules = array();
         $identry;
@@ -1000,7 +1031,7 @@ class Lexicon extends CI_Model {
         }
         else return null;
             
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('ID_RSHPSentence', $identry);
         $this->db->join('Pictograms', 'Pictograms.pictoid = R_S_HistoricPictograms.pictoid', 'left');
         $this->db->order_by('ID_RSHPSentencePicto', 'asc');
@@ -1094,6 +1125,13 @@ class Lexicon extends CI_Model {
                             $word->initialise($paraules[$i], $query2->result(), $ordre, $beforeverb, $beforeverb2, false);
                         }
                         break;
+                        
+                    case 'keyboard':
+                        $word = new Myword();
+                        $word->initialise($paraules[$i], null, $ordre, $beforeverb, $beforeverb2, false);
+                        $output[$i] = $word;
+                        break;
+                        
                     default:
                         break;
                 }
@@ -1210,15 +1248,14 @@ class Lexicon extends CI_Model {
     }
     
     // Retorna l'estructura de la paraula Verbless o de qualsevol Verb amb els seus patterns
-    function getPatternsVerb($verbid, $withsubject)
+    function getPatternsVerb($verbid, $withsubject, $userlanguage, $idusu)
     {
         $output = array();
-        $userlanguage = $this->session->userdata('ulangabbr');
         
         // només retorna patrons amb subjecte, és a dir, no impersonals
         if ($withsubject) $this->db->where('Pattern'.$userlanguage.'.subj !=', '0');
         
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $this->session->userdata('idusu')));
+        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
         $this->db->where('Verb'.$userlanguage.'.verbid', $verbid);
         $this->db->join('Pictograms', 'Pictograms.pictoid = Verb'.$userlanguage.'.verbid', 'left');
         $this->db->join('Pattern'.$userlanguage, 'Pattern'.$userlanguage.'.verbid = Verb'.$userlanguage.'.verbid', 'left');
@@ -1238,7 +1275,7 @@ class Lexicon extends CI_Model {
     
     // conjuga el verb: retorna un string
     // ÉS ESPECÍFIC PER CATALÀ
-    public function conjugar($verbid, $tense, $persona, $numero, $pronominal)
+    public function conjugar($verbid, $tense, $persona, $numero, $pronominal, $userlanguage)
     {
         // DEBUG
         // echo "CONJ: ".$verbid." ".$tense." ".$persona." ".$numero."<br />";
@@ -1249,7 +1286,6 @@ class Lexicon extends CI_Model {
         $numeromain = $numero;
         
         $formafinal = "";
-        $userlanguage = $this->session->userdata('ulangabbr');
         
         // si el verb és pronominal, a la taula de conjugacions ja ve amb el verb auxiliar i 
         // el pronom corresponent
@@ -1317,7 +1353,7 @@ class Lexicon extends CI_Model {
     
     // conjuga el verb: retorna un string
     // ÉS ESPECÍFIC PER CASTELLÀ
-    public function conjugarES($verbid, $tense, $persona, $numero, $pronominal)
+    public function conjugarES($verbid, $tense, $persona, $numero, $pronominal, $userlanguage)
     {
         // DEBUG
         // echo "CONJ: ".$verbid." ".$tense." ".$persona." ".$numero."<br />";
@@ -1328,7 +1364,6 @@ class Lexicon extends CI_Model {
         $numeromain = $numero;
         
         $formafinal = "";
-        $userlanguage = $this->session->userdata('ulangabbr');
         
         // si el verb és pronominal, a la taula de conjugacions ja ve amb el verb auxiliar i 
         // el pronom corresponent
@@ -1419,13 +1454,25 @@ class Lexicon extends CI_Model {
      * Inserts individually each pictogram in P_StatsUserPicto.
      * If this picto already exists increment count
      */
-    function addStatsX1($paraulesFrase, $iduser) {
+    function addStatsX1($paraulesFrase, $iduser, $userlangid) {
+                
         for ($i = 0; $i < count($paraulesFrase); $i++) {
+                        
             if ($paraulesFrase[$i] != null) {//esto se podria quitar...
                 $word = $paraulesFrase[$i];
                 $inputid = $word->id;
+                $text = $word->text;
+                $imgtemp = $word->imgtemp;
                 
-                $this->addWordStatsX1($inputid, $iduser, false);
+                // words from keyboard have different stats
+                if ($inputid != 1900) {
+                    $this->addWordStatsX1($inputid, $iduser, false, $imgtemp);
+                }
+                
+                // treat words entered from keyboard
+                else {
+                    $this->addKBWordStatsX1($text, $iduser, $userlangid);
+                }
             }
         }
     }
@@ -1436,7 +1483,7 @@ class Lexicon extends CI_Model {
      * sets the counter to 1 if that user had never used that pictogram
      * before.
      */
-    public function addWordStatsX1($pictoid, $iduser, $first) 
+    public function addWordStatsX1($pictoid, $iduser, $first, $imgtemp) 
     {
         $datestring = "%Y/%m/%d";
         $daystring = 'D';
@@ -1462,7 +1509,8 @@ class Lexicon extends CI_Model {
                     'countx1' => $num,
                     'lastdate' => $avui,
                     $dia => $numdia,
-                    $hora => $numhora
+                    $hora => $numhora,
+                    'imgtemp' => $imgtemp
                 );
                 $query = $this->db->update('P_StatsUserPicto', $data);
             }
@@ -1471,7 +1519,8 @@ class Lexicon extends CI_Model {
                 'countx1' => '1',
                 'lastdate' => $avui,
                 'pictoid' => $pictoid,
-                'ID_PSUPUser' => $iduser
+                'ID_PSUPUser' => $iduser,
+                'imgtemp' => $imgtemp
             );
             $query = $this->db->insert('P_StatsUserPicto', $data);
         }
@@ -1481,8 +1530,8 @@ class Lexicon extends CI_Model {
      * Inserts, in pairs, each pictogram in P_StatsUserPicto.
      * If this combination of pictograms already exists increment count
      */
-    function addStatsX2($paraulesFrase, $iduser) {
-        
+    function addStatsX2($paraulesFrase, $iduser, $userlangid) {
+                
         $datestring = "%Y/%m/%d";
         $daystring = 'D';
         $hourstring = 'G';
@@ -1497,36 +1546,46 @@ class Lexicon extends CI_Model {
             $word2 = $paraulesFrase[$i];
             $inputid1 = $word1->id;
             $inputid2 = $word2->id;
-            $this->db->where('picto1id', $inputid1);
-            $this->db->where('picto2id', $inputid2);
-            $this->db->where('ID_PSUP2User', $iduser);
-            $query = $this->db->get('P_StatsUserPictox2');
-            if ($query->num_rows() > 0) {
-                $stat = $query->result();
-                $num = $stat[0]->countx2 + 1;
-                $numdia = $stat[0]->$dia + 1;
-                $numhora = $stat[0]->$hora + 1;
-                $this->db->where('picto2id', $inputid2);
+            $text1 = $word1->text;
+            $text2 = $word2->text;
+            
+            // words from keyboard have different stats
+            if ($inputid1 != 1900 && $inputid2 != 1900) {
                 $this->db->where('picto1id', $inputid1);
+                $this->db->where('picto2id', $inputid2);
                 $this->db->where('ID_PSUP2User', $iduser);
-                $data = array(
-                    'countx2' => $num,
-                    'lastdate' => $avui,
-                    $dia => $numdia,
-                    $hora => $numhora
-                );
-                $query = $this->db->update('P_StatsUserPictox2', $data);
-            } else {
-                $data = array(
-                    'countx2' => '1',
-                    'lastdate' => $avui,
-                    $dia => '1',
-                    $hora => '1',
-                    'picto2id' => $inputid2,
-                    'picto1id' => $inputid1,
-                    'ID_PSUP2User' => $iduser
-                );
-                $query = $this->db->insert('P_StatsUserPictox2', $data);
+                $query = $this->db->get('P_StatsUserPictox2');
+                if ($query->num_rows() > 0) {
+                    $stat = $query->result();
+                    $num = $stat[0]->countx2 + 1;
+                    $numdia = $stat[0]->$dia + 1;
+                    $numhora = $stat[0]->$hora + 1;
+                    $this->db->where('picto2id', $inputid2);
+                    $this->db->where('picto1id', $inputid1);
+                    $this->db->where('ID_PSUP2User', $iduser);
+                    $data = array(
+                        'countx2' => $num,
+                        'lastdate' => $avui,
+                        $dia => $numdia,
+                        $hora => $numhora
+                    );
+                    $query = $this->db->update('P_StatsUserPictox2', $data);
+                } else {
+                    $data = array(
+                        'countx2' => '1',
+                        'lastdate' => $avui,
+                        $dia => '1',
+                        $hora => '1',
+                        'picto2id' => $inputid2,
+                        'picto1id' => $inputid1,
+                        'ID_PSUP2User' => $iduser
+                    );
+                    $query = $this->db->insert('P_StatsUserPictox2', $data);
+                }
+            }
+            // treat words entered from keyboard
+            else {
+                $this->addKBWordStatsX2($text1, $text2, $iduser, $userlangid);
             }
         }
     }
@@ -1552,48 +1611,168 @@ class Lexicon extends CI_Model {
             $inputid1 = $word1->id;
             $inputid2 = $word2->id;
             $inputid3 = $word3->id;
-            $this->db->where('picto1id', $inputid1);
-            $this->db->where('picto2id', $inputid2);
-            $this->db->where('picto3id', $inputid3);
-            $this->db->where('ID_PSUP3User', $iduser);
-            $query = $this->db->get('P_StatsUserPictox3');
-            if ($query->num_rows() > 0) {
-                $stat = $query->result();
-                $num = $stat[0]->countx3 + 1;
-                $numdia = $stat[0]->$dia + 1;
-                $numhora = $stat[0]->$hora + 1;
-                $this->db->where('picto3id', $inputid3);
-                $this->db->where('picto2id', $inputid2);
+            
+            // words from keyboard have different stats
+            if ($inputid1 != 1900 && $inputid2 != 1900 && $inputid3 != 1900) {
                 $this->db->where('picto1id', $inputid1);
+                $this->db->where('picto2id', $inputid2);
+                $this->db->where('picto3id', $inputid3);
                 $this->db->where('ID_PSUP3User', $iduser);
-                $data = array(
-                    'countx3' => $num,
-                    'lastdate' => $avui,
-                    $dia => $numdia,
-                    $hora => $numhora
-                );
-                $query = $this->db->update('P_StatsUserPictox3', $data);
-            } else {
-                $data = array(
-                    'countx3' => '1',
-                    'lastdate' => $avui,
-                    $dia => '1',
-                    $hora => '1',
-                    'picto3id' => $inputid3,
-                    'picto2id' => $inputid2,
-                    'picto1id' => $inputid1,
-                    'ID_PSUP3User' => $iduser
-                );
-                $query = $this->db->insert('P_StatsUserPictox3', $data);
+                $query = $this->db->get('P_StatsUserPictox3');
+                if ($query->num_rows() > 0) {
+                    $stat = $query->result();
+                    $num = $stat[0]->countx3 + 1;
+                    $numdia = $stat[0]->$dia + 1;
+                    $numhora = $stat[0]->$hora + 1;
+                    $this->db->where('picto3id', $inputid3);
+                    $this->db->where('picto2id', $inputid2);
+                    $this->db->where('picto1id', $inputid1);
+                    $this->db->where('ID_PSUP3User', $iduser);
+                    $data = array(
+                        'countx3' => $num,
+                        'lastdate' => $avui,
+                        $dia => $numdia,
+                        $hora => $numhora
+                    );
+                    $query = $this->db->update('P_StatsUserPictox3', $data);
+                } else {
+                    $data = array(
+                        'countx3' => '1',
+                        'lastdate' => $avui,
+                        $dia => '1',
+                        $hora => '1',
+                        'picto3id' => $inputid3,
+                        'picto2id' => $inputid2,
+                        'picto1id' => $inputid1,
+                        'ID_PSUP3User' => $iduser
+                    );
+                    $query = $this->db->insert('P_StatsUserPictox3', $data);
+                }
             }
         }        
     }
     
     /*
-    * Adds or updates the stats of the pictogram with pictoid
-    * for the user with id=iduser. If first is set to true, it only
-    * sets the counter to 1 if that user had never used that pictogram
-    * before.
+     * Adds or updates the stats (countx1) of the word with paraulaid
+     * for the user with id=iduser.
+     */
+    public function addKBWordStatsX1($text, $iduser, $userlangid) 
+    {        
+        // get the id of the word
+        $paraulaid = $this->checkAddKBWord($text, $userlangid);
+                        
+        $this->db->where('ID_paraula1', $paraulaid);
+        $this->db->where('ID_KSUser', $iduser);
+        $query = $this->db->get('KeyboardStatsx1');
+        if ($query->num_rows() > 0) {
+            $stat = $query->result();
+            $num = $stat[0]->countx1 + 1;
+            
+            $this->db->where('ID_paraula1', $paraulaid);
+            $this->db->where('ID_KSUser', $iduser);
+            $data = array(
+                'countx1' => $num
+            );
+            $query = $this->db->update('KeyboardStatsx1', $data);
+        } else {
+            $data = array(
+                'countx1' => '1',
+                'ID_paraula1' => $paraulaid,
+                'ID_KSUser' => $iduser
+            );
+            $query = $this->db->insert('KeyboardStatsx1', $data);
+        }
+    }
+    
+    /*
+     * Adds or updates the stats (countx2) of the word tuple with paraulaid1
+     * and paraulaid2 for the user with id=iduser.
+     */
+    public function addKBWordStatsX2($text1, $text2, $iduser, $userlangid) 
+    {
+        // get the id of the words
+        $paraulaid1 = $this->checkAddKBWord($text1, $userlangid);
+        $paraulaid2 = $this->checkAddKBWord($text2, $userlangid);
+                
+        $this->db->where('ID_paraula1', $paraulaid1);
+        $this->db->where('ID_paraula2', $paraulaid2);
+        $this->db->where('ID_KS2User', $iduser);
+        $query = $this->db->get('KeyboardStatsx2');
+        if ($query->num_rows() > 0) {
+            $stat = $query->result();
+            $num = $stat[0]->countx2 + 1;
+            
+            $this->db->where('ID_paraula1', $paraulaid1);
+            $this->db->where('ID_paraula2', $paraulaid2);
+            $this->db->where('ID_KS2User', $iduser);
+            $data = array(
+                'countx2' => $num
+            );
+            $query = $this->db->update('KeyboardStatsx2', $data);
+        } else {
+            $data = array(
+                'countx2' => '1',
+                'ID_paraula1' => $paraulaid1,
+                'ID_paraula2' => $paraulaid2,
+                'ID_KS2User' => $iduser
+            );
+            $query = $this->db->insert('KeyboardStatsx2', $data);
+        }
+    }
+    
+    /**
+     * 
+     * @param type $text: Word that we are looking for
+     * @param type $userlangid: Language of the word
+     * @return type Id of the word
+     * Chechs if a word has already been typed by someone and returns its id,
+     * if not, it creates the entry and returns its id
+     */
+    private function checkAddKBWord($text, $userlangid) {
+                
+        // check if the word has already been typed by someone
+        $this->db->where('paraulatext', $text);
+        $this->db->where('lang', $userlangid);
+        $query0 = $this->db->get('KeyboardWords');
+        
+        $paraulaid = 0;
+        
+        // if not, we add the word and get its id
+        if ($query0->num_rows() <= 0) {
+                        
+            // we check the last inserted id and add 1
+            
+            $this->db->order_by('paraulaid', 'desc');
+            $this->db->limit(1);
+            $q0 = $this->db->get('KeyboardWords');
+            
+            if ($q0->num_rows() > 0) {
+                $output = $q0->result();
+                $paraulaid = $output[0]->paraulaid + 1;
+            }   
+            
+            $data = array(
+                'paraulaid' => $paraulaid,
+                'paraulatext' => $text,
+                'freq' => '5',
+                'lang' => $userlangid
+            );
+            
+            $q = $this->db->insert('KeyboardWords', $data);
+        }
+        
+        // we get the id
+        else {
+            $temp = $query0->result();
+            $paraulaid = $temp[0]->paraulaid;
+        }
+        
+        return $paraulaid;
+    } 
+    
+    /*
+    * Adds or updates the image of the pictogram with pictoid
+    * for the user with id=iduser.
     */
    public function addImgTempStatsX1($pictoid, $iduser, $imgtemp) 
    {

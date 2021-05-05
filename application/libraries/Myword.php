@@ -126,6 +126,10 @@ class Myword {
                 array_push($this->classes, $infobbdd[0]->complement2);
                 break;
             
+            case 'keyboard':
+                $this->text = $paraula->texttemp;
+                break;
+            
             default:
                 break;
         }

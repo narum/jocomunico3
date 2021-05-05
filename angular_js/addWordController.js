@@ -116,8 +116,10 @@ angular.module('controllers')
                     $location.path("/panelGroups");
                 }
 
+                var postdata = {idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr, idlang: $rootScope.interfaceLanguageId};
                 var URL = $scope.baseurl + "AddWord/getAllVerbs";
-                $http.post(URL).
+              
+                $http.post(URL, postdata).
                     success(function (response)
                     {
                     $scope.verbsList = response.data;
@@ -140,7 +142,7 @@ angular.module('controllers')
                     });
             };
             $scope.editWordData = function () {
-                var postdata = {id: $scope.idEditWord, type: $scope.addWordType};
+                var postdata = {id: $scope.idEditWord, type: $scope.addWordType, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr};
                 console.log(postdata);
                 var URL = $scope.baseurl + "AddWord/EditWordGetData";
                 $http.post(URL, postdata).
@@ -152,7 +154,7 @@ angular.module('controllers')
                             $scope.addWordEditData.imgFolder=response.data[0].imgFolder;
                             console.log($scope.addWordEditData.imgPicto);
 
-                            var postdata = {id: $scope.idEditWord, type: $scope.addWordType};
+                            var postdata = {id: $scope.idEditWord, type: $scope.addWordType, langabbr: $rootScope.languageAbbr};
                             URL = $scope.baseurl + "AddWord/EditWordGetClass";
                             $http.post(URL, postdata).
                                     success(function (response)
@@ -199,7 +201,7 @@ angular.module('controllers')
                 $location.path("/panelGroups");
             };
             $scope.EditWordRemove = function () {
-                var postdata = {id: $scope.idEditWord, type: $scope.addWordType};
+                var postdata = {id: $scope.idEditWord, type: $scope.addWordType, idusu: $rootScope.userId, langid: $rootScope.expanLanguageId};
                 console.log(postdata);
                 var URL = $scope.baseurl + "AddWord/EditWordRemove";
                 $http.post(URL, postdata).
@@ -230,6 +232,9 @@ angular.module('controllers')
 
                         if($scope.commit == 1)
                         {
+                            console.log("Add NAME");
+                            console.log($scope.objAdd.supExp);
+                            
                             $scope.objAdd = {
                                 type: "name",
                                 nomtext: $scope.objAdd.nomtext,
@@ -248,7 +253,9 @@ angular.module('controllers')
                                 new: $scope.NewModif == 1 ? true : false,
                                 class: $scope.NClassList,
                                 supExp: $scope.objAdd.supExp == true ? "1" : "0"};
-
+                            
+                            console.log($scope.objAdd);
+                            
                             if ($scope.objAdd.singpl == "pl"){
                                 $scope.objAdd.plural = $scope.objAdd.nomtext;
                                 $scope.objAdd.femeni = null;
@@ -262,7 +269,7 @@ angular.module('controllers')
                                 $scope.objAdd.plural = $scope.objAdd.nomtext;
                             }
                         var URL = $scope.baseurl + "AddWord/InsertWordData";
-                        var postdata = {objAdd: $scope.objAdd};
+                        var postdata = {objAdd: $scope.objAdd, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr};
                             $http.post(URL, postdata).success(function (response)
                             {
 
@@ -287,13 +294,19 @@ angular.module('controllers')
 
                         if($scope.commit == 1)
                         {
+                            console.log("Add ADJ");
+                            console.log($scope.objAdd.supExp);
+                            
                             $scope.objAdd = {type: "adj", masc: $scope.objAdd.masc, fem: $scope.objAdd.fem, mascpl: $scope.objAdd.mascpl,
                             fempl: $scope.objAdd.fempl, defaultverb: $scope.switchAdj.s1 == false ? "86" : "100", subjdef: $scope.switchAdj.s2 == false ? "1" : "3",
                             imgPicto: $scope.objAdd.imgPicto, imgFolder: $scope.objAdd.imgFolder, pictoid: $scope.idEditWord != null ? $scope.idEditWord : false, 
                             new: $scope.NewModif == 1 ? true : false, class: $scope.AdjClassList, 
                             supExp: $scope.objAdd.supExp == true ? "1" : "0"};
+                        
+                            console.log($scope.objAdd);
+                            
                             var URL = $scope.baseurl + "AddWord/InsertWordData";
-                            var postdata = {objAdd: $scope.objAdd};
+                            var postdata = {objAdd: $scope.objAdd, idusu: $rootScope.userId, langabbr: $rootScope.languageAbbr};
                             $http.post(URL, postdata).success(function (response)
                             {
 
@@ -315,6 +328,7 @@ angular.module('controllers')
                 var uploadUrl = $scope.baseurl + "ImgUploader/upload";
                 var fd = new FormData();
                 fd.append('vocabulary', angular.toJson(true));
+                fd.append('idusu', $rootScope.userId);
                 for (i = 0; i < $scope.myFile.length; i++) {
                     fd.append('file' + i, $scope.myFile[i]);
                 }
@@ -398,7 +412,7 @@ angular.module('controllers')
              */
              $scope.searchStartImg = function (name) {
                 var url = $scope.baseurl + "ARASAAC/searchDelete";
-                var postdata = {name: name};
+                var postdata = {name: name, idusu: $rootScope.userId};
                 $http.post(url, postdata).
                 success(function (response)
                 {

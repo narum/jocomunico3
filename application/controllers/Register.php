@@ -386,9 +386,13 @@ class Register extends REST_Controller {
         $this->BoardInterface->initTrans();
         $idusu = $this->query('idusu');
         $idsu = $this->query('idsu');
+        
+        $this->session->unset_userdata('idsu');
+        $this->session->unset_userdata('idusu');
         $this->session->set_userdata('idsu', $idsu);
         $this->session->set_userdata('idusu', $idusu);
-        $board = $this->BoardInterface->getPrimaryGroupBoard();
+        
+        $board = $this->BoardInterface->getPrimaryGroupBoard($idusu);
         if ($board == null) {
 
             $changedLinks = array();

@@ -29,21 +29,18 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        if ($canExpand == '0') {
-            $language = $this->session->userdata('ulangabbr', 'ES');
-        }
-        $user = $this->session->userdata('idusu');
-
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
 
         // Controller search all names from all picto table
-        $Names = $this->DBwords->getDBNamesLike($startswith, $user);
-        $Verbs = $this->DBwords->getDBVerbsLike($startswith, $user);
-        $Adj = $this->DBwords->getDBAdjLike($startswith, $user);
-        $Exprs = $this->DBwords->getDBExprsLike($startswith, $user);
-        $Advs = $this->DBwords->getDBAdvsLike($startswith, $user);
-        $Modifs = $this->DBwords->getDBModifsLike($startswith, $user);
-        $QuestionPart = $this->DBwords->getDBQuestionPartLike($startswith, $user);
+        $Names = $this->DBwords->getDBNamesLike($startswith, $user, $language, $langid);
+        $Verbs = $this->DBwords->getDBVerbsLike($startswith, $user, $language, $langid);
+        $Adj = $this->DBwords->getDBAdjLike($startswith, $user, $language, $langid);
+        $Exprs = $this->DBwords->getDBExprsLike($startswith, $user, $language, $langid);
+        $Advs = $this->DBwords->getDBAdvsLike($startswith, $user, $language, $langid);
+        $Modifs = $this->DBwords->getDBModifsLike($startswith, $user, $language, $langid);
+        $QuestionPart = $this->DBwords->getDBQuestionPartLike($startswith, $user, $language, $langid);
 
         // Marge all arrays to one
         $DataArray = array_merge($Names, $Verbs, $Adj, $Exprs, $Advs, $Modifs, $QuestionPart);
@@ -61,10 +58,12 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
+        
         // Controller search all names from all picto table
-        $DataArray = $this->DBwords->getDBNamesLike($startswith, $user);
+        $DataArray = $this->DBwords->getDBNamesLike($startswith, $user, $language, $langid);
         usort($DataArray, array('SearchWord','cmp'));
         $response = [
             "data" => $DataArray
@@ -77,12 +76,13 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
 
 
         // Controller search all names from all picto table
-        $DataArray = $this->DBwords->getDBVerbsLike($startswith, $user);
+        $DataArray = $this->DBwords->getDBVerbsLike($startswith, $user, $language, $langid);
         usort($DataArray, array('SearchWord','cmp'));
         $response = [
             "data" => $DataArray
@@ -95,12 +95,13 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
 
 
         // Controller search all names from all picto table
-        $DataArray = $this->DBwords->getDBAdjLike($startswith, $user);
+        $DataArray = $this->DBwords->getDBAdjLike($startswith, $user, $language, $langid);
         usort($DataArray, array('SearchWord','cmp'));
         $response = [
             "data" => $DataArray
@@ -113,12 +114,13 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
 
 
         // Controller search all names from all picto table
-        $DataArray = $this->DBwords->getDBExprsLike($startswith, $user);
+        $DataArray = $this->DBwords->getDBExprsLike($startswith, $user, $language, $langid);
         usort($DataArray, array('SearchWord','cmp'));
         $response = [
             "data" => $DataArray
@@ -131,14 +133,15 @@ class SearchWord extends REST_Controller {
         $postdata = file_get_contents("php://input");
         $request = json_decode($postdata);
         $startswith = $request->id;
-        $language = $this->session->userdata('ulangabbr');
-        $user = $this->session->userdata('idusu');
+        $user = $request->idusu;
+        $language = $request->langabbr;
+        $langid = $request->langid;
 
 
         // Controller search all names from all picto table
-        $Advs = $this->DBwords->getDBAdvsLike($startswith, $user);
-        $Modifs = $this->DBwords->getDBModifsLike($startswith, $user);
-        $QuestionPart = $this->DBwords->getDBQuestionPartLike($startswith, $user);
+        $Advs = $this->DBwords->getDBAdvsLike($startswith, $user, $language, $langid);
+        $Modifs = $this->DBwords->getDBModifsLike($startswith, $user, $language, $langid);
+        $QuestionPart = $this->DBwords->getDBQuestionPartLike($startswith, $user, $language, $langid);
 
         $DataArray = array_merge($Advs, $Modifs, $QuestionPart);
         usort($DataArray, array('SearchWord','cmp'));

@@ -10,17 +10,17 @@ class BackupSelects extends CI_Model{
   function __construct(){
       parent::__construct();
       $this->load->database();
-      $this->load->library('session');
   }
 //coge los registros de la base de datos pertenecientes a AdjectiveCA/ES y AdjectiveClassCA/ES
-function getAdjectives(){
-  $ID_Language=$this->session->uinterfacelangauge;
-  $ID_User=$this->session->idusu;
+function getAdjectives($ID_User, $ID_Language){
   $adjid=array(); $masc=array();
   $fem=array(); $mascpl=array();
   $fempl=array(); $defaultverb=array(); $subjdef=array();
   $class=array(); $pictoid=array(); $adjid2=array();
 
+  $maintable="AdjectiveCA";
+  $classtable="AdjClassCA";
+    
   switch($ID_Language){
     case 1:
     $maintable="AdjectiveCA";
@@ -71,8 +71,7 @@ function getAdjectives(){
 }
 
 //coge todos los registros de la tabla Boards en funcion del iduser
-function getBoards(){
-  $ID_User=$this->session->idusu;
+function getBoards($ID_User){
   $ID_Board=array(); $ID_GBBoard=array();
   $primaryboard=array(); $Bname=array();
   $width=array(); $height=array();
@@ -104,9 +103,8 @@ function getBoards(){
   );
   return $data;
 }
-private function getBoardkey(){
+private function getBoardkey($ID_User){
   $keys=array();
-  $ID_User=$this->session->idusu;
   $sql="SELECT ID_Board FROM Boards,GroupBoards WHERE ID_GBUser=? AND ID_GB=ID_GBBoard";
   $query=$this->db->query($sql,$ID_User);
   foreach ($query->result() as $row) {
@@ -115,14 +113,13 @@ private function getBoardkey(){
   return $keys;
 }
 //coge todos los registros de la tabla Cell en funcion del iduser
-function getCell(){
-  $ID_User=$this->session->idusu;
+function getCell($ID_User){
   $ID_Cell=array(); $isFixedInGroupBoards=array(); $imgCell=array();
   $ID_CPicto=array(); $ID_CSentence=array(); $sentenceFolder=array();
   $boardLink=array(); $color=array(); $ID_CFunction=array();
   $textInCell=array(); $textInCellTextOnOff=array(); $cellType=array();
   $activeCell=array();
-  $boardkey=$this->getBoardkey();
+  $boardkey=$this->getBoardkey($ID_User);
   for($i=0;$i<count($boardkey);$i++){
     $sql="SELECT DISTINCT ID_Cell,isFixedInGroupBoards,imgCell,ID_CPicto,ID_CSentence ,sentenceFolder,boardLink,color,
     ID_CFunction, textInCell,textInCellTextOnOff,cellType,activeCell FROM Cell,R_BoardCell WHERE R_BoardCell.ID_RBoard=?
@@ -164,8 +161,7 @@ function getCell(){
 }
 
 //coge todos los registros de la tabla GroupBoards en funcion del iduser
-function getGroupBoards(){
-  $ID_User=$this->session->idusu;
+function getGroupBoards($ID_User){
   $ID_GB=array(); $ID_GBUser=array();
   $GBname=array();$primaryGroupBoard=array();
   $defWidth=array(); $defHeight=array();
@@ -197,8 +193,7 @@ function getGroupBoards(){
 }
 
 //coge todos los registros de la tabla Images en funcion del iduser
-function getImages(){
-  $ID_User=$this->session->idsu;
+function getImages($ID_User){
   $ID_Image=array(); $ID_ISU=array();
   $imgPath=array(); $imgName=array();
   $isArasaac=array();
@@ -224,13 +219,16 @@ function getImages(){
 }
 
 //coge los registros de la base de datos pertenecientes a NameCA/ES y NameClassCA/ES
-function getNames(){
-  $ID_Language=$this->session->uinterfacelangauge;
-  $ID_User=$this->session->idusu;
+function getNames($ID_User, $ID_Language){
+
   $nomtext=array(); $mf=array(); $singpl=array();
   $contabincontab=array(); $determinat=array(); $ispropernoun=array();
   $class=array(); $pictoid=array(); $defaultverb=array(); $plural=array();
   $femeni=array(); $fempl=array(); $nameid=array();
+  
+  $maintable="NameCA";
+  $classtable="NameClassCA";
+  
   switch($ID_Language){
     case 1:
     $maintable="NameCA";
@@ -288,11 +286,8 @@ function getNames(){
 
 // Retorna los registros de la base de datos pertenecientes a VerbCA/ES,
 // VerConjugationCA/ES y PatternCA/ES
-function getVerbs(){
+function getVerbs($ID_User, $ID_Language){
         
-  $ID_Language=$this->session->uinterfacelangauge;
-  $ID_User=$this->session->idusu;
-  
   $pictoid = array(); $verbtext = array(); $actiu = array();
   $tense = array(); $pers = array(); $singpl = array(); $verbconj = array();
   
@@ -308,6 +303,10 @@ function getVerbs(){
   $locfrom = array(); $locfromtipus = array(); $locfromdef = array(); $locfromprep = array();
   $locat = array(); $locatdef = array(); $locatprep = array(); $time = array();
   $expressio = array(); $subverb = array(); $exemple = array(); $verbid1 = array(); $verbid2 = array();
+  
+  $maintable = "VerbCA";
+  $conjtable = "VerbConjugationCA";
+  $patterntable = "PatternCA";
   
   switch($ID_Language){
     case 1:
@@ -457,8 +456,7 @@ function getVerbs(){
 }
 
 //coge todos los registros de la tabla Pictograms en funcion del iduser
-function getPictograms(){
-  $ID_User=$this->session->idusu;
+function getPictograms($ID_User){
   $pictoid=array();
   $ID_PUser=array();	$pictoType=array();
   $supportsExpansion=array(); $imgPicto=array();
@@ -486,8 +484,7 @@ function getPictograms(){
   return $data;
 }
 //coge todos los registros de la tabla PictogramsLanguage en funcion del iduser
-function getPictogramsLanguage(){
-    $ID_User=$this->session->idusu;
+function getPictogramsLanguage($ID_User){
     $pictoid=array();
     $languageid=array();	$insertdate=array();
     $pictotext=array(); $pictofreq=array();
@@ -514,14 +511,13 @@ function getPictogramsLanguage(){
 }
 
 //coge todos los registros de la tabla R_BoardCell en funcion del iduser
-function getRBoardCell(){
-  $ID_User=$this->session->idusu;
+function getRBoardCell($ID_User){
   $ID_RBoard=array(); $ID_RCell=array(); $posInBoard=array();
   $isMenu=array(); $posInMenu=array();
   $customScanBlock1=array(); $customScanBlockText1=array();
   $customScanBlock2=array(); $customScanBlockText2=array();
 
-  $boardkey=$this->getBoardkey();
+  $boardkey=$this->getBoardkey($ID_User);
    for($i=0;$i<count($boardkey);$i++){
      $sql="SELECT ID_RBoard,ID_RCell,posInBoard,isMenu,posInMenu,customScanBlock1,
      customScanBlockText1,customScanBlock2,customScanBlockText2 FROM Cell,R_BoardCell WHERE R_BoardCell.ID_RBoard=?
@@ -553,14 +549,14 @@ function getRBoardCell(){
 }
 
 //coge todos los registros de la tabla R_S_HistoricPictograms en funcion del iduser
-function getRSHistoricPictograms(){
-  $ID_User=$this->session->idusu;
+function getRSHistoricPictograms($ID_User){
   $ID_RSHPSentencePicto=array(); $ID_RSHPSentence=array(); $pictoid=array();
   $isplural=array(); $isfem=array();
   $coordinated=array(); $ID_RSHPUser=array();
   $imgtemp=array();
+  $texttemp=array();
 
-  $sql="SELECT ID_RSHPSentencePicto,ID_RSHPSentence,pictoid,isplural,isfem,coordinated,ID_RSHPUser,imgtemp
+  $sql="SELECT ID_RSHPSentencePicto,ID_RSHPSentence,pictoid,isplural,isfem,coordinated,ID_RSHPUser,imgtemp,texttemp
   FROM R_S_HistoricPictograms,S_Historic WHERE S_Historic.ID_SHUser=? AND R_S_HistoricPictograms.ID_RSHPSentence=S_Historic.ID_SHistoric";
   $query=$this->db->query($sql,$ID_User);
 
@@ -573,6 +569,7 @@ function getRSHistoricPictograms(){
     array_push($coordinated,$row->coordinated);
     array_push($ID_RSHPUser,$row->ID_RSHPUser);
     array_push($imgtemp,$row->imgtemp);
+    array_push($texttemp,$row->texttemp);
   }
   $data=array(
     'ID_RSHPSentencePicto'=>$ID_RSHPSentencePicto,
@@ -582,20 +579,21 @@ function getRSHistoricPictograms(){
     'isfem'=>$isfem,
     'coordinated'=>$coordinated,
     'ID_RSHPUser'=>$ID_RSHPUser,
-    'imgtemp'=>$imgtemp
+    'imgtemp'=>$imgtemp,
+    'texttemp'=>$texttemp
   );
   return $data;
 }
 
 //coge todos los registros de la tabla R_S_SentencePictograms en funcion del iduser
-function getRSSentecePictograms(){
-  $ID_User=$this->session->idusu;
+function getRSSentecePictograms($ID_User){
   $ID_RSHPSentencePicto=array(); $ID_RSHPSentence=array(); $pictoid=array();
   $isplural=array(); $isfem=array();
   $coordinated=array(); $ID_RSHPUser=array();
   $imgtemp=array();
+  $texttemp=array();
 
-  $sql="SELECT ID_RSSPSentencePicto,ID_RSSPSentence,pictoid,isplural,isfem,coordinated,ID_RSSPUser,imgtemp FROM R_S_SentencePictograms,S_Sentence
+  $sql="SELECT ID_RSSPSentencePicto,ID_RSSPSentence,pictoid,isplural,isfem,coordinated,ID_RSSPUser,imgtemp,texttemp FROM R_S_SentencePictograms,S_Sentence
   WHERE S_Sentence.ID_SSUser=? AND R_S_SentencePictograms.ID_RSSPSentence=S_Sentence.ID_SSentence";
   $query=$this->db->query($sql,$ID_User);
 
@@ -608,6 +606,7 @@ function getRSSentecePictograms(){
     array_push($coordinated,$row->coordinated);
     array_push($ID_RSHPUser,$row->ID_RSSPUser);
     array_push($imgtemp,$row->imgtemp);
+    array_push($texttemp,$row->texttemp);
   }
   $data=array(
     'ID_RSSPSentencePicto'=>$ID_RSHPSentencePicto,
@@ -617,12 +616,12 @@ function getRSSentecePictograms(){
     'isfem'=>$isfem,
     'coordinated'=>$coordinated,
     'ID_RSSPUser'=>$ID_RSHPUser,
-    'imgtemp'=>$imgtemp
+    'imgtemp'=>$imgtemp,
+    'texttemp'=>$texttemp
   );
   return $data;
 }
-function getHistoric(){
-  $ID_User=$this->session->idusu;
+function getHistoric($ID_User){
   $ID_SHUser=array(); $sentenceType=array();
   $isNegative=array(); $sentenceTense=array();
   $sentenceDate=array(); $sentenceFinished=array();
@@ -677,10 +676,9 @@ function getHistoric(){
   return $data;
 }
 //coge todos los registros de la tabla SuperUser en funcion del iduser
-function getSuperUser(){
-  $ID_User=$this->session->idsu;
+function getSuperUser($ID_SUser){
   $sql="SELECT * FROM SuperUser WHERE ID_SU=?";
-  $query=$this->db->query($sql,$ID_User);
+  $query=$this->db->query($sql,$ID_SUser);
   foreach ($query->result() as $row) {
     $ID_SU=$row->ID_SU;
     $SUname=$row->SUname;
@@ -785,8 +783,7 @@ function getSuperUser(){
 }
 
 //coge todos los registros de la tabla S_Folder en funcion del iduser
-function getSFolder(){
-  $ID_User=$this->session->idusu;
+function getSFolder($ID_User){
   $ID_Folder=array(); $ID_SFUser=array(); $folderName=array();
   $folderDescr=array(); $imgSFolder=array();
   $folderColor=array(); $folderOrder=array();
@@ -815,8 +812,7 @@ function getSFolder(){
 }
 
 //coge todos los registros de la tabla S_Sentence en funcion del iduserS
-function getSSentence(){
-  $ID_User=$this->session->idusu;
+function getSSentence($ID_User){
   $ID_SSentence=array(); $ID_SSUser=array();
   $ID_SFolder=array(); $inputWords=array();
   $posInFolder=array(); $sentenceType=array();
@@ -894,8 +890,7 @@ function getSSentence(){
 }
 
 //coge todos los registros de la tabla User en funcion del iduser
-function getUser(){
-  $ID_User1=$this->session->idsu;
+function getUser($ID_SUser){
   $ID_User=array(); $ID_USU=array();
   $ID_ULanguage=array(); $ID_UOrg=array();
   $cfgExpansionVoiceOnline=array(); $cfgExpansionVoiceOnlineType=array();
@@ -905,7 +900,7 @@ function getUser(){
   $cfgExpansionLanguage=array(); $errorTemp=array();
 
   $sql="SELECT * FROM User WHERE ID_USU=?";
-  $query=$this->db->query($sql,$ID_User1);
+  $query=$this->db->query($sql,$ID_SUser);
 
   foreach ($query->result() as $row) {
     array_push($ID_USU,$row->ID_USU);

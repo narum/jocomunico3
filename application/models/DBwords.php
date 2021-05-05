@@ -13,13 +13,9 @@ class DBwords extends CI_Model {
      * Gets all names from ddbb that starts with ($startswith) in the language ($language)
      */
 
-    function getDBNamesLike($startswith, $user)
+    function getDBNamesLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
-        
+
         $output = array();
         
         $this->db->limit(6);// limit up to 6
@@ -46,12 +42,8 @@ class DBwords extends CI_Model {
      * Gets all verbs from ddbb that starts with ($startswith) in the language ($language)
      */
     
-    function getDBVerbsLike($startswith, $user)
+    function getDBVerbsLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
       
@@ -77,12 +69,8 @@ class DBwords extends CI_Model {
     /*
      * Gets all adjectius from ddbb that starts with ($startswith) in the language ($language)
      */
-    function getDBAdjLike($startswith, $user)
+    function getDBAdjLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
         
@@ -106,12 +94,8 @@ class DBwords extends CI_Model {
     /*
      * Gets all expressions from ddbb that starts with ($startswith) in the language ($language)
      */
-    function getDBExprsLike($startswith, $user)
+    function getDBExprsLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
         
@@ -135,12 +119,8 @@ class DBwords extends CI_Model {
     /*
      * Gets all adverbs from ddbb that starts with ($startswith) in the language ($language)
      */
-    function getDBAdvsLike($startswith, $user)
+    function getDBAdvsLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
         
@@ -165,12 +145,8 @@ class DBwords extends CI_Model {
     /*
      * Gets all modifier from ddbb that starts with ($startswith) in the language ($language)
      */
-    function getDBModifsLike($startswith, $user)
+    function getDBModifsLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
         
@@ -196,12 +172,8 @@ class DBwords extends CI_Model {
     /*
      * Gets all QuestionPart from ddbb that starts with ($startswith) in the language ($language)
      */
-    function getDBQuestionPartLike($startswith, $user)
+    function getDBQuestionPartLike($startswith, $user, $languageExp, $languageInt)
     {
-        // Expansion language
-        $languageExp = $this->session->userdata('ulangabbr');
-        //Interface language
-        $languageInt = $this->session->userdata('uinterfacelangauge');
         
         $output = array();
         
