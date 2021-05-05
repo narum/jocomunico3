@@ -11,7 +11,7 @@ For more information on Jocomunico:
 https://jocomunico.com/#/cc
 https://jocomunico.com/#/about
 
-*Jocomunico is optimized for Google Chrome.
+*Jocomunico is optimized for Google Chrome. It also works on Edge, Safari and Firefox.
 
 -----------------------
 KNOWN BUGS
