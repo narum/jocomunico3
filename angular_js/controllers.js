@@ -1910,7 +1910,7 @@ angular.module('controllers', [])
                             break;
                         case "predictionCellKB":
                             $scope.indexScannedCells = $scope.indexScannedCells + 1;
-                            if ($scope.indexScannedCells > $scope.arrayScannedCells.length - 1) {
+                            if ($scope.indexScannedCells > $scope.cfgPredBarNumPred - 1) {
                                 $scope.isScanning = "nowait";
                                 $scope.InitScan();
                             }
