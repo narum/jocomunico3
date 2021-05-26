@@ -1908,6 +1908,13 @@ angular.module('controllers', [])
                                 $scope.InitScan();
                             }
                             break;
+                        case "predictionCellKB":
+                            $scope.indexScannedCells = $scope.indexScannedCells + 1;
+                            if ($scope.indexScannedCells > $scope.arrayScannedCells.length - 1) {
+                                $scope.isScanning = "nowait";
+                                $scope.InitScan();
+                            }
+                            break;
                         case "home":
                             $scope.isScanning = "read";
                             if ($scope.cfgMenuReadActive == 0) {
@@ -2020,7 +2027,12 @@ angular.module('controllers', [])
                         case "prediction":
                             $scope.arrayScannedCells = $scope.recommenderArray;
                             $scope.indexScannedCells = 0;
-                            $scope.isScanning = "predictionCell";
+                            if ($scope.keyboardWord !== "") {
+                                $scope.isScanning = "predictionCellKB";
+                            }
+                            else {
+                                $scope.isScanning = "predictionCell";
+                            }
                             $scope.isScanningCancel = $scope.cfgCancelScanOnOff;
                             break;
                         case "sentence":
@@ -2051,6 +2063,12 @@ angular.module('controllers', [])
                             break;
                         case "predictionCell":
                             $scope.addToSentence($scope.arrayScannedCells[$scope.indexScannedCells].pictoid, $scope.arrayScannedCells[$scope.indexScannedCells].imgCell, $scope.arrayScannedCells[$scope.indexScannedCells].pictotext);
+                            $scope.InitScan();
+                            break;
+                        case "predictionCellKB":
+                            console.log("Selected KBWord");
+                            console.log($scope.arrayScannedCells);
+                            $scope.addToSentence(1900, $scope.arrayScannedCells[$scope.indexScannedCells].imgCell, $scope.arrayScannedCells[$scope.indexScannedCells].paraulatext);
                             $scope.InitScan();
                             break;
                         case "home":

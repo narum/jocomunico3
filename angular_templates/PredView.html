@@ -17,6 +17,7 @@
             </div>
             
             <div ng-if='keyboardWord != ""' class="contentPredCell" ng-mousedown="isClickEnable()?addToSentence(1900, picto.imgtemp, picto.paraulatext):null;" ng-mouseenter="cfgTimeOverOnOff?TimeoutOverClick(4,picto):null" ng-mouseleave="cfgTimeOverOnOff?CancelTimeoutOverClick():null">
+                <div ng-if="inScan && isScanning == 'predictionCellKB' && picto.paraulatext == arrayScannedCells[indexScannedCells].paraulatext && isScanningCancel === false" class="scaneo" ng-style="{'border':'7px solid #{{cfgScanColor}}'}"></div> 
                 <div ng-if="picto.paraulatext" class="textCell2">{{picto.paraulatext}}</div>
             </div>
         </div>
