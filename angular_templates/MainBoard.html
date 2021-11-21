@@ -31,6 +31,22 @@
         Timer = window.setTimeout(refreshPage, 600000);
 
     }
+    
+    function audiohallelujahkey(event) {
+        
+        // activate audio only with left arrow
+        if (event.keyCode === 37) {
+        
+            console.log("audio key");
+
+            var aux = document.getElementById('utterance');
+            aux.src="mp3/empty.m4a";
+            var audiotoplayinitial = aux.src;
+
+            var myVar = setInterval(function(){ waitloop(audiotoplayinitial, myVar) }, 500);
+        }
+    }
+    
     function refreshPage() {
             location.reload(true);
     }
@@ -57,6 +73,7 @@
             clearInterval(myVar);
         }
     }
+    
 </script>
 
 <!--menu superior dropdown-->
@@ -75,7 +92,7 @@
 <div id="main" style="background-image: url('/img/srcWeb/patterns/fons.png');background-size:100% 100%">
 <div class="loadingGif" ng-show="!viewActived"><img class="img-loadingGif" ng-src={{img.loading}}/></div>
 <div ng-show="viewActived">
-    <div class="row mainBoard" ng-init="config()" ng-click="scanLeftClick()" ng-right-click="scanRightClick()" ng-mousedown="playLongClick()" ng-mouseup="cancelLongClick()" ng-style="!inEdit ? {'padding':'3px'}:{}" onmousedown="audiohallelujah()">
+    <div id="placetoclick" class="row mainBoard" ng-init="config()" ng-keydown="detectKey($event)" ng-keyup="detectKeyUp($event)" ng-click="scanLeftClick()" ng-right-click="scanRightClick()" ng-mousedown="playLongClick()" ng-mouseup="cancelLongClick()" ng-style="!inEdit ? {'paddingplayLongClick()':'3px'}:{}" onmousedown="audiohallelujah()" onkeyup="audiohallelujahkey(event)" tabindex="-1">
         <div  ng-if="(cfgPredOnOff === '1' && cfgPredBarVertHor === '0')" id="predView" ng-if="inPred" class="col-xs-{{predViewWidth}}">
             <div  class="row fullheight">
                 <div class="col-xs-12" ng-include="baseurl + '/angular_templates/PredView.html'">

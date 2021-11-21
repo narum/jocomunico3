@@ -21,6 +21,20 @@
 
         var myVar = setInterval(function(){ waitloop(audiotoplayinitial, myVar) }, 500);
     }
+    
+    function audiohallelujahkey(event) {
+        
+        if (event.keyCode === 37) {
+        
+            console.log("audio key");
+
+            var aux = document.getElementById('utterance');
+            aux.src="mp3/empty.m4a";
+            var audiotoplayinitial = aux.src;
+
+            var myVar = setInterval(function(){ waitloop(audiotoplayinitial, myVar) }, 500);
+        }
+    }
 
     function waitloop(audiotoplayinitial, myVar) {
         var aux = document.getElementById('utterance');
@@ -57,7 +71,7 @@
 <div ng-show="cfgMenuBlock == true" ng-include="'/angular_templates/confirmPasswordHistoricView.html'"></div>
 
     <!--menu superior dropdown-->
-    <div id="main" style="background-image: url('/img/srcWeb/patterns/fons.png');background-size:100% 100%" ng-click="scanLeftClick()" ng-right-click="scanRightClick()" ng-mousedown="playLongClick()" ng-mouseup="cancelLongClick()" onmousedown="audiohallelujah()">
+    <div id="main" style="background-image: url('/img/srcWeb/patterns/fons.png');background-size:100% 100%" ng-keydown="detectKey($event)" ng-keyup="detectKeyUp($event)" ng-click="scanLeftClick()" ng-right-click="scanRightClick()" ng-mousedown="playLongClick()" ng-mouseup="cancelLongClick()" onmousedown="audiohallelujah()" onkeyup="audiohallelujahkey(event)" tabindex="-1">
     <div class="row historicView">
         <div class="col-xs-12 containerHistoric">
             <div ng-if="isScanning == '1row' && !isScanningCancel" class="scaneo" ng-style="{'border':'7px solid #{{cfgScanColor}}'}"></div>
