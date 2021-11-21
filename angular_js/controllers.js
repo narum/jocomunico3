@@ -1616,7 +1616,50 @@ angular.module('controllers', [])
                     $interval.cancel($scope.intervalScan);
                 }
             });
-
+            
+            $scope.keyIsDown = false;
+            
+            // Detect key down while scanning
+            $scope.detectKey = function($event) {
+                
+                // console.log($event.keyCode);
+                
+                // LONG CLICK ONLY MAPPED FOR KEYBOARD LEFT ARROW
+                if ($event.keyCode === 37 && $scope.longclick) {
+                    if (!$scope.keyIsDown) {
+                        $scope.keyIsDown = true;
+                        $scope.playLongClick();
+                    } 
+                }
+                // ONLY LEFT AND RIGHT ARROWS ARE MAPPED FOR SCANNING
+                else {
+                    if ($event.keyCode === 32) { // SPACE
+                        // $scope.scanLeftClick();
+                    }
+                    else if ($event.keyCode === 37) { // LEFT ARROW
+                        $scope.scanLeftClick();
+                    }
+                    else if ($event.keyCode === 39) { // RIGHT ARROW
+                        $scope.scanRightClick();
+                    }
+                    else if ($event.keyCode === 13) { // ENTER
+                        // $scope.scanRightClick();
+                    }
+                }
+            };
+            
+            // Detect key up while scanning
+            $scope.detectKeyUp = function($event) {
+                
+                // console.log("KEY UP:");
+                // console.log($event.keyCode);
+                
+                if ($event.keyCode === 37) { // LEFT ARROW
+                    $scope.keyIsDown = false;
+                    $scope.cancelLongClick();
+                }
+            };
+            
             //Control the left click button while scanning
             $scope.scanLeftClick = function ()
             {
@@ -2352,7 +2395,16 @@ angular.module('controllers', [])
                 } else {
                     $scope.getPrimaryUserBoard();
                 }
+                
+                // In order for keyboard arrow keys to work with scanning
+                if ($scope.cfgScanningOnOff == 1) {
+                    $timeout(function () {
+                        angular.element($window.document.getElementById('placetoclick')).focus();
+                        console.log("FOCUS");
+                    }, 1000);
+                }
             };
+            
             //Get the current sentence in order to show to the user
             $scope.getSentence = function () {
                 var url = $scope.baseurl + "Board/getTempSentence";
@@ -3397,6 +3449,9 @@ angular.module('controllers', [])
                 var msg = successful ? 'successful' : 'unsuccessful';
                 console.log('Copying text command was ' + msg);
                 $window.getSelection().removeAllRanges();
+                
+                // return focus to board
+                angular.element($window.document.getElementById('placetoclick')).focus();
             };
 
 
@@ -4606,7 +4661,7 @@ angular.module('controllers', [])
 
             $scope.InitScan = function ()
             {
-
+                
                 $scope.inScan = true;
                 //When the scan is automatic, this timer manage when the scan have to move to the next block
 
@@ -4642,7 +4697,50 @@ angular.module('controllers', [])
                 ;
                 $scope.intervalScan = $interval(myTimer, Intervalscan);
             };
-
+                        
+            $scope.keyIsDown = false;
+            
+            // Detect key down while scanning
+            $scope.detectKey = function($event) {
+                
+                // console.log($event.keyCode);
+                
+                // LONG CLICK ONLY MAPPED FOR KEYBOARD LEFT ARROW
+                if ($event.keyCode === 37 && $scope.longclick) {
+                    if (!$scope.keyIsDown) {
+                        $scope.keyIsDown = true;
+                        $scope.playLongClick();
+                    } 
+                }
+                // ONLY LEFT AND RIGHT ARROWS ARE MAPPED FOR SCANNING
+                else {
+                    if ($event.keyCode === 32) { // SPACE
+                        // $scope.scanLeftClick();
+                    }
+                    else if ($event.keyCode === 37) { // LEFT ARROW
+                        $scope.scanLeftClick();
+                    }
+                    else if ($event.keyCode === 39) { // RIGHT ARROW
+                        $scope.scanRightClick();
+                    }
+                    else if ($event.keyCode === 13) { // ENTER
+                        // $scope.scanRightClick();
+                    }
+                }
+            };
+            
+            // Detect key up while scanning
+            $scope.detectKeyUp = function($event) {
+                
+                // console.log("KEY UP:");
+                // console.log($event.keyCode);
+                
+                if ($event.keyCode === 37) { // LEFT ARROW
+                    $scope.keyIsDown = false;
+                    $scope.cancelLongClick();
+                }
+            };
+            
             //Control the left click button while scanning
             $scope.scanLeftClick = function ()
             {
@@ -5027,6 +5125,12 @@ angular.module('controllers', [])
                     location.reload(true);
                 });
             };
+            
+            // In order for keyboard arrow keys to work with scanning
+            if ($scope.cfgScanningOnOff == 1) {
+                    $('#main').focus();
+                    console.log("FOCUS-MAIN");
+            }
 
         })
 
@@ -5078,6 +5182,9 @@ angular.module('controllers', [])
               var msg = successful ? 'successful' : 'unsuccessful';
               console.log('Copying text command was ' + msg);
               getSelection().removeAllRanges();
+              
+              // return focus to board
+              angular.element($window.document.getElementById('placetoclick')).focus();
 
             });
             }
