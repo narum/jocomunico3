@@ -3517,27 +3517,13 @@ angular.module('controllers', [])
             $scope.goPrimaryBoard = function () {
                 $scope.config();
             };
+            
+            
             /*
-             * Generate the current senence under contruction.
-             * Add the pictograms (and the sentence itself) in the historic
+             * Call for generate function below
              */
-
-            $scope.generate = function () {
-                
-                console.log("GENERATE IN");
-                // if there was a keyboard word in the making, we add it to the sentence
-                // when generate button is selected
-                if ($scope.keyboardWord !== "") {
-                    console.log("GENERATE & KEYBOARD");
-                    $scope.AccObPressed = false;
-                    $scope.AccTPressed = false;
-
-                    $scope.keyboardWord = $scope.keyboardWord.trim();
-                    $rootScope.spaceAndGenerate = true;
-                    $scope.addToSentence(1900, null, $scope.keyboardWord);
-                    $scope.keyboardWord = " ";
-                } 
-                
+            $scope.generateCall = function () {
+            
                 var url = $scope.baseurl + "Board/generate";
 
                 var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr, autoerase: $rootScope.autoEraseSB, expansion: $rootScope.expansionOnOff, isfem: $rootScope.isFem, langType: $rootScope.langType, adjOrder: $rootScope.AdjOrder, ncOrder: $rootScope.NCOrder};
@@ -3561,6 +3547,37 @@ angular.module('controllers', [])
                     $scope.negativa = false;
                 }
             };
+            
+            /*
+             * Generate the current senence under contruction.
+             * Add the pictograms (and the sentence itself) in the historic
+             */
+            $scope.generate = function () {
+                
+                // if there was a keyboard word in the making, we add it to the sentence
+                // when generate button is selected; then we generate the sentence
+                if ($scope.keyboardWord !== "") {
+                    console.log("GENERATE & KEYBOARD");
+                    $scope.AccObPressed = false;
+                    $scope.AccTPressed = false;
+
+                    $scope.keyboardWord = $scope.keyboardWord.trim();
+                    $rootScope.spaceAndGenerate = true;
+                    $scope.addToSentence(1900, null, $scope.keyboardWord);
+                    $scope.keyboardWord = " ";
+                    
+                    $timeout(function () {
+                        $scope.generateCall();
+                    }, 500);
+                } 
+                
+                // normal call
+                else {
+                    $scope.generateCall();
+                }
+            };
+            
+            
             //Show the feedback panel, scanning it if inScan is true
             $scope.puntuar = function () {
                 if (!$scope.inEdit) {
