@@ -2947,7 +2947,7 @@ angular.module('controllers', [])
              */
             $scope.addToSentence = function (id, img, text) {
 
-                if ($scope.TimeMultiClic === 0)
+                if ($scope.TimeMultiClic === 0 && text !== "")
                 {
 
                     if ($scope.cfgTimeNoRepeatedClickOnOff === 1)
@@ -2970,9 +2970,14 @@ angular.module('controllers', [])
                         else {
                             $scope.keyboardWord = " ";
                         }
-
-                        $scope.readText(text, true);
-                        $scope.getPred();
+                        if (!$rootScope.spaceAndGenerate) 
+                        {
+                            $scope.readText(text, true);
+                            $scope.getPred();
+                        }
+                        else {
+                            $rootScope.spaceAndGenerate = false;
+                        }
                     });
                 }
                 //MODIF: comentario op por parte de jordi
@@ -3252,6 +3257,7 @@ angular.module('controllers', [])
                     }
 
                     else if ((control !== "") && (control !== "home") && (control !== "historic") && (control !== "stopAudio")) {
+                        
                         var url = $scope.baseurl + "Board/" + control;
                         var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, pos: $scope.chooseElementDeleted, idusu: $rootScope.userId};
 
@@ -3517,6 +3523,21 @@ angular.module('controllers', [])
              */
 
             $scope.generate = function () {
+                
+                console.log("GENERATE IN");
+                // if there was a keyboard word in the making, we add it to the sentence
+                // when generate button is selected
+                if ($scope.keyboardWord !== "") {
+                    console.log("GENERATE & KEYBOARD");
+                    $scope.AccObPressed = false;
+                    $scope.AccTPressed = false;
+
+                    $scope.keyboardWord = $scope.keyboardWord.trim();
+                    $rootScope.spaceAndGenerate = true;
+                    $scope.addToSentence(1900, null, $scope.keyboardWord);
+                    $scope.keyboardWord = " ";
+                } 
+                
                 var url = $scope.baseurl + "Board/generate";
 
                 var postdata = {tense: $scope.tense, tipusfrase: $scope.tipusfrase, negativa: $scope.negativa, idusu: $rootScope.userId, idlang: $rootScope.expanLanguageId, lang: $rootScope.languageAbbr, autoerase: $rootScope.autoEraseSB, expansion: $rootScope.expansionOnOff, isfem: $rootScope.isFem, langType: $rootScope.langType, adjOrder: $rootScope.AdjOrder, ncOrder: $rootScope.NCOrder};
