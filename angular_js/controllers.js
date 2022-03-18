@@ -831,6 +831,7 @@ angular.module('controllers', [])
                             $scope.userData.cfgTimeClick = parseInt(results.userConfig.cfgTimeClick, 10);
                             $scope.userData.cfgTimeScanning = parseInt(results.userConfig.cfgTimeScanning, 10);
                             $scope.userData.cfgVoiceOfflineRate = parseInt(results.userConfig.cfgVoiceOfflineRate, 10);
+                            $rootScope.speechRate = parseInt(results.userConfig.cfgVoiceOfflineRate, 10);
 
                             //change string (0,1) to boolean (true,false)
                             $scope.userData.cfgExpansionOnOff = ($scope.userData.cfgExpansionOnOff === "1");
@@ -1225,6 +1226,7 @@ angular.module('controllers', [])
                                 });
                             } else {
                                 $scope.sound = "mp3/" + results[0];
+                                $scope.speechrate = $rootScope.speechRate;
                                 var audiotoplay = $('#utterance');
                                 audiotoplay.src = "mp3/" + results[0];
                             }
@@ -2350,6 +2352,8 @@ angular.module('controllers', [])
                 $scope.cfgBgColorPanel = userConfig.cfgBgColorPanel;
                 $scope.cfgBgColorPred = userConfig.cfgBgColorPred;
                 $scope.cfgScanColor = userConfig.cfgScanColor;
+                $scope.cfgScanColor = userConfig.cfgScanColor;
+                $scope.cfgVoiceOfflineRate = userConfig.cfgVoiceOfflineRate;
                 $scope.cfgExpansionOnOff = userConfig.cfgExpansionOnOff == 1 ? true : false;
                 $rootScope.expansionOnOff = userConfig.cfgExpansionOnOff;
                 $rootScope.isFem = userConfig.cfgIsFem;
@@ -2835,10 +2839,12 @@ angular.module('controllers', [])
                         $scope.dataAudio = response.audio;
                         if (!$scope.dataAudio[1]) {
                             $scope.sound = "mp3/" + $scope.dataAudio[0];
+                            $scope.speechrate = $scope.cfgVoiceOfflineRate;
                             var audiotoplay = $('#utterance');
                             audiotoplay.src = "mp3/" + $scope.dataAudio[0];
 
                             console.log($scope.dataAudio[0]);
+                            console.log($scope.speechrate);
                             if ($scope.cfgTimeOverOnOff) {
                                 $timeout(function () {
                                     audiotoplay.get(0).play();
@@ -3625,6 +3631,7 @@ angular.module('controllers', [])
                                 });
                             } else {
                                 $scope.sound = "mp3/" + $scope.dataAudio[0];
+                                $scope.speechrate = $scope.cfgVoiceOfflineRate;
                                 $timeout(function () {
                                     $('#utterance').get(0).play();
                                 });
@@ -3652,6 +3659,7 @@ angular.module('controllers', [])
                                 });
                             } else {
                                 $scope.sound = "mp3/" + $scope.dataAudio[0];
+                                $scope.speechrate = $scope.cfgVoiceOfflineRate;
                                 $timeout(function () {
                                     $('#utterance').get(0).play();
                                 });
@@ -4578,6 +4586,7 @@ angular.module('controllers', [])
                             }
                         } else {
                             $scope.sound = "mp3/" + $scope.dataAudio[0];
+                            $scope.speechrate = $scope.cfgVoiceOfflineRate;
                             var audiotoplay = $('#utterance');
                             audiotoplay.src = "mp3/" + $scope.dataAudio[0];
                             if ($scope.cfgTimeOverOnOff) {
@@ -5082,6 +5091,7 @@ angular.module('controllers', [])
             $scope.cfgScanningOnOff = userConfig.cfgScanningOnOff;
             $scope.cfgScanStartClick = userConfig.cfgScanStartClick == 1 ? true : false;
             $scope.cfgCancelScanOnOff = userConfig.cfgCancelScanOnOff == 1 ? true : false;
+            $scope.cfgVoiceOfflineRate = userConfig.cfgVoiceOfflineRate;
 
             $scope.cfgMenuBlock = userConfig.cfgMenuBlock;
 
