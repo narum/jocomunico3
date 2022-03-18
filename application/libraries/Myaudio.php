@@ -337,7 +337,7 @@ class Myaudio {
         $interfacelanguage = $userinfo->ID_ULanguage;
         $interfacegender = $userinfo->cfgInterfaceVoiceMascFem;
         $expansionlanguage = $userinfo->cfgExpansionLanguage;
-        $rate = $userinfo->cfgVoiceOfflineRate;
+        $rate = 100;
         
         $md5 = "";
         
@@ -677,7 +677,7 @@ function synthesizeOnline($vocalwareLID, $vocalwareVID, $text, $filename)
         try {
             $concatveus = "";
         
-            if ($rate > 0) $concatveus .= "-r ".$rate." ";
+            if ($rate > 0 && $rate != 100) $concatveus .= "-r ".$rate." ";
 
             $concatveus .= "-v '".$voice."' ";
             $concatveus .= "-o mp3/".$filename.".m4a --data-format=aach ";
