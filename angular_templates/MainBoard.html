@@ -13,7 +13,7 @@
 
     var myVar;
     var exit = 0;
-
+    
     //Timer that will refresh the page after 10min if the user dont click anything.
     var Timer = window.setTimeout(refreshPage, 600000);
 
@@ -59,9 +59,15 @@
     function waitloop(audiotoplayinitial, myVar) {
         var aux = document.getElementById('utterance');
         var audiotoplayfinal = aux.src;
+        var aux2 = document.getElementById('speechRate');
+        var speechrate = aux2.value;
+        if (speechrate === "0") {
+            speechrate = 100;
+        }
 
         if (audiotoplayinitial !== audiotoplayfinal) {
             exit = 0;
+            aux.playbackRate = speechrate/100;
             aux.play();
             clearInterval(myVar);
         }
@@ -88,6 +94,7 @@
 
 
 <div ng-show="cfgMenuBlock == true" ng-include="'/angular_templates/confirmPassword.html'"></div>
+<div style="display:none"><input id="speechRate" value="{{speechrate}}" type="text"></div>
 
 <div id="main" style="background-image: url('/img/srcWeb/patterns/fons.png');background-size:100% 100%">
 <div class="loadingGif" ng-show="!viewActived"><img class="img-loadingGif" ng-src={{img.loading}}/></div>
