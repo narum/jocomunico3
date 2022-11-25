@@ -2842,7 +2842,8 @@ angular.module('controllers', [])
                             $scope.speechrate = $scope.cfgVoiceOfflineRate;
                             var audiotoplay = $('#utterance');
                             audiotoplay.src = "mp3/" + $scope.dataAudio[0];
-
+                            
+                            console.log("Hello Dear");
                             console.log($scope.dataAudio[0]);
                             console.log($scope.speechrate);
                             if ($scope.cfgTimeOverOnOff) {
