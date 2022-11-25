@@ -73,8 +73,8 @@
         }
 
         exit = exit+1;
-
-        if (exit > 8) {
+        // if it takes more than 15 seconds (=30 loops)
+        if (exit > 30) {
             exit = 0;
             clearInterval(myVar);
         }
