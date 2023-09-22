@@ -1519,7 +1519,7 @@ angular.module('controllers', [])
                     angular.element('#clkOutside').triggerHandler('click');
                       $('#confirmPassword').modal('hide');
                       $scope.passwordCopyPanel = null;
-                    }, 10000);
+                    }, 5000);
 
                   $('#input_id').on('input',function(e){
                     $timeout.cancel($scope.timerPassword);
