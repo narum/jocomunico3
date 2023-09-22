@@ -224,6 +224,14 @@
                                         </button>
                                     </a>
                                 </div>
+                                <div ng-if= "langabbr == 'EN'">
+                                    <a ng-href="https://jocomunico.com/files/Vocabulario_Inicial.pdf" target="_self">
+                                        <button class="btn-gray" >
+                                            {{text.downloadButton}}
+                                            <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download" />
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                       </div>
@@ -268,6 +276,49 @@
                             <div class="col-xs-12 paddingUp1 paddingDown1 text-justify paddingLeft3 paddingRight3" bind-html-compile="text.faq3_11Text"></div>
                         </div>
                     </div>
+                      
+                      <!-- #H Vocabulario CACE  -->
+                    <div class="row menuBar">
+                        <div class="row headerBar buttonBar" ng-click="contentBar312=!contentBar312">
+                            <div class="col-xs-11 text-indent-up">
+                                {{text.faq3_12}}
+                            </div>
+                            <div class="col-xs-1">
+                                <img class="arrowMenuBar pull-right" src={{img.orangeArrow}}/>
+                            </div>
+                        </div>
+                        <div class="row col-xs-12 contentBar" uib-collapse="!contentBar312">
+                            <div class="col-xs-9 paddingUp1 paddingDown1 text-indent-up text-justify paddingRight3" bind-html-compile="text.faq3_12Text"></div>
+                            <div class="col-xs-3 paddingUp1 paddingDown1 paddingLeft2 paddingRight2">
+                                <div ng-if= "langabbr == 'CA'">
+                                    <a ng-href="https://jocomunico.com/files/CACE_CA_final.zip" target="_self">
+                                        <button class="btn-gray" >
+                                            {{text.downloadButton}}
+                                            <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download" />
+                                        </button>
+                                    </a>
+                                </div>
+                                <div ng-if= "langabbr == 'ES'">
+                                    <a ng-href="https://jocomunico.com/files/CACE_ES_final.zip" target="_self">
+                                        <button class="btn-gray" >
+                                            {{text.downloadButton}}
+                                            <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download" />
+                                        </button>
+                                    </a>
+                                </div>
+                                <div ng-if= "langabbr == 'EN'">
+                                    <a ng-href="https://jocomunico.com/files/CACE_ES_final.zip" target="_self">
+                                        <button class="btn-gray" >
+                                            {{text.downloadButton}}
+                                            <img src="img/srcWeb/DropdownMenuBar/downloadIconSelected.png" class="img-download" />
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                      
+                      
                     </div>
                 </div>
             </div>
