@@ -296,11 +296,11 @@ class PanelGroup extends REST_Controller {
         $idusu = $request->idusu;
         $langid = $request->langid;
         
-        $textex = "Exemple";
+        $textex = "CACE";
         $textkb = "Teclat";
         
         if ($langid == 2) {
-            $textex = "Ejemplo";
+            $textex = "CACE";
             $textkb = "Teclado";
         }
         
