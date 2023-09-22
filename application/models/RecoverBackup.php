@@ -37,15 +37,48 @@ class RecoverBackup extends CI_Model {
         return $data;
     }
     
-    private function folderName($Fname)
+    private function folderName($Fname, $idusu)
     {
+        
+        $langid = 1;
         $fullpath = "";
-  
+        
+        // we get the language of the user
+        $this->db->where('ID_User', $idusu);
+        $query = $this->db->get('User');
+        
+        if ($query->num_rows() > 0) {
+            $aux = $query->result();
+            
+            $langid = $aux[0]->cfgExpansionLanguage;
+        }
+          
         if ($this->isWin) {
-            $fullpath = "C:\\xampp\\htdocs\\Temp\\$Fname";
+            if ($Fname == "CACE") {
+                if ($langid == 1 || $langid == "1") {
+                    $fullpath = "C:\\xampp\\htdocs\\boards\\CACECA";
+                }
+                else {
+                    $fullpath = "C:\\xampp\\htdocs\\boards\\CACEES";
+                }
+            } 
+            else {
+                $fullpath = "C:\\xampp\\htdocs\\Temp\\$Fname";
+            }
         }
         else {
-            $fullpath = "./Temp/$Fname";      
+            if ($Fname == "CACE") {
+                if ($langid == 1 || $langid == "1") {
+                    $fullpath = "./boards/CACECA"; 
+                }
+                else {
+                    $fullpath = "./boards/CACEES"; 
+                }
+            } 
+            else {
+                $fullpath = "./Temp/$Fname"; 
+            }
+            
         }
         
         return $fullpath;
@@ -53,13 +86,13 @@ class RecoverBackup extends CI_Model {
 
     //llama a la recuperacion parcial de imagenes
     function LaunchParcialRecover_images($Fname, $idusu){
-      $Fname = $this->folderName($Fname);
+      $Fname = $this->folderName($Fname, $idusu);
       $this->InsertImages($Fname, $idusu);
       return ":d";
     }
     
     function LaunchParcialRecover_Pictograms($Fname, $overwrite, $idusu, $langid, $pcont){
-      $Fname = $this->folderName($Fname);
+      $Fname = $this->folderName($Fname, $idusu);
       $this->InsertPictograms($Fname, $idusu, $langid);
       $this->InsertAdjectives($Fname, $pcont, $overwrite, $idusu, $langid);
       $this->InsertNames($Fname, $pcont, $overwrite, $idusu, $langid);
@@ -68,7 +101,7 @@ class RecoverBackup extends CI_Model {
     }
       //llama a la recuperacion parcial de la carpetas tematicas
     function LaunchParcialRecover_Folder($Fname, $cfold, $sscont, $hcont, $overwrite, $idusu){
-      $Fname = $this->folderName($Fname);
+      $Fname = $this->folderName($Fname, $idusu);
             
       // Check if its Jocomunico 3.0+ or lower version
       $isHigherVersion = true;
@@ -84,7 +117,7 @@ class RecoverBackup extends CI_Model {
     }
       //llama a la recuperacion parcial de configuracion
     function LaunchParcialRecover_cfg($ow,$Fname, $idsu, $idusu){
-      $Fname = $this->folderName($Fname);
+      $Fname = $this->folderName($Fname, $idusu);
       $this->UpdateSuperUser($Fname,$ow, $idsu, $idusu);
       // $this->UpdateUser($Fname, $idsu, $idusu);
       return $Fname;
@@ -99,7 +132,7 @@ class RecoverBackup extends CI_Model {
 
       //llama a la recuperacion parcial de paneles
     function LaunchParcialRecover_panels($mainGboard,$Fname, $gbcont, $bcont, $scont, $fcont, $pcont, $overwrite, $idusu){
-      $Fname = $this->folderName($Fname);
+      $Fname = $this->folderName($Fname, $idusu);
       $this->InsertGroupBoards($Fname, $mainGboard, $idusu);
       $this->InsertBoards($Fname,$gbcont, $overwrite, $idusu);
       $this->InsertCells($Fname,$bcont,$scont,$fcont,$pcont, $overwrite, $idusu);

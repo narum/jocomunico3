@@ -112,7 +112,7 @@ class PanelInterface extends CI_Model {
     
     function alreadyKBExample($idusu, $text) {
         $output = false;
-        $this->db->where('GBname', $text);
+        $this->db->like('GBname', $text, 'after');
         $this->db->where('ID_GBUser', $idusu);
         $query = $this->db->get('GroupBoards');
 
