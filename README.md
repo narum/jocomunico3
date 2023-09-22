@@ -1,4 +1,4 @@
-Jocomunico version 3.0.
+Jocomunico version 3.2.
 
 Jocomunico by Joan Pahisa is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
 
