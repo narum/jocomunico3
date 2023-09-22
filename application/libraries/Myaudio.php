@@ -606,6 +606,7 @@ function synthesizeOnline($vocalwareLID, $vocalwareVID, $text, $filename)
         $url = "http://www.vocalware.com/tts/gen.php";
         $secret_phrase = "5a823f715692c02de9e215fef94c5dc2";
 
+        // Needs vocalware API
         $data = array(
             'EID' => '2',
             'LID' => $vocalwareLID,
