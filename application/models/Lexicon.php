@@ -1287,10 +1287,8 @@ class Lexicon extends CI_Model {
         
         $formafinal = "";
         
-        // si el verb és pronominal, a la taula de conjugacions ja ve amb el verb auxiliar i 
-        // el pronom corresponent
-        if (!$pronominal) {
-        
+        // si el temps verbal és el perfet o perifràstic, afegim el verb auxiliar 
+		// i conjuguem en participi o infinitiu el principal
             if ($tense == "perfet") {
                 $tenseaux = "present";
                 $tensemain = "participi";
@@ -1306,6 +1304,7 @@ class Lexicon extends CI_Model {
                 $idverbaux = 102; // id del verb anar quan fa d'auxiliar als perifràstics
             }
         
+			// conjuguem el verb auxiliar
             if ($idverbaux != null) {
                 $this->db->where('verbid', $idverbaux);
                 $this->db->where('tense', $tenseaux);
@@ -1317,7 +1316,7 @@ class Lexicon extends CI_Model {
                     $formafinal .= $aux[0]->verbconj." ";
                 }
             }
-        }
+
         // si és infinitiu, gerundi o participi, no té persona
         if ($tensemain == 'infinitiu' || $tensemain == 'gerundi' 
                 || $tensemain == 'participi') {
@@ -1347,6 +1346,17 @@ class Lexicon extends CI_Model {
             
             $formafinal = preg_replace($patterns, $replacements, $formafinal);
         }
+		
+		// pels verbs pronominals en perfet (temps que no está a la taula de conjugacions)
+		// afegim els pronoms personals a davant
+		else if ($pronominal && $tense == "perfet") {
+            if ($persona == 1 && $numero == 'sing') $formafinal = "m'".$formafinal;
+            else if ($persona == 2 && $numero == 'sing') $formafinal = "t'".$formafinal;
+            else if ($persona == 3) $formafinal = "s'".$formafinal;
+            else if ($persona == 1 && $numero == 'pl') $formafinal = "ens ".$formafinal;
+            else if ($persona == 2 && $numero == 'pl') $formafinal = "us ".$formafinal;
+		}
+
         
         return $formafinal;
     }
@@ -1365,10 +1375,7 @@ class Lexicon extends CI_Model {
         
         $formafinal = "";
         
-        // si el verb és pronominal, a la taula de conjugacions ja ve amb el verb auxiliar i 
-        // el pronom corresponent
-        if (!$pronominal) {
-        
+        // si el temps verbal és el perfet, afegim el verb auxiliar i conjuguem en participi el principal
             if ($tense == "perfet") {
                 $tenseaux = "present";
                 $tensemain = "participi";
@@ -1377,6 +1384,7 @@ class Lexicon extends CI_Model {
                 $idverbaux = 101; // id del verb haver
             }
         
+			// conjuguem el verb auxiliar
             if ($idverbaux != null) {
                 $this->db->where('verbid', $idverbaux);
                 $this->db->where('tense', $tenseaux);
@@ -1388,8 +1396,8 @@ class Lexicon extends CI_Model {
                     $formafinal .= $aux[0]->verbconj." ";
                 }
             }
-        }
-        // si és infinitiu, gerundi o participi, no té persona
+			
+		// si és infinitiu, gerundi o participi, no té persona
         if ($tensemain == 'infinitiu' || $tensemain == 'gerundi' 
                 || $tensemain == 'participi') {
             $personamain = 0;
@@ -1418,6 +1426,16 @@ class Lexicon extends CI_Model {
             
             $formafinal = preg_replace($patterns, $replacements, $formafinal);
         }
+		
+		// pels verbs pronominals en perfet (temps que no está a la taula de conjugacions)
+		// afegim els pronoms personals a davant
+		else if ($pronominal && $tense == "perfet") {
+            if ($persona == 1 && $numero == 'sing') $formafinal = "me ".$formafinal;
+            else if ($persona == 2 && $numero == 'sing') $formafinal = "te ".$formafinal;
+            else if ($persona == 3) $formafinal = "se ".$formafinal;
+            else if ($persona == 1 && $numero == 'pl') $formafinal = "nos ".$formafinal;
+            else if ($persona == 2 && $numero == 'pl') $formafinal = "os ".$formafinal;
+		}
         
         return $formafinal;
     }
