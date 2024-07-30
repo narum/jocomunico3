@@ -22,6 +22,26 @@ ALTER TABLE `User` CHANGE `cfgVoiceOfflineRate` `cfgVoiceOfflineRate` INT(11) NO
 
 -- JOCOMUNICO 3.2
 
+INSERT INTO `Content` (`idString`, `tagString`, `ID_CLanguage`, `content`, `section`) VALUES 
+(2069, 'ffe889', 1, 'Groc clar', 'color'), 
+(2069, 'ffe889', 2, 'Amarillo claro', 'color'), 
+(2070, 'fcb38b', 1, 'Taronja clar', 'color'), 
+(2070, 'fcb38b', 2, 'Naranja claro', 'color'), 
+(2071, '86c779', 1, 'Verd clar', 'color'), 
+(2071, '86c779', 2, 'Verde claro', 'color'), 
+(2072, 'fc9fb0', 1, 'Rosa clar', 'color'), 
+(2072, 'fc9fb0', 2, 'Rosa claro', 'color'), 
+(2073, 'a7c7cf', 1, 'Blau clar', 'color'), 
+(2073, 'a7c7cf', 2, 'Azul claro', 'color'), 
+(2074, 'd1d1d1', 1, 'Gris clar', 'color'), 
+(2074, 'd1d1d1', 2, 'Gris claro', 'color'), 
+(2075, 'cfc5b0', 1, 'Beix clar', 'color'), 
+(2075, 'cfc5b0', 2, 'Beis claro', 'color'), 
+(2076, 'bd9adb', 1, 'Morat clar', 'color'), 
+(2076, 'bd9adb', 2, 'Morado claro', 'color'), 
+(2077, 'db7676', 1, 'Vermell clar', 'color'), 
+(2077, 'db7676', 2, 'Rojo claro', 'color');
+
 UPDATE `Content` SET `content` = 'Afegir grups vocabulari CACE' WHERE `Content`.`idString` = 11012 AND `Content`.`tagString` = 'addgroups' AND `Content`.`ID_CLanguage` = 1;
 
 UPDATE `Content` SET `content` = 'Añadir grupos vocabulario CACE' WHERE `Content`.`idString` = 11012 AND `Content`.`tagString` = 'addgroups' AND `Content`.`ID_CLanguage` = 2;
