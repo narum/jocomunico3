@@ -41,7 +41,7 @@ class ImgUploader_model extends CI_Model {
 
         $this->db->limit(6); // limit up to 6
 
-        $this->db->where_in('Pictograms.ID_PUser', array('1', $idusu));
+        $this->db->where_in('Pictograms.ID_PUser', array('1'));
         $this->db->where('PictogramsLanguage.languageid', $languageInt);
         //$this->db->or_where_in('Pictograms.ID_PUser', array('1',$user)); //Get all default and own user pictos
         $this->db->select('PictogramsLanguage.pictotext as imgName, imgPicto as imgPath, Pictograms.ID_PUser'); // rename the field like we want
